@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->tableView->setModel(pipeTableModel);
+    ui->tableView->setModel(&pipeTableModel);
     server  = new QTcpServer();
     server->listen(QHostAddress("127.0.0.1"),8080);
     connect(server,SIGNAL(newConnection()),SLOT(onConnections()));

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
-
+#include "pipedata.h"
 class QPipe : public QObject
 {
     Q_OBJECT
@@ -12,6 +12,8 @@ private:
         QString* reqRawString;
         QTcpSocket* requestSocket;
         QByteArray* reqByteArray;
+        PipeData* pipeData;
+
 public:
         explicit QPipe(QTcpSocket *socket = 0);
         ~QPipe();
@@ -28,7 +30,7 @@ public slots:
         void onRequestSocketError();
 
 private:
-        QMap<QString,QString>* parseHeader(const QString headerString);
+        void parseHeader(const QString headerString);
 };
 
 #endif // QPIPE_H

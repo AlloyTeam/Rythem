@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
 private:
         QTcpServer *server;
         QVector<QPipe*> *pipes;
-        QiddlerPipeTableModel *pipeTableModel;
+        QiddlerPipeTableModel pipeTableModel;
 public:
     explicit MainWindow(QWidget *parent = 0);
 
