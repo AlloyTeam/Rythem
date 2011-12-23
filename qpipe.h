@@ -11,8 +11,12 @@ class QPipe : public QObject
 private:
         QString* reqRawString;
         QTcpSocket* requestSocket;
-        QByteArray* reqByteArray;
+        QByteArray reqByteArray;
+        QString reqSig;// change GET http://xxx.xx.xx/a/path/to/some.index HTTP/1.1 to GET /a/path/to/some.index HTTP/1.1
+        QString reqHeaderString;
         PipeData* pipeData;
+        QTcpSocket* responseSocket;
+        bool headerFound;
 
 public:
         explicit QPipe(QTcpSocket *socket = 0);
@@ -28,6 +32,11 @@ public slots:
         void onReqSocketReadFinished();
         void onRequestHostFound();
         void onRequestSocketError();
+        void onRequestSocketClose();
+        void onResponseConnected();
+        void onResponseReceived();
+        void onResponseError(QAbstractSocket::SocketError);
+        void onResponseClose();
 
 private:
         void parseHeader(const QString headerString);

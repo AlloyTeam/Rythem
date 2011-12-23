@@ -5,6 +5,8 @@
 #include <QMap>
 
 class PipeData : public QObject{
+private:
+    QMap<QString,QString> allHeaders;
 public:
     PipeData();
     QString host;
@@ -15,7 +17,6 @@ public:
     QString resStatus;
     QString resHeader;
     QString resBody;
-    QMap<QString,QString> allHeaders;
     void setHeader(QString name,QString value);
     const QString getHeader(QString name)const;
 };
