@@ -1,22 +1,38 @@
 #include "qpipe.h"
 #include <QStringList>
 #include <QRegExp>
+#include <QNetworkProxyFactory>
+#include <QSslSocket>
+#include <QThread>
+#include <QApplication>
+
 const static QRegExp headerSplitter("\r?\n\r?\n");
 const static QRegExp newLine("\r?\n");
 QPipe::QPipe(QTcpSocket *socket) :
-    QObject(socket),
+    QThread(socket),
     requestSocket(socket),
-    headerFound(false){
+    headerFound(false),
+    responseSocket(NULL){
+
+
 
     reqRawString = new QString();
-    pipeData = new PipeData();
+    pipeData = new PipeData(socket->socketDescriptor());
+    qDebug()<<"Pipe Ctor:"<<QThread::currentThreadId();
 
-    connect(socket,SIGNAL(readyRead()),SLOT(onReqSocketReadReady()));
-    connect(socket,SIGNAL(readChannelFinished()),SLOT(onReqSocketReadFinished()));
-    //connect(socket,SIGNAL(hostFound()),SLOT(onRequestHostFound()));??
-    connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onRequestSocketError()));
-    connect(socket,SIGNAL(aboutToClose()),SLOT(onRequestSocketClose()));
 }
+void QPipe::run(){
+    qDebug()<<"Pipe run:"<<QThread::currentThreadId();
+    if(QApplication::instance()->thread() == QThread::currentThread()){
+        qDebug()<<"in main thread";
+    }
+    connect(requestSocket,SIGNAL(readyRead()),SLOT(onReqSocketReadReady()));
+    connect(requestSocket,SIGNAL(readChannelFinished()),SLOT(onReqSocketReadFinished()));
+    //connect(socket,SIGNAL(hostFound()),SLOT(onRequestHostFound()));??
+    connect(requestSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onRequestSocketError()));
+    connect(requestSocket,SIGNAL(aboutToClose()),SLOT(onRequestSocketClose()));
+}
+
 void QPipe::onReqSocketReadReady(){
     QObject *id = sender();
     if(id==0)return;
@@ -34,6 +50,7 @@ void QPipe::onReqSocketReadReady(){
         qDebug()<<"readReady headerFound:\n"<<QString(reqByteArray);
         return;
     }
+    //Proxy-Connection: keep-alive
     reqByteArray.append(QByteArray(socket->readAll()));
     //reqByteArray = reqByteArray.replace("\r\n","\n");
     reqHeaderString = reqByteArray.mid(reqByteArray.indexOf("\r\n"));
@@ -41,10 +58,12 @@ void QPipe::onReqSocketReadReady(){
     //reqByteArray = QByteArray(socket->readAll());
     //qDebug()<<QString(reqByteArray);
     parseHeader(QString(reqByteArray));
-    reqByteArray.clear();
-    reqByteArray.append(reqSig);
-    reqByteArray.append(reqHeaderString);
-    qDebug()<<"host="<<pipeData->getHeader("Host")<<pipeData->getHeader("Port");
+    if(!isHttpsConnect){
+        reqByteArray.clear();
+        reqByteArray.append(reqSig);
+        reqByteArray.append(reqHeaderString);
+    }
+    qDebug()<<"host="<<pipeData->getHeader("Host")<<pipeData->getHeader("Port")<<reqSig;
     if(pipeData->getHeader("Host") == "127.0.0.1" && pipeData->getHeader("Port")=="8080"){//避免死循环
         QByteArray byteToWrite;
         QString s = "hello Qiddler";
@@ -56,12 +75,37 @@ void QPipe::onReqSocketReadReady(){
         requestSocket->close();
         return;
     }else{
-        responseSocket = new QTcpSocket();
-        connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
-        connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReceived()));
-        connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
-        connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
-        responseSocket->connectToHost(pipeData->getHeader("Host"),pipeData->getHeader("Port").toInt());
+        if(!isHttpsConnect){
+            responseSocket = new QTcpSocket();
+            connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+            connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReceived()));
+            connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
+            connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
+            responseSocket->connectToHost(pipeData->getHeader("Host"),pipeData->getHeader("Port").toInt());
+        }else{
+            QByteArray byteToWrite;
+            QString s = "HTTP/1.1 200 Connection established\r\nConnection: keep-alive\r\n\r\n";
+            byteToWrite.append(s);
+            requestSocket->write(byteToWrite);
+            requestSocket->flush();
+            //requestSocket->close();
+            //return;
+            //responseSocketSSL = new QSslSocket();
+            //connect(responseSocketSSL,SIGNAL(connected()),SLOT(onResponseConnected()));
+            //connect(responseSocketSSL,SIGNAL(readyRead()),SLOT(onResponseReceived()));
+            //connect(responseSocketSSL,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
+            //connect(responseSocketSSL,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
+            //responseSocketSSL->connectToHostEncrypted(pipeData->getHeader("Host"),443);
+        }
+        //connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+        //connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReceived()));
+        //connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
+        //connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
+        //if(!isHttpsConnect){
+        //    responseSocket->connectToHost(pipeData->getHeader("Host"),pipeData->getHeader("Port").toInt());
+        //}else{
+        //    responseSocket->connectToHost(pipeData->getHeader("Host"),443);
+        //}
     }
 }
 void QPipe::onReqSocketReadFinished(){
@@ -105,7 +149,7 @@ Accept-Charset: gb18030,utf-8;q=0.7,*;q=0.3
     int headerPosition = headerString.indexOf(headerSplitter);
     if(headerPosition==-1)return;
     headerFound = true;
-    qDebug()<<"headerPosition:"<<headerPosition<<" totalLength="<<(headerString.length())<<headerString;
+    //qDebug()<<"headerPosition:"<<headerPosition<<" totalLength="<<(headerString.length())<<headerString;
     QStringList ll = headerString.split(headerSplitter);
     QString header = ll[0];
     QStringList headers = header.split(newLine);
@@ -145,6 +189,10 @@ Accept-Charset: gb18030,utf-8;q=0.7,*;q=0.3
                 QString method = lst[0];
                 reqSig = method+" "+p+" "+lst[2];
                 qDebug()<<"sig="<<reqSig;
+                if(method == "CONNECT"){
+                    qDebug()<<"is HTTPS";
+                    isHttpsConnect = true;
+                }
             }
         }
     }
@@ -165,29 +213,50 @@ void QPipe::onResponseConnected(){
     //responseSocket->write(reqSig.toUtf8().append("\n"));
     //responseSocket->write(reqHeaderString.toUtf8());
     qDebug()<<"connected:"<<reqByteArray;
-    responseSocket->write(reqByteArray);
-    responseSocket->flush();
+    if(isHttpsConnect){
+        responseSocketSSL->write(reqByteArray);
+        responseSocketSSL->flush();
+    }else{
+        responseSocket->write(reqByteArray);
+        responseSocket->flush();
+    }
     reqByteArray.clear();
 }
 
 void QPipe::onResponseReceived(){
-    QByteArray response = QByteArray(responseSocket->readAll());
+    QByteArray response;
+    if(isHttpsConnect){
+        response = QByteArray(responseSocketSSL->readAll());
+    }else{
+        response = QByteArray(responseSocket->readAll());
+    }
     qDebug()<<"receive response:\n"<<response;
     requestSocket->write(response);
     requestSocket->flush();
 }
 void QPipe::onResponseError(QAbstractSocket::SocketError error){
-
+    qDebug()<<"responseError:"<<error;
+    tearDown();
 }
 void QPipe::onRequestSocketClose(){
-    if(responseSocket && responseSocket->isOpen()){
-        responseSocket->close();
-    }
+    tearDown();
 }
 void QPipe::onResponseClose(){
+    tearDown();
+}
+void QPipe::tearDown(){
+    mutex.lock();
     if(requestSocket->isOpen()){
+        disconnect(requestSocket,SIGNAL(aboutToClose()),this,SLOT(onRequestSocketClose()));
         requestSocket->close();
+        requestSocket = NULL;
     }
+    if(responseSocket && responseSocket->isOpen()){
+        disconnect(responseSocket,SIGNAL(aboutToClose()),this,SLOT(onResponseClose()));
+        responseSocket->close();
+        responseSocket = NULL;
+    }
+    mutex.unlock();
 }
 
 QPipe::~QPipe(){

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network script
 
 
 TARGET = Qiddler
@@ -15,12 +15,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
         qpipe.cpp \
     qiddlerpipetablemodel.cpp \
-    pipedata.cpp
+    pipedata.cpp \
+    qnetworkproxyfactoryexendforpac.cpp \
+    qproxyserver.cpp
 
 HEADERS  += mainwindow.h \
         qpipe.h \
     qiddlerpipetablemodel.h \
-    pipedata.h
+    pipedata.h \
+    qnetworkproxyfactoryexendforpac.h \
+    qproxyserver.h
 
 FORMS    += mainwindow.ui
 

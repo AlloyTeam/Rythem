@@ -4,10 +4,13 @@
 #include <QObject>
 #include <QTcpSocket>
 #include "pipedata.h"
-class QPipe : public QObject
+#include <QMutex>
+#include <QSslSocket>
+#include <QThread>
+#include <QTcpSocket>
+class QPipe : public QThread
 {
     Q_OBJECT
-
 private:
         QString* reqRawString;
         QTcpSocket* requestSocket;
@@ -16,16 +19,22 @@ private:
         QString reqHeaderString;
         PipeData* pipeData;
         QTcpSocket* responseSocket;
+        QSslSocket* responseSocketSSL;
         bool headerFound;
+
+        bool isHttpsConnect;
+
+        QMutex mutex;
 
 public:
         explicit QPipe(QTcpSocket *socket = 0);
         ~QPipe();
+        void tearDown();
 
 signals:
-        void completed();
-        void error();
-        void connected();
+        void completed(PipeData);
+        void error(PipeData);
+        void connected(PipeData);
 
 public slots:
         void onReqSocketReadReady();
@@ -37,6 +46,9 @@ public slots:
         void onResponseReceived();
         void onResponseError(QAbstractSocket::SocketError);
         void onResponseClose();
+
+protected:
+        void run();
 
 private:
         void parseHeader(const QString headerString);

@@ -2,7 +2,9 @@
 #include "ui_mainwindow.h"
 
 #include <QTcpServer>
-#include "qpipe.h"
+#include "pipedata.h"
+#include "qproxyserver.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     pipes(new QVector<QPipe*>),
@@ -11,42 +13,34 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tableView->setModel(&pipeTableModel);
-    server  = new QTcpServer();
-    server->listen(QHostAddress("127.0.0.1"),8080);
-    connect(server,SIGNAL(newConnection()),SLOT(onConnections()));
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setColumnWidth(0,30);
+    //ui->tableView->setItemDelegate();
+    createMenus();
 
+    server  = new QProxyServer();
+    server->listen(QHostAddress("127.0.0.1"),8080);
+    connect(server,SIGNAL(newPipe(int)),SLOT(onNewPipe(int)));
+    connect(server,SIGNAL(pipeUpdate(int,PipeData)),SLOT(onPipeUpdate(int,PipeData)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-void MainWindow::onConnections(){
-    QTcpSocket* socket = server->nextPendingConnection();
-    //qDebug()<<"got new connection \n";
-
-
-    QPipe *pipe = new QPipe(socket);
-    pipes->append(pipe);
-
-    connect(pipe,SIGNAL(connected()),SLOT(onPipeConnected()));
-    connect(pipe,SIGNAL(completed()),SLOT(onPipeCompleted()));
-    connect(pipe,SIGNAL(error()),SLOT(onPipeError()));
+void MainWindow::createMenus(){
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    captureAct = new QAction(tr("&Capture"),this);
+    fileMenu->addAction(captureAct);
+    connect(captureAct,SIGNAL(triggered()),SLOT(toggleCapture()));
 }
 
-void MainWindow::onPipeConnected(){
+
+
+void MainWindow::onPipeUpdate(int socketId,const PipeData pipeData){
     //qDebug()<<"connected";
-    QPipe* pipe = (QPipe*)sender();
-    if(pipe == 0){
-        return;
-    }
 }
 
-void MainWindow::onPipeError(){
-
-}
-
-void MainWindow::onPipeCompleted(){
-
+void MainWindow::onNewPipe(int socketId){
+    //pipeTableModel
 }

@@ -1,7 +1,10 @@
 #include "pipedata.h"
 
-PipeData::PipeData(){
+PipeData::PipeData(int socketDescriptor):id(socketDescriptor){
 }
+
+
+
 void PipeData::setHeader(QString name,QString value){
     if(name == "Host"){
         int d = value.indexOf(":");
@@ -18,5 +21,8 @@ void PipeData::setHeader(QString name,QString value){
 }
 const QString PipeData::getHeader(QString name)const{
     return allHeaders[name];
+}
+const QString PipeData::getBodyDecoded(){
+    return "--";
 }
 

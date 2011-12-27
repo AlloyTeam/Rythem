@@ -7,28 +7,36 @@
 namespace Ui {
     class MainWindow;
 }
-class QTcpServer;
+class QProxyServer;
 class QPipe;
+class PipeData;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 private:
-        QTcpServer *server;
+        QProxyServer *server;
         QVector<QPipe*> *pipes;
         QiddlerPipeTableModel pipeTableModel;
+private slots:
+        void toggleCapture(){}
 public:
     explicit MainWindow(QWidget *parent = 0);
 
     ~MainWindow();
 public slots:
-        void onConnections();
-        void onPipeConnected();
-        void onPipeError();
-        void onPipeCompleted();
+        void onNewPipe(int socketId);
+        void onPipeUpdate(int socketId,const PipeData);
 
 private:
     Ui::MainWindow *ui;
+    void createMenus();
+    void removePipe(QPipe*);
+
+
+    QMenu *fileMenu;
+    QMenu *toolMenu;
+    QAction *captureAct;
 };
 
 #endif // MAINWINDOW_H
