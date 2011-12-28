@@ -1,9 +1,10 @@
 #QiProxyServer# 监听代理端口.
 每个连接用一个#QiPipe# 处理.
 每个连接的数据（请求与响应）都用一个 #QiPipeData# 保存，以QSharedPointer进行管理。
-QiPipeData只能在QPipe里产生并修改。
-QiPipe:
-    #QiReplaceRuleManager# :when QiPipe got request header query QiReplaceRuleManager for QiResponse
+#QiPipeData#
+    只能在QPipe里产生并修改。
+
+#QiReplaceRuleManager#
 
 QiResponse:
     QiResponseLocal: return local replace files;
