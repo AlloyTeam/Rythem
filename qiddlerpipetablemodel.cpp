@@ -41,7 +41,7 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
             case 5:
                 return p->URL;
             default:
-                return "Unknow";
+                return QString("Unknow %1").arg(index.column());
         }
 
     }else{
@@ -73,11 +73,11 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
 
 
 void QiddlerPipeTableModel::addItem(QSharedPointer<PipeData> p){
-    qDebug()<<"addItem...."<<p->getHeader("Host");
+    qDebug()<<"addItem...."<<p->getHeader("Host")<<pipesVector.count();
     QSharedPointer<PipeData> p1 = p;
     p1->number=++pipeNumber;
 
-    this->beginInsertRows(QModelIndex(),0,7);
+    this->beginInsertRows(index(pipeNumber-1, 0),pipeNumber-1,pipeNumber-1);
 
     //TODO thread safe?
     pipesMap.value(p1->socketId,p1);
