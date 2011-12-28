@@ -1,6 +1,6 @@
 #include "pipedata.h"
 
-PipeData::PipeData(int socketDescriptor):id(socketDescriptor){
+PipeData::PipeData(int socketDescriptor):socketId(socketDescriptor){
 }
 
 

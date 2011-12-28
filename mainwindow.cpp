@@ -20,8 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     server  = new QProxyServer();
     server->listen(QHostAddress("127.0.0.1"),8080);
-    connect(server,SIGNAL(newPipe(int)),SLOT(onNewPipe(int)));
-    connect(server,SIGNAL(pipeUpdate(int,PipeData)),SLOT(onPipeUpdate(int,PipeData)));
+    connect(server,SIGNAL(newPipe(QSharedPointer<PipeData>)),SLOT(onNewPipe(QSharedPointer<PipeData>)));
+    connect(server,SIGNAL(pipeUpdate(QSharedPointer<PipeData>)),SLOT(onPipeUpdate(QSharedPointer<PipeData>)));
 }
 
 MainWindow::~MainWindow()
@@ -37,10 +37,11 @@ void MainWindow::createMenus(){
 
 
 
-void MainWindow::onPipeUpdate(int socketId,const PipeData pipeData){
+void MainWindow::onPipeUpdate(QSharedPointer<PipeData> pipeData){
     //qDebug()<<"connected";
 }
 
-void MainWindow::onNewPipe(int socketId){
+void MainWindow::onNewPipe(QSharedPointer<PipeData> p){
     //pipeTableModel
+    pipeTableModel.addItem(p);
 }

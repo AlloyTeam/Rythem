@@ -25,13 +25,12 @@ public:
 
     ~MainWindow();
 public slots:
-        void onNewPipe(int socketId);
-        void onPipeUpdate(int socketId,const PipeData);
+        void onNewPipe(QSharedPointer<PipeData>);
+        void onPipeUpdate(QSharedPointer<PipeData>);
 
 private:
     Ui::MainWindow *ui;
     void createMenus();
-    void removePipe(QPipe*);
 
 
     QMenu *fileMenu;

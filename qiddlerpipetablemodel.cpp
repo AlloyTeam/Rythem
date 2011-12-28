@@ -5,23 +5,29 @@
 #include <QDebug>
 
 QiddlerPipeTableModel::QiddlerPipeTableModel(QObject *parent) :
-    QAbstractTableModel(parent){
+    QAbstractTableModel(parent),pipeNumber(0){
 }
 int QiddlerPipeTableModel::rowCount( const QModelIndex & parent ) const{
-    return 3;//pipesVector.count();
+    return pipesVector.count();
 }
 int QiddlerPipeTableModel::columnCount(const QModelIndex &parent) const{
     return 8;
 }
 QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
     if(role == Qt::DisplayRole || role == Qt::ToolTipRole){
-        int column = index.column();
-        if(pipesVector.count()>column){
-            PipeData *p = pipesVector[column];
+        int row = index.row();
+        QSharedPointer<PipeData> p;
+        if(pipesVector.count()>row){
+            p = pipesVector[row];
+        }else{
+            return tr("unknown..%1").arg(row);
         }
-        return tr("AAAAAAAA");
-        /*
-        switch(index.row()){
+        if(!p){
+            return tr("unknown..2");
+        }
+        //return tr("AAAAAAAA");
+
+        switch(index.column()){
             case 0:
                 return QString("%1").arg(p->number);
             case 1:
@@ -37,7 +43,7 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
             default:
                 return "Unknow";
         }
-        */
+
     }else{
         return QVariant();
     }
@@ -63,4 +69,23 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
         return Qt::ItemIsEnabled;
     }
     return QAbstractTableModel::flags(index);
+}
+
+
+void QiddlerPipeTableModel::addItem(QSharedPointer<PipeData> p){
+    qDebug()<<"addItem...."<<p->getHeader("Host");
+    QSharedPointer<PipeData> p1 = p;
+    p1->number=++pipeNumber;
+
+    this->beginInsertRows(QModelIndex(),0,7);
+
+    //TODO thread safe?
+    pipesMap.value(p1->socketId,p1);
+    pipesVector.append(p1);
+
+    //QModelIndex index1 = index(pipeNumber-1, 0);
+    //QModelIndex index2 = index(pipeNumber-1, 7);
+
+    this->endInsertRows();
+    //emit(dataChanged(index1,index2));
 }

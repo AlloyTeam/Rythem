@@ -6,6 +6,7 @@
 #include <QVector>
 class QPipe;
 class PipeData;
+#include <QSharedPointer>
 
 class QProxyServer : public QTcpServer{
         Q_OBJECT
@@ -13,16 +14,19 @@ class QProxyServer : public QTcpServer{
         explicit QProxyServer(QObject *parent = 0);
         
     signals:
-        void newPipe(int socketId);
-        void pipeUpdate(int socketId,const PipeData pipeData);
+        void newPipe(QSharedPointer<PipeData>);
+        void pipeUpdate(QSharedPointer<PipeData>);
     public slots:
-        void onPipeConnected();
-        void onPipeComplete();
-        void onPipeError();
+        void onPipeConnected(QSharedPointer<PipeData>);
+        void onPipeComplete(QSharedPointer<PipeData>);
+        void onPipeError(QSharedPointer<PipeData>);
     protected:
         void incomingConnection(int handle);
 
-        QVector<QPipe*> pipes;
+        QMap<int,QPipe*> pipes;
+    private:
+        QPipe* addPipe(QTcpSocket* socket);
+        bool removePipe(int socketId);
         
 };
 

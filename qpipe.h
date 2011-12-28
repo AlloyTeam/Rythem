@@ -8,6 +8,8 @@
 #include <QSslSocket>
 #include <QThread>
 #include <QTcpSocket>
+#include <QSharedPointer>
+
 class QPipe : public QThread
 {
     Q_OBJECT
@@ -17,12 +19,13 @@ private:
         QByteArray reqByteArray;
         QString reqSig;// change GET http://xxx.xx.xx/a/path/to/some.index HTTP/1.1 to GET /a/path/to/some.index HTTP/1.1
         QString reqHeaderString;
-        PipeData* pipeData;
+        QSharedPointer<PipeData> pipeData;
         QTcpSocket* responseSocket;
         QSslSocket* responseSocketSSL;
         bool headerFound;
 
         bool isHttpsConnect;
+        bool isError;
 
         QMutex mutex;
 
@@ -32,9 +35,9 @@ public:
         void tearDown();
 
 signals:
-        void completed(PipeData);
-        void error(PipeData);
-        void connected(PipeData);
+        void completed(QSharedPointer<PipeData>);
+        void error(QSharedPointer<PipeData>);
+        void connected(QSharedPointer<PipeData>);
 
 public slots:
         void onReqSocketReadReady();

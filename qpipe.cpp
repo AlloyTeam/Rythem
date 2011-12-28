@@ -6,18 +6,21 @@
 #include <QThread>
 #include <QApplication>
 
+
 const static QRegExp headerSplitter("\r?\n\r?\n");
 const static QRegExp newLine("\r?\n");
 QPipe::QPipe(QTcpSocket *socket) :
     QThread(socket),
     requestSocket(socket),
     headerFound(false),
-    responseSocket(NULL){
+    responseSocket(NULL),
+    isError(false){
 
 
 
     reqRawString = new QString();
-    pipeData = new PipeData(socket->socketDescriptor());
+    qDebug()<<"socket?"<<(socket?"has socket":"oh no..");
+    pipeData = QSharedPointer<PipeData>(new PipeData(socket->socketDescriptor()));
     qDebug()<<"Pipe Ctor:"<<QThread::currentThreadId();
 
 }
@@ -58,6 +61,10 @@ void QPipe::onReqSocketReadReady(){
     //reqByteArray = QByteArray(socket->readAll());
     //qDebug()<<QString(reqByteArray);
     parseHeader(QString(reqByteArray));
+    //TODO..
+    pipeData->host = pipeData->getHeader("Host");
+    pipeData->port = pipeData->getHeader("Port").toInt();
+
     if(!isHttpsConnect){
         reqByteArray.clear();
         reqByteArray.append(reqSig);
@@ -65,6 +72,7 @@ void QPipe::onReqSocketReadReady(){
     }
     qDebug()<<"host="<<pipeData->getHeader("Host")<<pipeData->getHeader("Port")<<reqSig;
     if(pipeData->getHeader("Host") == "127.0.0.1" && pipeData->getHeader("Port")=="8080"){//避免死循环
+        emit(connected(pipeData));
         QByteArray byteToWrite;
         QString s = "hello Qiddler";
         int count = s.length();
@@ -73,6 +81,7 @@ void QPipe::onReqSocketReadReady(){
         requestSocket->write(byteToWrite);
         requestSocket->flush();
         requestSocket->close();
+        tearDown();
         return;
     }else{
         if(!isHttpsConnect){
@@ -125,7 +134,7 @@ void QPipe::onRequestHostFound(){//??
 
 }
 void QPipe::onRequestSocketError(){
-    emit(error());
+    emit(error(pipeData));
 }
 
 void QPipe::parseHeader(const QString headerString){
@@ -193,6 +202,7 @@ Accept-Charset: gb18030,utf-8;q=0.7,*;q=0.3
                     qDebug()<<"is HTTPS";
                     isHttpsConnect = true;
                 }
+                pipeData->URL = p;
             }
         }
     }
@@ -221,6 +231,7 @@ void QPipe::onResponseConnected(){
         responseSocket->flush();
     }
     reqByteArray.clear();
+    emit(connected(pipeData));
 }
 
 void QPipe::onResponseReceived(){
@@ -246,7 +257,7 @@ void QPipe::onResponseClose(){
 }
 void QPipe::tearDown(){
     mutex.lock();
-    if(requestSocket->isOpen()){
+    if(requestSocket && requestSocket->isOpen()){
         disconnect(requestSocket,SIGNAL(aboutToClose()),this,SLOT(onRequestSocketClose()));
         requestSocket->close();
         requestSocket = NULL;
@@ -257,6 +268,11 @@ void QPipe::tearDown(){
         responseSocket = NULL;
     }
     mutex.unlock();
+    if(isError){
+        emit(error(pipeData));
+    }else{
+        emit(completed(pipeData));
+    }
 }
 
 QPipe::~QPipe(){

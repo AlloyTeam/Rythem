@@ -3,12 +3,13 @@
 
 #include <QObject>
 #include <QMap>
+#include <QDebug>
 
 class PipeData {
 private:
     QMap<QString,QString> allHeaders;
 public:
-    PipeData(int socketDescriptor);
+    PipeData(int socketDescriptor=-1);
     inline PipeData(PipeData& p){//copy ctor
         number = p.number;
         returnCode = p.returnCode;
@@ -28,6 +29,7 @@ public:
         qDebug()<<"PipeData(const PipeData&) called";
     }
 
+    int socketId;
     int number;
     int returnCode;
     QString protocol;
