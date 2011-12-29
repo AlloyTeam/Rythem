@@ -32,6 +32,7 @@ FORMS    += mainwindow.ui
 
 
 
+win32:LIBS += G:\qtsdk\mingw\lib\libwininet.a
 
 
 

@@ -11,6 +11,9 @@ namespace Ui {
 class QiProxyServer;
 class QiPipe;
 class PipeData;
+
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -20,7 +23,7 @@ private:
         QVector<QiPipe*> *pipes;
         QiddlerPipeTableModel pipeTableModel;
 private slots:
-        void toggleCapture(){}
+        void toggleCapture();
 public:
     explicit MainWindow(QWidget *parent = 0);
 
@@ -29,11 +32,19 @@ public slots:
         void onNewPipe(Pipedata_const_ptr);
         void onPipeUpdate(Pipedata_const_ptr);
 
+
+public:
+        typedef struct __proxyInfo{
+            int enable;
+            QString proxyString;
+            QString pacUrl;
+        }ProxyInfo;
 private:
     Ui::MainWindow *ui;
     void createMenus();
 
-
+    bool isUsingCapture;
+    ProxyInfo previousProxyInfo;
     QMenu *fileMenu;
     QMenu *toolMenu;
     QAction *captureAct;
