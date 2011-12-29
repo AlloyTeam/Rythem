@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include <QDebug>
+#include <QSharedPointer>
 
 class PipeData {
 private:
@@ -47,5 +48,8 @@ public:
     const QString getHeader(QString name)const;
     const QString getBodyDecoded();
 };
-
+typedef QSharedPointer<const PipeData> Pipedata_const_ptr;
+typedef QSharedPointer<PipeData> PipeData_ptr;
+typedef const QSharedPointer<PipeData> PipeData_ptr_const;
+typedef const QSharedPointer<const PipeData> PipeData_const_ptr_const;
 #endif // PIPEDATA_H

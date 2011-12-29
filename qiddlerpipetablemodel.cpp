@@ -16,9 +16,9 @@ int QiddlerPipeTableModel::columnCount(const QModelIndex &parent) const{
 QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
     if(role == Qt::DisplayRole || role == Qt::ToolTipRole){
         int row = index.row();
-        QSharedPointer<PipeData> p;
+        Pipedata_const_ptr p;
         if(pipesVector.count()>row){
-            p = pipesVector[row];
+            p = pipesVector.at(row);
         }else{
             return tr("unknown..%1").arg(row);
         }
@@ -72,10 +72,10 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
 }
 
 
-void QiddlerPipeTableModel::addItem(QSharedPointer<PipeData> p){
+void QiddlerPipeTableModel::addItem(Pipedata_const_ptr p){
     qDebug()<<"addItem...."<<p->getHeader("Host")<<pipesVector.count();
-    QSharedPointer<PipeData> p1 = p;
-    p1->number=++pipeNumber;
+    Pipedata_const_ptr p1 = p;
+    //p1->number=++pipeNumber;
 
     this->beginInsertRows(index(pipeNumber-1, 0),pipeNumber-1,pipeNumber-1);
 
@@ -88,4 +88,11 @@ void QiddlerPipeTableModel::addItem(QSharedPointer<PipeData> p){
 
     this->endInsertRows();
     //emit(dataChanged(index1,index2));
+}
+
+void QiddlerPipeTableModel::removeAllItem(){
+
+}
+void QiddlerPipeTableModel::removeItems(){
+
 }

@@ -13,18 +13,20 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-        qpipe.cpp \
     qiddlerpipetablemodel.cpp \
     pipedata.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
-    qproxyserver.cpp
+    qiproxyserver.cpp \
+    qipipe.cpp \
+    qiresponse.cpp
 
 HEADERS  += mainwindow.h \
-        qpipe.h \
     qiddlerpipetablemodel.h \
     pipedata.h \
     qnetworkproxyfactoryexendforpac.h \
-    qproxyserver.h
+    qiproxyserver.h \
+    qipipe.h \
+    qiresponse.h
 
 FORMS    += mainwindow.ui
 

@@ -10,7 +10,7 @@
 #include <QTcpSocket>
 #include <QSharedPointer>
 
-class QPipe : public QThread
+class QiPipe : public QThread
 {
     Q_OBJECT
 private:
@@ -30,14 +30,14 @@ private:
         QMutex mutex;
 
 public:
-        explicit QPipe(QTcpSocket *socket = 0);
-        ~QPipe();
+        explicit QiPipe(QTcpSocket *socket = 0);
+        ~QiPipe();
         void tearDown();
 
 signals:
-        void completed(QSharedPointer<PipeData>);
-        void error(QSharedPointer<PipeData>);
-        void connected(QSharedPointer<PipeData>);
+        void completed(Pipedata_const_ptr);
+        void error(Pipedata_const_ptr);
+        void connected(Pipedata_const_ptr);
 
 public slots:
         void onReqSocketReadReady();

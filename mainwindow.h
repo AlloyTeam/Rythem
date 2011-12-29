@@ -3,20 +3,21 @@
 
 #include <QMainWindow>
 #include "qiddlerpipetablemodel.h"
+#include "pipedata.h"
 
 namespace Ui {
     class MainWindow;
 }
-class QProxyServer;
-class QPipe;
+class QiProxyServer;
+class QiPipe;
 class PipeData;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 private:
-        QProxyServer *server;
-        QVector<QPipe*> *pipes;
+        QiProxyServer *server;
+        QVector<QiPipe*> *pipes;
         QiddlerPipeTableModel pipeTableModel;
 private slots:
         void toggleCapture(){}
@@ -25,8 +26,8 @@ public:
 
     ~MainWindow();
 public slots:
-        void onNewPipe(QSharedPointer<PipeData>);
-        void onPipeUpdate(QSharedPointer<PipeData>);
+        void onNewPipe(Pipedata_const_ptr);
+        void onPipeUpdate(Pipedata_const_ptr);
 
 private:
     Ui::MainWindow *ui;

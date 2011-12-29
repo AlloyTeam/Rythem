@@ -1,4 +1,4 @@
-#include "qpipe.h"
+#include "qipipe.h"
 #include <QStringList>
 #include <QRegExp>
 #include <QNetworkProxyFactory>
@@ -9,7 +9,7 @@
 
 const static QRegExp headerSplitter("\r?\n\r?\n");
 const static QRegExp newLine("\r?\n");
-QPipe::QPipe(QTcpSocket *socket) :
+QiPipe::QiPipe(QTcpSocket *socket) :
     QThread(socket),
     requestSocket(socket),
     headerFound(false),
@@ -24,7 +24,7 @@ QPipe::QPipe(QTcpSocket *socket) :
     qDebug()<<"Pipe Ctor:"<<QThread::currentThreadId();
 
 }
-void QPipe::run(){
+void QiPipe::run(){
     qDebug()<<"Pipe run:"<<QThread::currentThreadId();
     if(QApplication::instance()->thread() == QThread::currentThread()){
         qDebug()<<"in main thread";
@@ -36,7 +36,7 @@ void QPipe::run(){
     connect(requestSocket,SIGNAL(aboutToClose()),SLOT(onRequestSocketClose()));
 }
 
-void QPipe::onReqSocketReadReady(){
+void QiPipe::onReqSocketReadReady(){
     QObject *id = sender();
     if(id==0)return;
     QTcpSocket* socket = static_cast<QTcpSocket*>(id);
@@ -117,14 +117,14 @@ void QPipe::onReqSocketReadReady(){
         //}
     }
 }
-void QPipe::onReqSocketReadFinished(){
+void QiPipe::onReqSocketReadFinished(){
     QObject *id = sender();
     if(id==0)return;
     QTcpSocket* socket = static_cast<QTcpSocket*>(id);
     if(!socket)return;
     //qDebug()<<"readfinished..";
 }
-void QPipe::onRequestHostFound(){//??
+void QiPipe::onRequestHostFound(){//??
     /*
     QObject *id = sender();
     if(id==0)return;
@@ -133,11 +133,11 @@ void QPipe::onRequestHostFound(){//??
     */
 
 }
-void QPipe::onRequestSocketError(){
+void QiPipe::onRequestSocketError(){
     emit(error(pipeData));
 }
 
-void QPipe::parseHeader(const QString headerString){
+void QiPipe::parseHeader(const QString headerString){
 /*
 CONNECT clients4.google.com:443 HTTP/1.1
 Host: clients4.google.com
@@ -219,7 +219,7 @@ Accept-Charset: gb18030,utf-8;q=0.7,*;q=0.3
 }
 
 
-void QPipe::onResponseConnected(){
+void QiPipe::onResponseConnected(){
     //responseSocket->write(reqSig.toUtf8().append("\n"));
     //responseSocket->write(reqHeaderString.toUtf8());
     qDebug()<<"connected:"<<reqByteArray;
@@ -234,7 +234,7 @@ void QPipe::onResponseConnected(){
     emit(connected(pipeData));
 }
 
-void QPipe::onResponseReceived(){
+void QiPipe::onResponseReceived(){
     QByteArray response;
     if(isHttpsConnect){
         response = QByteArray(responseSocketSSL->readAll());
@@ -245,17 +245,17 @@ void QPipe::onResponseReceived(){
     requestSocket->write(response);
     requestSocket->flush();
 }
-void QPipe::onResponseError(QAbstractSocket::SocketError error){
+void QiPipe::onResponseError(QAbstractSocket::SocketError error){
     qDebug()<<"responseError:"<<error;
     tearDown();
 }
-void QPipe::onRequestSocketClose(){
+void QiPipe::onRequestSocketClose(){
     tearDown();
 }
-void QPipe::onResponseClose(){
+void QiPipe::onResponseClose(){
     tearDown();
 }
-void QPipe::tearDown(){
+void QiPipe::tearDown(){
     mutex.lock();
     if(requestSocket && requestSocket->isOpen()){
         disconnect(requestSocket,SIGNAL(aboutToClose()),this,SLOT(onRequestSocketClose()));
@@ -275,7 +275,7 @@ void QPipe::tearDown(){
     }
 }
 
-QPipe::~QPipe(){
+QiPipe::~QiPipe(){
     delete reqRawString;
     reqRawString = NULL;
     delete requestSocket;

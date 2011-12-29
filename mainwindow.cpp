@@ -3,11 +3,11 @@
 
 #include <QTcpServer>
 #include "pipedata.h"
-#include "qproxyserver.h"
+#include "qiproxyserver.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    pipes(new QVector<QPipe*>),
+    pipes(new QVector<QiPipe*>),
     pipeTableModel(new QiddlerPipeTableModel()),
     ui(new Ui::MainWindow)
 {
@@ -18,10 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->tableView->setItemDelegate();
     createMenus();
 
-    server  = new QProxyServer();
+    server  = new QiProxyServer();
     server->listen(QHostAddress("127.0.0.1"),8080);
-    connect(server,SIGNAL(newPipe(QSharedPointer<PipeData>)),SLOT(onNewPipe(QSharedPointer<PipeData>)));
-    connect(server,SIGNAL(pipeUpdate(QSharedPointer<PipeData>)),SLOT(onPipeUpdate(QSharedPointer<PipeData>)));
+    connect(server,SIGNAL(newPipe(Pipedata_const_ptr)),SLOT(onNewPipe(Pipedata_const_ptr)));
+    connect(server,SIGNAL(pipeUpdate(Pipedata_const_ptr)),SLOT(onPipeUpdate(Pipedata_const_ptr)));
 }
 
 MainWindow::~MainWindow()
@@ -37,11 +37,11 @@ void MainWindow::createMenus(){
 
 
 
-void MainWindow::onPipeUpdate(QSharedPointer<PipeData> pipeData){
+void MainWindow::onPipeUpdate(Pipedata_const_ptr pipeData){
     //qDebug()<<"connected";
 }
 
-void MainWindow::onNewPipe(QSharedPointer<PipeData> p){
+void MainWindow::onNewPipe(Pipedata_const_ptr p){
     //pipeTableModel
     pipeTableModel.addItem(p);
 }
