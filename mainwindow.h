@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "qiddlerpipetablemodel.h"
 #include "pipedata.h"
+#include <QSettings>
 
 namespace Ui {
     class MainWindow;
@@ -24,6 +25,7 @@ private:
         QiddlerPipeTableModel pipeTableModel;
 private slots:
         void toggleCapture();
+        void doSomeBug();
 public:
     explicit MainWindow(QWidget *parent = 0);
 
@@ -33,12 +35,18 @@ public slots:
         void onPipeUpdate(Pipedata_const_ptr);
 
 
+
 public:
         typedef struct __proxyInfo{
             int enable;
             QString proxyString;
             QString pacUrl;
+            QString isUsingPac;
         }ProxyInfo;
+protected:
+        void closeEvent(QCloseEvent *event);
+
+        QSettings proxySetting;
 private:
     Ui::MainWindow *ui;
     void createMenus();

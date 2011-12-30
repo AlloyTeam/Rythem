@@ -40,7 +40,7 @@ bool QiProxyServer::removePipe(int socketId){
     if(pipes.contains(socketId)){
         QiPipe *p = pipes.value(socketId);
         pipes.remove(socketId);
-        delete p;
+        p->deleteLater();
     }
     return false;
 }

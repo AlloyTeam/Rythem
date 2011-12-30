@@ -14,7 +14,8 @@ QiPipe::QiPipe(QTcpSocket *socket) :
     requestSocket(socket),
     headerFound(false),
     responseSocket(NULL),
-    isError(false){
+    isError(false),
+    isHttpsConnect(false){
 
 
 
@@ -253,10 +254,11 @@ void QiPipe::onRequestSocketClose(){
     tearDown();
 }
 void QiPipe::onResponseClose(){
+    qDebug()<<"responseClose";
     tearDown();
 }
 void QiPipe::tearDown(){
-    mutex.lock();
+    //mutex.lock();
     if(requestSocket && requestSocket->isOpen()){
         disconnect(requestSocket,SIGNAL(aboutToClose()),this,SLOT(onRequestSocketClose()));
         requestSocket->close();
@@ -267,7 +269,7 @@ void QiPipe::tearDown(){
         responseSocket->close();
         responseSocket = NULL;
     }
-    mutex.unlock();
+    //mutex.unlock();
     if(isError){
         emit(error(pipeData));
     }else{

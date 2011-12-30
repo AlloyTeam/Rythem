@@ -32,7 +32,11 @@ FORMS    += mainwindow.ui
 
 
 
-win32:LIBS += G:\qtsdk\mingw\lib\libwininet.a
+win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
+
+
+
+
 
 
 
