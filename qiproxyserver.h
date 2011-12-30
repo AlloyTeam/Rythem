@@ -25,7 +25,7 @@ class QiProxyServer : public QTcpServer{
 
         QMap<int,QiPipe*> pipes;
     private:
-        QiPipe* addPipe(QTcpSocket* socket);
+        QiPipe* addPipe(int socketDescriptor);
         bool removePipe(int socketId);
         
 };

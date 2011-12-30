@@ -9,6 +9,14 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QSharedPointer>
+#include <QNetworkAccessManager>
+
+typedef struct RequestInfo{
+    QString url;
+    QMap<QByteArray,QByteArray> headers;
+    QByteArray data;
+    QString method;
+}RequestInfo;
 
 class QiPipe : public QThread
 {
@@ -16,21 +24,19 @@ class QiPipe : public QThread
 private:
         QString* reqRawString;
         QTcpSocket* requestSocket;
-        QByteArray reqByteArray;
-        QString reqSig;// change GET http://xxx.xx.xx/a/path/to/some.index HTTP/1.1 to GET /a/path/to/some.index HTTP/1.1
-        QString reqHeaderString;
+
         QSharedPointer<PipeData> pipeData;
+        RequestInfo requestInfo;
+
         QTcpSocket* responseSocket;
         QSslSocket* responseSocketSSL;
-        bool headerFound;
-
-        bool isHttpsConnect;
-        bool isError;
-
         QMutex mutex;
+        QNetworkAccessManager *manager;
+
+        int _socketDescriptor;
 
 public:
-        explicit QiPipe(QTcpSocket *socket = 0);
+        explicit QiPipe(int socketDescriptor = 0);
         ~QiPipe();
         void tearDown();
 
@@ -50,11 +56,14 @@ public slots:
         void onResponseError(QAbstractSocket::SocketError);
         void onResponseClose();
 
+        void onResponseFinished(QNetworkReply*);
+
 protected:
         void run();
 
+
 private:
-        void parseHeader(const QString headerString);
+        void parseRequest(const QByteArray requestString);
 };
 
 #endif // QPIPE_H

@@ -32,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
     server->listen(QHostAddress("127.0.0.1"),8888);
     connect(server,SIGNAL(newPipe(Pipedata_const_ptr)),SLOT(onNewPipe(Pipedata_const_ptr)));
     connect(server,SIGNAL(pipeUpdate(Pipedata_const_ptr)),SLOT(onPipeUpdate(Pipedata_const_ptr)));
+
+    toggleCapture();
 }
 
 MainWindow::~MainWindow()
@@ -65,11 +67,19 @@ void MainWindow::toggleCapture(){
 #ifdef Q_WS_WIN32
     if(isUsingCapture){
         isUsingCapture = false;
+        /*
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
         proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
         if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
         }
+        */
+        // hard code just for some crash issue
+        proxySetting.setValue("ProxyEnable",1);
+        proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
+        //if( previousProxyInfo.isUsingPac != "0"){
+            proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
+        //}
     }else{
         isUsingCapture = true;
         previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
@@ -101,6 +111,7 @@ void MainWindow::toggleCapture(){
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
 #endif
     captureAct->setChecked(isUsingCapture);
+    qDebug()<<"toggle capture";
 }
 
 

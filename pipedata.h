@@ -5,10 +5,10 @@
 #include <QMap>
 #include <QDebug>
 #include <QSharedPointer>
+#include <QMetaType>
 
 class PipeData {
 private:
-    QMap<QString,QString> allHeaders;
 public:
     PipeData(int socketDescriptor=-1);
     inline PipeData(PipeData& p){//copy ctor
@@ -44,12 +44,23 @@ public:
     QString resStatus;
     QString resHeader;
     QString resBody;
-    void setHeader(QString name,QString value);
-    const QString getHeader(QString name)const;
+    QMap<QByteArray,QByteArray> allHeaders;
+    void setHeader(QByteArray name,QByteArray value);
+    const QByteArray getHeader(QByteArray name)const;
     const QString getBodyDecoded();
 };
 typedef QSharedPointer<const PipeData> Pipedata_const_ptr;
 typedef QSharedPointer<PipeData> PipeData_ptr;
 typedef const QSharedPointer<PipeData> PipeData_ptr_const;
 typedef const QSharedPointer<const PipeData> PipeData_const_ptr_const;
+
+
+
+
+/*
+qRegisterMetaType(PipeData_ptr);
+qRegisterMetaType(PipeData_ptr_const);
+qRegisterMetaType(PipeData_const_ptr_const);
+*/
+
 #endif // PIPEDATA_H

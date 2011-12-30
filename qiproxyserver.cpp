@@ -6,9 +6,9 @@ QiProxyServer::QiProxyServer(QObject *parent) :
 }
 
 void QiProxyServer::incomingConnection(int socketId){
-    QTcpSocket *socket = new QTcpSocket();
-    socket->setSocketDescriptor(socketId);
-    QiPipe *pipe = addPipe(socket);
+    //QTcpSocket *socket = new QTcpSocket();
+    //socket->setSocketDescriptor(socketId);
+    QiPipe *pipe = addPipe(socketId);
 
     connect(pipe,SIGNAL(connected(Pipedata_const_ptr)),SLOT(onPipeConnected(Pipedata_const_ptr)));
     connect(pipe,SIGNAL(connected(Pipedata_const_ptr)),SIGNAL(newPipe(Pipedata_const_ptr)));
@@ -18,6 +18,8 @@ void QiProxyServer::incomingConnection(int socketId){
     connect(pipe,SIGNAL(error(Pipedata_const_ptr)),SIGNAL(pipeUpdate(Pipedata_const_ptr)));
 
     pipe->start();
+
+
 }
 void QiProxyServer::onPipeConnected(Pipedata_const_ptr p){
     // do nothing?
@@ -30,9 +32,9 @@ void QiProxyServer::onPipeError(Pipedata_const_ptr p){
     removePipe(p->socketId);
 }
 
-QiPipe* QiProxyServer::addPipe(QTcpSocket *socket){
-    QiPipe *p = new QiPipe(socket);//delete in removePipe(int)
-    pipes.value(socket->socketDescriptor(),p);
+QiPipe* QiProxyServer::addPipe(int socketDescriptor){
+    QiPipe *p = new QiPipe(socketDescriptor);//delete in removePipe(int)
+    pipes.value(socketDescriptor,p);
     return p;
 }
 

@@ -5,7 +5,7 @@ PipeData::PipeData(int socketDescriptor):socketId(socketDescriptor){
 
 
 
-void PipeData::setHeader(QString name,QString value){
+void PipeData::setHeader(QByteArray name,QByteArray value){
     if(name == "Host"){
         int d = value.indexOf(":");
         if(d!=-1){
@@ -19,7 +19,7 @@ void PipeData::setHeader(QString name,QString value){
         allHeaders[name] = value;
     }
 }
-const QString PipeData::getHeader(QString name)const{
+const QByteArray PipeData::getHeader(QByteArray name)const{
     return allHeaders[name];
 }
 const QString PipeData::getBodyDecoded(){
