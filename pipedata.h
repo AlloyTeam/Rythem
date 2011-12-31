@@ -5,7 +5,6 @@
 #include <QMap>
 #include <QDebug>
 #include <QSharedPointer>
-#include <QMetaType>
 
 class PipeData {
 private:
@@ -56,11 +55,5 @@ typedef const QSharedPointer<const PipeData> PipeData_const_ptr_const;
 
 
 
-
-/*
-qRegisterMetaType(PipeData_ptr);
-qRegisterMetaType(PipeData_ptr_const);
-qRegisterMetaType(PipeData_const_ptr_const);
-*/
 
 #endif // PIPEDATA_H

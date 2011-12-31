@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createMenus();
 
     server  = new QiProxyServer();
-    server->listen(QHostAddress("127.0.0.1"),8888);
+    server->listen(QHostAddress("127.0.0.1"),8889);
     connect(server,SIGNAL(newPipe(Pipedata_const_ptr)),SLOT(onNewPipe(Pipedata_const_ptr)));
     connect(server,SIGNAL(pipeUpdate(Pipedata_const_ptr)),SLOT(onPipeUpdate(Pipedata_const_ptr)));
 
@@ -99,7 +99,7 @@ void MainWindow::toggleCapture(){
         qDebug()<<previousProxyInfo.proxyString;
         //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
 
-        QString proxyServer="127.0.0.1:8888";
+        QString proxyServer="127.0.0.1:8889";
         if(previousProxyInfo.proxyString.indexOf(";")!=-1){
             proxyServer = QString("http=")+proxyServer;
             QStringList proxies = previousProxyInfo.proxyString.split(";");

@@ -197,6 +197,7 @@ void QiPipe::onResponseFinished(QNetworkReply* reply){
         requestSocket->write(bah);
         requestSocket->write(": ");
         requestSocket->write(reply->rawHeader(bah));
+        requestSocket->write("\r\n");
         if(reply->url().host().contains("oa.com")){
             qDebug()<<"response="<<bah<<reply->rawHeader(bah);
         }
