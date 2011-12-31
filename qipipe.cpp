@@ -67,7 +67,7 @@ void QiPipe::onReqSocketReadReady(){
         tearDown();
         return;
     }else{
-        QNetworkRequest request(QUrl(requestInfo.url));
+        QNetworkRequest request(QUrl(requestInfo.url.toLatin1()));
         manager->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"proxy.tencent.com",8080));
 
         QMap<QByteArray,QByteArray>::Iterator i=requestInfo.headers.begin();
@@ -89,19 +89,7 @@ void QiPipe::onReqSocketReadReady(){
 
     }
 }
-void QiPipe::onReqSocketReadFinished(){
-    QObject *id = sender();
-    if(id==0)return;
-    QTcpSocket* socket = static_cast<QTcpSocket*>(id);
-    if(!socket)return;
-    //qDebug()<<"readfinished..";
-}
-void QiPipe::onRequestHostFound(){//??
 
-}
-void QiPipe::onRequestSocketError(){
-    emit(error(pipeData));
-}
 
 void QiPipe::parseRequest(const QByteArray requestString){
     qDebug()<<"parseRequest"<<requestString;
@@ -180,40 +168,6 @@ void QiPipe::parseRequest(const QByteArray requestString){
     }
 }
 
-
-void QiPipe::onResponseConnected(){
-
-}
-
-void QiPipe::onResponseReceived(){
-}
-void QiPipe::onResponseError(QAbstractSocket::SocketError error){
-    qDebug()<<"responseError:"<<error;
-    tearDown();
-}
-void QiPipe::onRequestSocketClose(){
-    tearDown();
-}
-void QiPipe::onResponseClose(){
-    qDebug()<<"responseClose";
-    tearDown();
-}
-void QiPipe::tearDown(){
-    //mutex.lock();
-    if(requestSocket && requestSocket->isOpen()){
-        disconnect(requestSocket,SIGNAL(aboutToClose()),this,SLOT(onRequestSocketClose()));
-        requestSocket->close();
-        requestSocket = NULL;
-    }
-    if(responseSocket && responseSocket->isOpen()){
-        disconnect(responseSocket,SIGNAL(aboutToClose()),this,SLOT(onResponseClose()));
-        responseSocket->close();
-        responseSocket = NULL;
-    }
-    //mutex.unlock();
-
-}
-
 void QiPipe::onResponseFinished(QNetworkReply* reply){
     if(QApplication::instance()->thread() == QThread::currentThread()){
         qDebug()<<"onResponseFinished in main thread";
@@ -242,3 +196,16 @@ QiPipe::~QiPipe(){
         responseSocket = NULL;
     }
 }
+void QiPipe::onReqSocketReadFinished(){}
+void QiPipe::onRequestSocketError(){
+    emit(error(pipeData));
+}
+void QiPipe::onRequestHostFound(){}
+void QiPipe::onResponseConnected(){}
+void QiPipe::onResponseReceived(){}
+void QiPipe::onResponseError(QAbstractSocket::SocketError error){}
+void QiPipe::onRequestSocketClose(){}
+void QiPipe::onResponseClose(){}
+void QiPipe::tearDown(){}
+
+
