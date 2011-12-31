@@ -7,8 +7,17 @@
 #include <QSettings>
 #include <QVariant>
 
+#include <QNetworkConfigurationManager>
+#include <QMAp>
+#include <QList>
+
 #ifdef Q_WS_WIN32
     #include "wininet.h"
+#endif
+#ifdef Q_WS_MAC
+#include <CoreFoundation/CoreFoundation.h>
+#include <SystemConfiguration/SystemConfiguration.h>
+#include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
 #endif
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -109,6 +118,57 @@ void MainWindow::toggleCapture(){
     proxySetting.sync();
     ::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+#endif
+#ifdef Q_WS_MAC
+    /*
+    CFDictionaryRef dict = SCDynamicStoreCopyProxies(NULL);
+    if(!dict){
+        qDebug()<<"no proxy";
+    }
+    */
+
+
+    QNetworkConfigurationManager mgr;
+    QList<QNetworkConfiguration> activeConfigs = mgr.allConfigurations(QNetworkConfiguration::Active);
+    QList<QString> activeNames;
+    foreach(QNetworkConfiguration cf,activeConfigs){
+        //qDebug()<<"new work activated:"<<cf.type()<<cf.state()<<cf.name()<<cf.bearerTypeName()<<cf.identifier();
+
+        activeNames.append(cf.name());
+    }
+    ///Library/Preferences/SystemConfiguration
+    QSettings::setPath(QSettings::NativeFormat,QSettings::SystemScope,"/Library/Preferences/SystemConfiguration/");
+    QSettings plist("/Library/Preferences/SystemConfiguration/preferences.plist",QSettings::NativeFormat);
+
+    QMap<QString,QVariant> services = plist.value("NetworkServices").toMap();
+    QMap<QString,QVariant>::Iterator i;
+    QString theServiceKey;
+    QMap<QString,QVariant> theService;
+    QMap<QString,QVariant> interface;
+
+    for(i = services.begin();i!=services.end();i++){
+        //qDebug()<<i.key();
+        theService = i.value().toMap();
+        theServiceKey = i.key();
+        interface = theService["Interface"].toMap();
+        //qDebug()<<"interface"<<interface;
+        if(activeNames.contains(interface.value("DeviceName").toString())){
+            qDebug()<<"got it.."<<theService["Proxies"].toMap().value("HTTPEnable");
+            break;
+        }
+    }
+    if(i!=services.end()){
+        QMap<QString,QVariant> proxies = theService["Proxies"].toMap();
+        qDebug()<<"proxies="<<proxies;
+        qDebug()<<proxies.value("HTTPEnable");
+        proxies["HTTPEnable"]=0;
+        theService["Proxies"] = proxies;
+        services[theServiceKey]=theService;
+        qDebug()<<theService;
+    }
+    qDebug()<<services[theServiceKey];
+    plist.setValue("NetworkServices",services);
+    plist.sync();//doesn't work.. plist readonly
 #endif
     captureAct->setChecked(isUsingCapture);
     qDebug()<<"toggle capture";
