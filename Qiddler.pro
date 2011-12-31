@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     qnetworkproxyfactoryexendforpac.cpp \
     qiproxyserver.cpp \
     qipipe.cpp \
-    qiresponse.cpp
+    qiresponse.cpp \
+    qiwinhttp.cpp
 
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
@@ -26,13 +27,20 @@ HEADERS  += mainwindow.h \
     qnetworkproxyfactoryexendforpac.h \
     qiproxyserver.h \
     qipipe.h \
-    qiresponse.h
+    qiresponse.h \
+    qiwinhttp.h
 
 FORMS    += mainwindow.ui
 
 
 
 win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
+
+
+
+
+
+
 
 
 

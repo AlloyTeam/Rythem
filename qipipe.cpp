@@ -10,11 +10,11 @@
 #include <QDebug>
 #include <QNetworkProxy>
 #include <QTcpSocket>
+#include "qiwinhttp.h"
+#include <QByteArray>
 
 
 
-const static QRegExp headerSplitter("\r?\n\r?\n");
-const static QRegExp newLine("\r?\n");
 QiPipe::QiPipe(int socketDescriptor):_socketDescriptor(socketDescriptor){
 
 }
@@ -67,8 +67,13 @@ void QiPipe::onReqSocketReadReady(){
         tearDown();
         return;
     }else{
+        QUrl url(requestInfo.url);
         QNetworkRequest request(QUrl(requestInfo.url.toLatin1()));
-        manager->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"proxy.tencent.com",8080));
+        //manager->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"proxy.tencent.com",8080));
+        QList<QNetworkProxy> proxyList = QiWinHttp::queryProxy(QNetworkProxyQuery(url));
+        foreach(QNetworkProxy p, proxyList){
+            manager->setProxy(p);
+        }
 
         QMap<QByteArray,QByteArray>::Iterator i=requestInfo.headers.begin();
         for(;i!=requestInfo.headers.end();++i){
@@ -92,13 +97,13 @@ void QiPipe::onReqSocketReadReady(){
 
 
 void QiPipe::parseRequest(const QByteArray requestString){
-    qDebug()<<"parseRequest"<<requestString;
+    //qDebug()<<"parseRequest"<<requestString;
     Q_ASSERT(requestString.size()>0);
     int i=0;
     QByteArray fragment;
     fragment.reserve(512);
     bool allHeadersFound=false;
-    qDebug()<<requestString;
+    //qDebug()<<requestString;
     do {
         char c = requestString.at(i);
         fragment=requestString.left(i+1);
@@ -152,7 +157,7 @@ void QiPipe::parseRequest(const QByteArray requestString){
                     int tmp = line.indexOf(":");
                     if(tmp!=-1){
                         requestInfo.headers[line.left(tmp)] = line.mid(tmp+1).trimmed();
-                        qDebug()<<line.left(tmp)<<":"<<line.mid(tmp+1).trimmed();
+                        //qDebug()<<line.left(tmp)<<":"<<line.mid(tmp+1).trimmed();
                     }
                 }
                 //qDebug()<<line;
@@ -174,8 +179,29 @@ void QiPipe::onResponseFinished(QNetworkReply* reply){
     }else{
         qDebug()<<"onResponseFinished no in main";
     }
+    requestSocket->write("HTTP/1.1 ");
+    requestSocket->write(
+                QString::number(
+                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt()
+                    ).toLatin1());
+    QByteArray resone = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toByteArray();
+    requestSocket->write(" ");
+    requestSocket->write(resone);
+    requestSocket->write("\r\n");
     QByteArray ba = reply->readAll();
-    qDebug()<<"response="<<ba;
+    if(reply->url().host().contains("oa.com")){
+        qDebug()<<"response="<<ba;
+    }
+    QList<QByteArray> headers = reply->rawHeaderList();
+    foreach(QByteArray bah,headers){
+        requestSocket->write(bah);
+        requestSocket->write(": ");
+        requestSocket->write(reply->rawHeader(bah));
+        if(reply->url().host().contains("oa.com")){
+            qDebug()<<"response="<<bah<<reply->rawHeader(bah);
+        }
+    }
+    requestSocket->write("\r\n");
     requestSocket->write(ba);
     requestSocket->flush();
     requestSocket->close();

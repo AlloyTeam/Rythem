@@ -12,7 +12,9 @@
 #include <QList>
 
 #ifdef Q_WS_WIN32
-    #include "wininet.h"
+#include "wininet.h"
+#include "qiwinhttp.h"
+#include "winnetwk.h"
 #endif
 #ifdef Q_WS_MAC
 #include <CoreFoundation/CoreFoundation.h>
@@ -118,6 +120,7 @@ void MainWindow::toggleCapture(){
     proxySetting.sync();
     ::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+    QiWinHttp::init(previousProxyInfo.isUsingPac);
 #endif
 #ifdef Q_WS_MAC
     /*
