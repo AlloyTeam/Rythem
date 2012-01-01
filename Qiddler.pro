@@ -35,6 +35,7 @@ FORMS    += mainwindow.ui
 
 
 win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
+mac:LIBS += -framework SystemConfiguration -framework coreFoundation
 
 
 
