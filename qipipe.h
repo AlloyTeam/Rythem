@@ -32,9 +32,9 @@ public:
         explicit QiPipe(int socketDescriptor = 0);
         ~QiPipe();
 signals:
-        void completed(Pipedata_const_ptr);
-        void error(Pipedata_const_ptr);
-        void connected(Pipedata_const_ptr);
+        void completed(PipeData_ptr);
+        void error(PipeData_ptr);
+        void connected(PipeData_ptr);
 protected:
         void run();
 
@@ -48,9 +48,9 @@ class QiPipe_Private:public QObject{
 public:
     QiPipe_Private(int descriptor);
 signals:
-        void completed(Pipedata_const_ptr);
-        void error(Pipedata_const_ptr);
-        void connected(Pipedata_const_ptr);
+        void completed(PipeData_ptr);
+        void error(PipeData_ptr);
+        void connected(PipeData_ptr);
         void finished();// error or completed
 
 public slots:

@@ -10,25 +10,25 @@ void QiProxyServer::incomingConnection(int socketId){
     //socket->setSocketDescriptor(socketId);
     QiPipe *pipe = addPipe(socketId);
 
-    connect(pipe,SIGNAL(connected(Pipedata_const_ptr)),SLOT(onPipeConnected(Pipedata_const_ptr)));
-    connect(pipe,SIGNAL(connected(Pipedata_const_ptr)),SIGNAL(newPipe(Pipedata_const_ptr)));
-    connect(pipe,SIGNAL(completed(Pipedata_const_ptr)),SLOT(onPipeComplete(Pipedata_const_ptr)));
-    connect(pipe,SIGNAL(completed(Pipedata_const_ptr)),SIGNAL(pipeUpdate(Pipedata_const_ptr)));
-    connect(pipe,SIGNAL(error(Pipedata_const_ptr)),SLOT(onPipeError(Pipedata_const_ptr)));
-    connect(pipe,SIGNAL(error(Pipedata_const_ptr)),SIGNAL(pipeUpdate(Pipedata_const_ptr)));
+    connect(pipe,SIGNAL(connected(PipeData_ptr)),SLOT(onPipeConnected(PipeData_ptr)));
+    connect(pipe,SIGNAL(connected(PipeData_ptr)),SIGNAL(newPipe(PipeData_ptr)));
+    connect(pipe,SIGNAL(completed(PipeData_ptr)),SLOT(onPipeComplete(PipeData_ptr)));
+    connect(pipe,SIGNAL(completed(PipeData_ptr)),SIGNAL(pipeUpdate(PipeData_ptr)));
+    connect(pipe,SIGNAL(error(PipeData_ptr)),SLOT(onPipeError(PipeData_ptr)));
+    connect(pipe,SIGNAL(error(PipeData_ptr)),SIGNAL(pipeUpdate(PipeData_ptr)));
 
     pipe->start();
 
 
 }
-void QiProxyServer::onPipeConnected(Pipedata_const_ptr p){
+void QiProxyServer::onPipeConnected(PipeData_ptr p){
     // do nothing?
     Q_UNUSED(p);
 }
-void QiProxyServer::onPipeComplete(Pipedata_const_ptr p){
+void QiProxyServer::onPipeComplete(PipeData_ptr p){
     removePipe(p->socketId);
 }
-void QiProxyServer::onPipeError(Pipedata_const_ptr p){
+void QiProxyServer::onPipeError(PipeData_ptr p){
     removePipe(p->socketId);
 }
 

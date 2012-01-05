@@ -16,7 +16,7 @@ int QiddlerPipeTableModel::columnCount(const QModelIndex &parent) const{
 QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
     if(role == Qt::DisplayRole || role == Qt::ToolTipRole){
         int row = index.row();
-        Pipedata_const_ptr p;
+        PipeData_ptr p;
         if(pipesVector.count()>row){
             p = pipesVector.at(row);
         }else{
@@ -31,7 +31,7 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
             case 0:
                 return QString("%1").arg(p->number);
             case 1:
-                return QString("%1").arg(p->returnCode);
+                return ((p->returnCode==0)?QString("-"):QString("%1").arg(p->returnCode));
             case 2:
                 return p->protocol;
             case 3:
@@ -72,17 +72,17 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
 }
 
 
-void QiddlerPipeTableModel::addItem(Pipedata_const_ptr p){
+void QiddlerPipeTableModel::addItem(PipeData_ptr p){
     qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
-    Pipedata_const_ptr p1 = p;
-    //p1->number=++pipeNumber;
+    PipeData_ptr p1 = p;
+    ++pipeNumber;
+    p1->number=pipeNumber;
 
-    this->beginInsertRows(index(pipeNumber, 0),pipeNumber,pipeNumber);
+    this->beginInsertRows(index(pipeNumber-1, 0),pipeNumber-1,pipeNumber-1);
 
     //TODO thread safe?
     pipesMap.value(p1->socketId,p1);
     pipesVector.append(p1);
-    pipeNumber++;
 
     //QModelIndex index1 = index(pipeNumber-1, 0);
     //QModelIndex index2 = index(pipeNumber-1, 7);

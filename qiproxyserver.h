@@ -14,12 +14,12 @@ class QiProxyServer : public QTcpServer{
         explicit QiProxyServer(QObject *parent = 0);
         
     signals:
-        void newPipe(Pipedata_const_ptr);
-        void pipeUpdate(Pipedata_const_ptr);
+        void newPipe(PipeData_ptr);
+        void pipeUpdate(PipeData_ptr);
     public slots:
-        void onPipeConnected(Pipedata_const_ptr);
-        void onPipeComplete(Pipedata_const_ptr);
-        void onPipeError(Pipedata_const_ptr);
+        void onPipeConnected(PipeData_ptr);
+        void onPipeComplete(PipeData_ptr);
+        void onPipeError(PipeData_ptr);
     protected:
         void incomingConnection(int handle);
 

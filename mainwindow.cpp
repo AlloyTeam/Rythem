@@ -41,8 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     server  = new QiProxyServer();
     server->listen(QHostAddress("127.0.0.1"),8889);
-    connect(server,SIGNAL(newPipe(Pipedata_const_ptr)),SLOT(onNewPipe(Pipedata_const_ptr)));
-    connect(server,SIGNAL(pipeUpdate(Pipedata_const_ptr)),SLOT(onPipeUpdate(Pipedata_const_ptr)));
+    connect(server,SIGNAL(newPipe(PipeData_ptr)),SLOT(onNewPipe(PipeData_ptr)));
+    connect(server,SIGNAL(pipeUpdate(PipeData_ptr)),SLOT(onPipeUpdate(PipeData_ptr)));
 
     //toggleCapture();
 }
@@ -66,11 +66,11 @@ void MainWindow::doSomeBug(){
     s.at(10);
 }
 
-void MainWindow::onPipeUpdate(Pipedata_const_ptr pipeData){
+void MainWindow::onPipeUpdate(PipeData_ptr pipeData){
     //qDebug()<<"connected";
 }
 
-void MainWindow::onNewPipe(Pipedata_const_ptr p){
+void MainWindow::onNewPipe(PipeData_ptr p){
     //pipeTableModel
     pipeTableModel.addItem(p);
 }

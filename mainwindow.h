@@ -31,8 +31,8 @@ public:
 
     ~MainWindow();
 public slots:
-        void onNewPipe(Pipedata_const_ptr);
-        void onPipeUpdate(Pipedata_const_ptr);
+        void onNewPipe(PipeData_ptr);
+        void onPipeUpdate(PipeData_ptr);
 
 
 

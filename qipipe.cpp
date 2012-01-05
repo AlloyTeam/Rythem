@@ -25,9 +25,9 @@ QiPipe::~QiPipe(){
 
 void QiPipe::run(){
     qp = new QiPipe_Private(_socketDescriptor);
-    connect(qp,SIGNAL(connected(Pipedata_const_ptr)),this,SIGNAL(connected(Pipedata_const_ptr)));
-    connect(qp,SIGNAL(completed(Pipedata_const_ptr)),this,SIGNAL(completed(Pipedata_const_ptr)));
-    connect(qp,SIGNAL(error(Pipedata_const_ptr)),this,SIGNAL(error(Pipedata_const_ptr)));
+    connect(qp,SIGNAL(connected(PipeData_ptr)),this,SIGNAL(connected(PipeData_ptr)));
+    connect(qp,SIGNAL(completed(PipeData_ptr)),this,SIGNAL(completed(PipeData_ptr)));
+    connect(qp,SIGNAL(error(PipeData_ptr)),this,SIGNAL(error(PipeData_ptr)));
 
     qDebug()<<"Pipe run:"<<QThread::currentThreadId();
 
