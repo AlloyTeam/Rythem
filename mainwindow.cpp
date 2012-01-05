@@ -79,18 +79,18 @@ void MainWindow::toggleCapture(){
 #ifdef Q_WS_WIN32
     if(isUsingCapture){
         isUsingCapture = false;
-        /*
+
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
         proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
         if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
         }
-        */
+
         // hard code just for some crash issue
         //proxySetting.setValue("ProxyEnable",1);
         //proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
         //if( previousProxyInfo.isUsingPac != "0"){
-            proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
+        //    proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
         //}
     }else{
         isUsingCapture = true;
