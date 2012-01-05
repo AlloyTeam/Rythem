@@ -38,6 +38,8 @@ void QiPipe::run(){
 }
 //===========QiPipe_Private
 QiPipe_Private::QiPipe_Private(int descriptor):responseSocket(NULL){
+    responseHeaderFound = false;
+    requestHeaderFound = false;
     requestSocket = new QTcpSocket();
     bool isSocketValid = requestSocket->setSocketDescriptor(descriptor);
     if(!isSocketValid){
@@ -62,14 +64,15 @@ void QiPipe_Private::onRequestReadReady(){
     QByteArray newReqData = requestSocket->readAll();
 
     //update raw data
-    requestRawData->append(newReqData);
+    requestRawData.append(newReqData);
     parseRequest(newReqData);
 }
 void QiPipe_Private::parseRequest(const QByteArray &newContent){
-
-    if(!requstHeaderFound){
+    if(!requestHeaderFound){
         parseRequestHeader(newContent);
     }else{
+        //应该不会来到这一步吧..
+        Q_ASSERT(true);
         if(responseSocket){
             if(responseSocket->isOpen()){
                 responseSocket->write(newContent);
@@ -84,21 +87,25 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
     Q_UNUSED(newContent);
 
     QByteArray header;
-    int indexOfRN = requestRawData->indexOf(QByteArray("\r\n\r\n"));
-    int indexOfN = requestRawData->indexOf(QByteArray("\n\n"));
+    int indexOfRN = requestRawData.indexOf(QByteArray("\r\n\r\n"));
+    int indexOfN = requestRawData.indexOf(QByteArray("\n\n"));
     if(indexOfRN!=-1){
         requestHeaderSpliterSize = 4;
         requestHeaderSpliterIndex = indexOfRN;
-        header = requestRawData->left(indexOfRN);
+        header = requestRawData.left(indexOfRN);
     }else if(indexOfN!=-1){
         requestHeaderSpliterSize = 2;
         requestHeaderSpliterIndex = indexOfN;
-        header = requestRawData->left(indexOfN);
+        header = requestRawData.left(indexOfN);
     }else{
         return;
     }
-
+    requestHeaderFound = true;
     pipeData->setRequestHeader(header);
+
+    //TODO
+    pipeData->requestRawDataToSend.append(requestRawData.mid(requestHeaderSpliterIndex));
+
     QString reqSig = QString("%1 %2 %3")
             .arg(pipeData->requestMethod)
             .arg(pipeData->path)
@@ -106,7 +113,7 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
 
     qDebug()<<"host="<<pipeData->getRequestHeader("Host")<<pipeData->getRequestHeader("Port")<<reqSig;
 
-    if(pipeData->getRequestHeader("Host") == "127.0.0.1" && pipeData->getRequestHeader("Port")=="8080"){//避免死循环
+    if(pipeData->getRequestHeader("Host") == "127.0.0.1" && pipeData->getRequestHeader("Port")=="8889"){//避免死循环
         emit(connected(pipeData));
         QByteArray byteToWrite;
         QString s = "hello Qiddler";
@@ -116,7 +123,7 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
         requestSocket->write(byteToWrite);
         requestSocket->flush();
         requestSocket->close();
-        tearDown();
+        emit(finished());
         return;
     }else{
         responseSocket = new QTcpSocket();
@@ -138,11 +145,23 @@ void QiPipe_Private::onResponseConnected(){
     pipeData->serverIP = responseSocket->peerAddress().toString();
     // emit connect signal
     emit(connected(pipeData));
-
+    responseSocket->write(pipeData->requestRawDataToSend);
 
 }
 void QiPipe_Private::onResponseReadReady(){
+    QByteArray ba = responseSocket->readAll();
+    responseRawData.append(ba);
 
+    //write back to request
+    //TODO check if the socket opening..
+    requestSocket->write(ba);
+    requestSocket->flush();
+
+    if(parseResponse(ba)){
+        responseSocket->close();
+        requestSocket->close();
+        //todo emit
+    }
 }
 
 void QiPipe_Private::onResponseError(QAbstractSocket::SocketError error){
@@ -150,6 +169,40 @@ void QiPipe_Private::onResponseError(QAbstractSocket::SocketError error){
 void QiPipe_Private::onRequestClose(){
 }
 void QiPipe_Private::onResponseClose(){
+}
+
+bool QiPipe_Private::parseResponse(const QByteArray &newContent){
+    if(!responseHeaderFound){
+        parseResponseHeader(newContent);
+        if(responseHeaderFound){//check if got end
+
+        }
+    }else{
+        parseResponseBody(newContent);
+    }
+}
+
+void QiPipe_Private::parseResponseHeader(const QByteArray &newContent){
+    Q_UNUSED(newContent);
+    responseHeaderFound = true;
+    responseHeaderSpliterInex = responseRawData.indexOf(QByteArray("\r\n\r\n"));
+    if(responseHeaderSpliterInex!=-1){
+        responseHeaderSpliterSize = 4;
+        pipeData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
+    }else{
+        responseHeaderSpliterInex = responseRawData.indexOf(QByteArray("\r\n\r\n"));
+        if(responseHeaderSpliterInex != -1){
+            responseHeaderSpliterSize = 2;
+            pipeData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
+        }else{
+            responseHeaderSpliterInex =-1;
+            responseHeaderFound = false;
+        }
+    }
+}
+
+void QiPipe_Private::parseResponseBody(const QByteArray &body){
+    //根据http协议，需由header及body共同判断请求是否结束。
 }
 void QiPipe_Private::tearDown(){
 }

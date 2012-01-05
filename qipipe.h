@@ -69,16 +69,20 @@ private:
         void parseResponseHeader(const QByteArray &header);
         void parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束。
 
-        QByteArray* requestRawData;
-        QByteArray* requestRawDataHeader;
-        QByteArray* requestRawDataBody;
+        QByteArray requestRawData;
+        QByteArray requestRawDataHeader;
+        QByteArray requestRawDataBody;
 
-        bool requstHeaderFound;
+        bool requestHeaderFound;
         int requestHeaderSpliterSize;
         int requestHeaderSpliterIndex;
 
-        QByteArray *responseRawData;
-        QByteArray *responseBodyRawData;
+        bool responseHeaderFound;
+        int responseHeaderSpliterSize;
+        int responseHeaderSpliterInex;
+
+        QByteArray responseRawData;
+        QByteArray responseBodyRawData;
 
         QTcpSocket* requestSocket;
         QTcpSocket* responseSocket;

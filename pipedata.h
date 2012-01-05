@@ -41,6 +41,8 @@ public:
     QString requestMethod;
     QString responseStatus;
 
+    QByteArray requestRawDataToSend;
+
 
     void setRequestHeader(QByteArray name,QByteArray value);
     void setRequestHeader(QByteArray headerBa);
@@ -48,7 +50,7 @@ public:
     QByteArray getRequestHeader()const;
     QByteArray getRequestBody()const;
 
-    void setResponseHeader(QByteArray name,QByteArray value);
+    void setResponseHeader(QByteArray header);
     void setResponseBody(QByteArray body);
     QByteArray getResponseHeader(QByteArray name)const;
     QByteArray getResponseHeader()const;

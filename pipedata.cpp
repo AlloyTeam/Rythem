@@ -6,8 +6,7 @@ PipeData::PipeData(int socketDescriptor):socketId(socketDescriptor){
 }
 
 
-void PipeData::setRequestHeader(QByteArray theHeader){
-    QByteArray header = theHeader;
+void PipeData::setRequestHeader(QByteArray header){
     header.replace("\r\n","\n");
     int i=0,l=header.length();
     //firstline
@@ -36,7 +35,45 @@ void PipeData::setRequestHeader(QByteArray theHeader){
         }
     }
 
+    //TODO..
+    requestRawDataToSend = QByteArray().append(requestMethod)
+                .append(path)
+                .append(protocol);
+    requestRawDataToSend.append(header.mid(i));
+
     //the rest..
+    while(i<l){
+        int j=header.indexOf('\n',i);
+        if(j==-1){// last line
+            j=l;
+        }
+        QByteArray line = header.mid(i,j-i);
+        //qDebug()<<line;
+
+        int splitIndex = line.indexOf(':');
+        QByteArray name = QByteArray(line.left(splitIndex));
+        QByteArray value = QByteArray(line.mid(splitIndex+1).trimmed());
+        //setRequestHeader(name,value);
+        if(name == QString("Host")){
+            int d = value.indexOf(":");
+            if(d!=-1){
+                allRequestHeaders["Host"] = value.left(d);
+                allRequestHeaders["Port"] = value.mid(d+1);
+            }else{
+                allRequestHeaders["Host"] = value;
+                allRequestHeaders["Port"] = "80";
+            }
+        }else{
+            allRequestHeaders[name] = value;
+        }
+        i=j+1;
+    }
+}
+void PipeData::setResponseHeader(QByteArray header){
+    //TODO.. Ctrl+c & Ctrl+v from setRequestHeader
+    header.replace("\r\n","\n");
+    int i=0,l=header.length();
+
     while(i<l){
         int j=header.indexOf('\n');
         if(j==-1){// last line
@@ -48,8 +85,7 @@ void PipeData::setRequestHeader(QByteArray theHeader){
         int splitIndex = line.indexOf(':');
         QByteArray name = QByteArray(line.left(splitIndex));
         QByteArray value = QByteArray(line.mid(splitIndex+1).trimmed());
-        //setRequestHeader(name,value);
-        allRequestHeaders[name]=value;
+        allResponseHeaders[name]=value;
         //setRequestHeader(name,value);
         i=j+1;
     }
@@ -57,7 +93,7 @@ void PipeData::setRequestHeader(QByteArray theHeader){
 
 
 QByteArray PipeData::getResponseHeader(QByteArray name)const{
-    return QByteArray();
+    return allResponseHeaders[name];
 }
 QByteArray PipeData::getResponseHeader()const{
 
@@ -81,7 +117,7 @@ QByteArray PipeData::getRequestHeader() const{
     }
 }
 QByteArray PipeData::getRequestHeader(QByteArray name) const{
-    return QByteArray();
+    return allRequestHeaders[name];
 }
 QByteArray PipeData::getRequestBody()const{
     if(requestRawData.isEmpty()){
