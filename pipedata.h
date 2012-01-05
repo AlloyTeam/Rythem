@@ -10,6 +10,10 @@ class PipeData {
 private:
 public:
     PipeData(int socketDescriptor=-1);
+    ~PipeData(){
+        qDebug()<<"~PipeData";
+    }
+
     inline PipeData(const PipeData& p){//copy ctor
         number = p.number;
         /*

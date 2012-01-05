@@ -3,6 +3,7 @@
 #include <QStringList>
 
 PipeData::PipeData(int socketDescriptor):socketId(socketDescriptor){
+    qDebug()<<"PipeData contructed:"<<socketId;
 }
 
 
@@ -37,8 +38,10 @@ void PipeData::setRequestHeader(QByteArray header){
 
     //TODO..
     requestRawDataToSend = QByteArray().append(requestMethod)
-                .append(path)
-                .append(protocol);
+            .append(" ")
+            .append(path)
+            .append(" ")
+            .append(protocol);
     requestRawDataToSend.append(header.mid(i));
 
     //the rest..
@@ -75,7 +78,7 @@ void PipeData::setResponseHeader(QByteArray header){
     int i=0,l=header.length();
 
     while(i<l){
-        int j=header.indexOf('\n');
+        int j=header.indexOf('\n',i);
         if(j==-1){// last line
             j=l;
         }

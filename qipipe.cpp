@@ -32,6 +32,7 @@ void QiPipe::run(){
     qDebug()<<"Pipe run:"<<QThread::currentThreadId();
 
     QEventLoop eventLoop;//use eventloop keep the thread running
+    //TODO WARNING:  QThread: Destroyed while thread is still running
     connect(this, SIGNAL(finished()), &eventLoop, SLOT(quit()));
     eventLoop.exec();
     qp->deleteLater();
@@ -106,10 +107,13 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
     //TODO
     pipeData->requestRawDataToSend.append(requestRawData.mid(requestHeaderSpliterIndex));
 
+    /* code below cause bug when arg has %n
     QString reqSig = QString("%1 %2 %3")
             .arg(pipeData->requestMethod)
             .arg(pipeData->path)
             .arg(pipeData->protocol);
+    */
+    QString reqSig = pipeData->requestMethod+" "+pipeData->path+" "+pipeData->protocol;
 
     qDebug()<<"host="<<pipeData->getRequestHeader("Host")<<pipeData->getRequestHeader("Port")<<reqSig;
 
@@ -123,6 +127,7 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
         requestSocket->write(byteToWrite);
         requestSocket->flush();
         requestSocket->close();
+        emit(completed(pipeData));
         emit(finished());
         return;
     }else{
@@ -145,6 +150,7 @@ void QiPipe_Private::onResponseConnected(){
     pipeData->serverIP = responseSocket->peerAddress().toString();
     // emit connect signal
     emit(connected(pipeData));
+    qDebug()<<"send this:\n"<<pipeData->requestRawDataToSend;
     responseSocket->write(pipeData->requestRawDataToSend);
 
 }

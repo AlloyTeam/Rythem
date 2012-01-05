@@ -34,15 +34,26 @@ void QiProxyServer::onPipeError(PipeData_ptr p){
 
 QiPipe* QiProxyServer::addPipe(int socketDescriptor){
     QiPipe *p = new QiPipe(socketDescriptor);//delete in removePipe(int)
-    pipes.value(socketDescriptor,p);
+    pipes[socketDescriptor]=p;
     return p;
 }
 
 bool QiProxyServer::removePipe(int socketId){
+    qDebug()<<"removePipe"<<socketId;
     if(pipes.contains(socketId)){
+        qDebug()<<"removePipe contains.."<<socketId;
         QiPipe *p = pipes.value(socketId);
         pipes.remove(socketId);
         p->deleteLater();
+        //delete p;
     }
     return false;
+}
+void QiProxyServer::removeAllPipe(){
+    while(pipes.size()>0){
+        int key = pipes.begin().key();
+        QiPipe *p = pipes[key];
+        pipes.remove(key);
+        delete p;
+    }
 }

@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+
+    delete server;
     delete ui;
 }
 void MainWindow::createMenus(){

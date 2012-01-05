@@ -12,6 +12,10 @@ class QiProxyServer : public QTcpServer{
         Q_OBJECT
     public:
         explicit QiProxyServer(QObject *parent = 0);
+         ~QiProxyServer(){
+            qDebug()<<"~QiProxyServer";
+            removeAllPipe();
+         }
         
     signals:
         void newPipe(PipeData_ptr);
@@ -27,6 +31,7 @@ class QiProxyServer : public QTcpServer{
     private:
         QiPipe* addPipe(int socketDescriptor);
         bool removePipe(int socketId);
+        void removeAllPipe();
         
 };
 
