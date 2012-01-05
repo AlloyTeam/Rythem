@@ -39,7 +39,7 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
             case 4:
                 return p->serverIP;
             case 5:
-                return p->URL;
+                return p->path;
             default:
                 return QString("Unknow %1").arg(index.column());
         }
@@ -73,7 +73,7 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
 
 
 void QiddlerPipeTableModel::addItem(Pipedata_const_ptr p){
-    qDebug()<<"addItem...."<<p->getHeader("Host")<<pipesVector.count();
+    qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
     Pipedata_const_ptr p1 = p;
     //p1->number=++pipeNumber;
 

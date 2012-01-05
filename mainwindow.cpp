@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createMenus();
 
     server  = new QiProxyServer();
-    server->listen(QHostAddress("127.0.0.1"),8889);
+    //server->listen(QHostAddress("127.0.0.1"),8889);
     connect(server,SIGNAL(newPipe(Pipedata_const_ptr)),SLOT(onNewPipe(Pipedata_const_ptr)));
     connect(server,SIGNAL(pipeUpdate(Pipedata_const_ptr)),SLOT(onPipeUpdate(Pipedata_const_ptr)));
 

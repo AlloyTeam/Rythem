@@ -18,52 +18,74 @@ typedef struct RequestInfo{
     QString method;
 }RequestInfo;
 
+
+
+class QiPipe_Private;
+
 class QiPipe : public QThread
 {
     Q_OBJECT
 private:
-        QString* reqRawString;
-        QTcpSocket* requestSocket;
-
-        QSharedPointer<PipeData> pipeData;
-        RequestInfo requestInfo;
-
-        QTcpSocket* responseSocket;
-        QSslSocket* responseSocketSSL;
-        QMutex mutex;
-        QNetworkAccessManager *manager;
-
+        QiPipe_Private *qp;
         int _socketDescriptor;
-
 public:
         explicit QiPipe(int socketDescriptor = 0);
         ~QiPipe();
-        void tearDown();
-
 signals:
         void completed(Pipedata_const_ptr);
         void error(Pipedata_const_ptr);
         void connected(Pipedata_const_ptr);
-
-public slots:
-        void onReqSocketReadReady();
-        void onReqSocketReadFinished();
-        void onRequestHostFound();
-        void onRequestSocketError();
-        void onRequestSocketClose();
-        void onResponseConnected();
-        void onResponseReceived();
-        void onResponseError(QAbstractSocket::SocketError);
-        void onResponseClose();
-
-        void onResponseFinished(QNetworkReply*);
-
 protected:
         void run();
 
 
+
+};
+
+
+class QiPipe_Private:public QObject{
+    Q_OBJECT
+public:
+    QiPipe_Private(int descriptor);
+signals:
+        void completed(Pipedata_const_ptr);
+        void error(Pipedata_const_ptr);
+        void connected(Pipedata_const_ptr);
+        void finished();// error or completed
+
+public slots:
+        void onRequestReadReady();
+        void onRequestError();
+        void onRequestClose();
+        void onResponseConnected();
+        void onResponseReadReady();
+        void onResponseError(QAbstractSocket::SocketError);
+        void onResponseClose();
+        void tearDown();
 private:
-        void parseRequest(const QByteArray requestString);
+        void parseRequest(const QByteArray &requestBa);
+        void parseRequestHeader(const QByteArray & header);
+        bool parseResponse(const QByteArray &responseBa);
+        void parseResponseHeader(const QByteArray &header);
+        void parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束。
+
+        QByteArray* requestRawData;
+        QByteArray* requestRawDataHeader;
+        QByteArray* requestRawDataBody;
+
+        bool requstHeaderFound;
+        int requestHeaderSpliterSize;
+        int requestHeaderSpliterIndex;
+
+        QByteArray *responseRawData;
+        QByteArray *responseBodyRawData;
+
+        QTcpSocket* requestSocket;
+        QTcpSocket* responseSocket;
+
+        QSharedPointer<PipeData> pipeData;
+        RequestInfo requestInfo;
+        QMutex mutex;
 };
 
 #endif // QPIPE_H
