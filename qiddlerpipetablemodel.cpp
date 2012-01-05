@@ -7,6 +7,11 @@
 QiddlerPipeTableModel::QiddlerPipeTableModel(QObject *parent) :
     QAbstractTableModel(parent),pipeNumber(0){
 }
+QiddlerPipeTableModel::~QiddlerPipeTableModel(){
+    removeAllItem();
+    qDebug()<<"~QiddlerPipeTableModel";
+}
+
 int QiddlerPipeTableModel::rowCount( const QModelIndex & parent ) const{
     return pipesVector.count();
 }
@@ -92,7 +97,11 @@ void QiddlerPipeTableModel::addItem(PipeData_ptr p){
 }
 
 void QiddlerPipeTableModel::removeAllItem(){
-
+    int l = pipesVector.size();
+    for(int i=0;i<l;++i){
+        PipeData_ptr p = pipesVector.at(i);
+        p.clear();
+    }
 }
 void QiddlerPipeTableModel::removeItems(){
 

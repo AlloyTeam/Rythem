@@ -16,10 +16,15 @@
 
 
 QiPipe::QiPipe(int socketDescriptor):_socketDescriptor(socketDescriptor){
-
+    stoped = false;
 }
 
 QiPipe::~QiPipe(){
+    mutex.lock();
+    stoped=true;
+    mutex.unlock();
+    emit finished();
+    wait();
     qDebug()<<"~QPipe in main:"<<((QThread::currentThread()==QApplication::instance()->thread())?"YES":"NO");
 }
 
@@ -29,10 +34,11 @@ void QiPipe::run(){
     connect(qp,SIGNAL(completed(PipeData_ptr)),this,SIGNAL(completed(PipeData_ptr)));
     connect(qp,SIGNAL(error(PipeData_ptr)),this,SIGNAL(error(PipeData_ptr)));
 
-    qDebug()<<"Pipe run:"<<QThread::currentThreadId();
-
+    //qDebug()<<"Pipe run:"<<QThread::currentThreadId();
     QEventLoop eventLoop;//use eventloop keep the thread running
     //TODO WARNING:  QThread: Destroyed while thread is still running
+    connect(this, SIGNAL(error(PipeData_ptr)), &eventLoop, SLOT(quit()));
+    connect(this, SIGNAL(completed(PipeData_ptr)), &eventLoop, SLOT(quit()));
     connect(this, SIGNAL(finished()), &eventLoop, SLOT(quit()));
     eventLoop.exec();
     qp->deleteLater();
@@ -105,7 +111,7 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
     pipeData->setRequestHeader(header);
 
     //TODO
-    pipeData->requestRawDataToSend.append(requestRawData.mid(requestHeaderSpliterIndex));
+    pipeData->requestRawDataToSend.append(requestRawData.mid(requestHeaderSpliterIndex+requestHeaderSpliterSize));
 
     /* code below cause bug when arg has %n
     QString reqSig = QString("%1 %2 %3")
@@ -137,6 +143,7 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
         connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
         connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
 
+        //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
         responseSocket->connectToHost(pipeData->getRequestHeader("Host"),pipeData->getRequestHeader("Port").toInt());
 
     }
@@ -150,7 +157,7 @@ void QiPipe_Private::onResponseConnected(){
     pipeData->serverIP = responseSocket->peerAddress().toString();
     // emit connect signal
     emit(connected(pipeData));
-    qDebug()<<"send this:\n"<<pipeData->requestRawDataToSend;
+    //qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<pipeData->requestRawDataToSend;
     responseSocket->write(pipeData->requestRawDataToSend);
 
 }
@@ -162,7 +169,12 @@ void QiPipe_Private::onResponseReadReady(){
     //TODO check if the socket opening..
     requestSocket->write(ba);
     requestSocket->flush();
-
+    /*
+    qDebug()<<"========response========***"<<responseSocket->peerName();
+    qDebug()<<pipeData->requestRawDataToSend;
+    qDebug()<<ba;
+    qDebug()<<"***========response========"<<responseSocket->peerName();
+    */
     if(parseResponse(ba)){
         responseSocket->close();
         requestSocket->close();
@@ -170,9 +182,11 @@ void QiPipe_Private::onResponseReadReady(){
     }
 }
 
-void QiPipe_Private::onResponseError(QAbstractSocket::SocketError error){
+void QiPipe_Private::onResponseError(QAbstractSocket::SocketError e){
+    emit(error(pipeData));
 }
 void QiPipe_Private::onRequestClose(){
+    emit(error(pipeData));
 }
 void QiPipe_Private::onResponseClose(){
 }
@@ -186,6 +200,7 @@ bool QiPipe_Private::parseResponse(const QByteArray &newContent){
     }else{
         parseResponseBody(newContent);
     }
+    return false;
 }
 
 void QiPipe_Private::parseResponseHeader(const QByteArray &newContent){

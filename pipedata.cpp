@@ -37,13 +37,23 @@ void PipeData::setRequestHeader(QByteArray header){
     }
 
     //TODO..
+
     requestRawDataToSend = QByteArray().append(requestMethod)
-            .append(" ")
+            .append(' ')
             .append(path)
-            .append(" ")
+            .append(' ')
             .append(protocol);
     requestRawDataToSend.append(header.mid(i));
 
+    requestRawDataToSend.replace(QString("Proxy-Connection: keep-alive\n"),QByteArray(""));
+    requestRawDataToSend.replace(QString("\n"),QByteArray("\r\n"));
+    requestRawDataToSend.append(QByteArray("\r\n\r\n"));
+    /*
+    QByteArray test = requestRawDataToSend;
+    test.replace("\r","\\r\r");
+    test.replace("\n","\\n\n");
+    qDebug()<<"test=\n"<<test;
+    */
     //the rest..
     while(i<l){
         int j=header.indexOf('\n',i);
@@ -83,7 +93,7 @@ void PipeData::setResponseHeader(QByteArray header){
             j=l;
         }
         QByteArray line = header.mid(i,j-i);
-        qDebug()<<line;
+        //qDebug()<<line;
 
         int splitIndex = line.indexOf(':');
         QByteArray name = QByteArray(line.left(splitIndex));

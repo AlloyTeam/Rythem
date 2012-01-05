@@ -1,5 +1,6 @@
 #include "qiproxyserver.h"
 #include "qipipe.h"
+#include <QThreadPool>
 
 QiProxyServer::QiProxyServer(QObject *parent) :
     QTcpServer(parent){
@@ -8,6 +9,8 @@ QiProxyServer::QiProxyServer(QObject *parent) :
 void QiProxyServer::incomingConnection(int socketId){
     //QTcpSocket *socket = new QTcpSocket();
     //socket->setSocketDescriptor(socketId);
+    QMutexLocker locker(&mutex);
+    Q_UNUSED(locker);
     QiPipe *pipe = addPipe(socketId);
 
     connect(pipe,SIGNAL(connected(PipeData_ptr)),SLOT(onPipeConnected(PipeData_ptr)));
@@ -18,8 +21,19 @@ void QiProxyServer::incomingConnection(int socketId){
     connect(pipe,SIGNAL(error(PipeData_ptr)),SIGNAL(pipeUpdate(PipeData_ptr)));
 
     pipe->start();
+    //pipe->setAutoDelete(false);
+    //QThreadPool::globalInstance()->start(pipe);
 
 
+}
+QiProxyServer::~QiProxyServer(){
+    this->close();
+    qDebug()<<"~QiProxyServer";
+    while(hasPendingConnections()){
+        QTcpSocket *socket = nextPendingConnection();
+        socket->close();
+    }
+    removeAllPipe();
 }
 void QiProxyServer::onPipeConnected(PipeData_ptr p){
     // do nothing?
@@ -39,7 +53,6 @@ QiPipe* QiProxyServer::addPipe(int socketDescriptor){
 }
 
 bool QiProxyServer::removePipe(int socketId){
-    qDebug()<<"removePipe"<<socketId;
     if(pipes.contains(socketId)){
         qDebug()<<"removePipe contains.."<<socketId;
         QiPipe *p = pipes.value(socketId);

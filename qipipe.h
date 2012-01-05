@@ -10,6 +10,7 @@
 #include <QTcpSocket>
 #include <QSharedPointer>
 #include <QNetworkAccessManager>
+#include <QRunnable>
 
 typedef struct RequestInfo{
     QString url;
@@ -37,6 +38,8 @@ signals:
         void connected(PipeData_ptr);
 protected:
         void run();
+        bool stoped;
+        QMutex mutex;
 
 
 

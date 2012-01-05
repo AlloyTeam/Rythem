@@ -49,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-
     delete server;
     delete ui;
 }
@@ -88,8 +87,8 @@ void MainWindow::toggleCapture(){
         }
         */
         // hard code just for some crash issue
-        proxySetting.setValue("ProxyEnable",1);
-        proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
+        //proxySetting.setValue("ProxyEnable",1);
+        //proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
         //if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
         //}

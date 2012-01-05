@@ -1,6 +1,8 @@
 #ifndef QPROXYSERVER_H
 #define QPROXYSERVER_H
 
+#include <QMutex>
+#include <QMutexLocker>
 #include <QTcpServer>
 #include <pipedata.h>
 #include <QVector>
@@ -12,10 +14,7 @@ class QiProxyServer : public QTcpServer{
         Q_OBJECT
     public:
         explicit QiProxyServer(QObject *parent = 0);
-         ~QiProxyServer(){
-            qDebug()<<"~QiProxyServer";
-            removeAllPipe();
-         }
+         ~QiProxyServer();
         
     signals:
         void newPipe(PipeData_ptr);
@@ -32,6 +31,8 @@ class QiProxyServer : public QTcpServer{
         QiPipe* addPipe(int socketDescriptor);
         bool removePipe(int socketId);
         void removeAllPipe();
+
+        QMutex mutex;
         
 };
 

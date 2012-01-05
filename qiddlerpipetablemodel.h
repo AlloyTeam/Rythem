@@ -11,6 +11,7 @@ class QiddlerPipeTableModel : public QAbstractTableModel
     Q_OBJECT
 public:
     explicit QiddlerPipeTableModel(QObject *parent = 0);
+    ~QiddlerPipeTableModel();
     QMap<int,PipeData_ptr > pipesMap;
     QVector<PipeData_ptr > pipesVector;
 
