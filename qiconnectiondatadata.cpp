@@ -130,7 +130,7 @@ QByteArray QiConnectionData::getRequestHeader() const{
     }
 }
 QByteArray QiConnectionData::getRequestHeader(QByteArray name) const{
-    return allRequestHeaders[name];
+    return allRequestHeaders.value(name,QByteArray());
 }
 QByteArray QiConnectionData::getRequestBody()const{
     if(requestRawData.isEmpty()){

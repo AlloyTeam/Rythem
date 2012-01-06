@@ -16,19 +16,16 @@ public:
 
     inline QiConnectionData(const QiConnectionData& p){//copy ctor
         number = p.number;
-        /*
+
         returnCode = p.returnCode;
         protocol = p.protocol;
         serverIP = p.serverIP;
         host = p.host;
         path = p.path;
         port = p.port;
-        resStatus = p.resStatus;
-        resHeader = p.resHeader;
-        resBody = p.resBody;
         fullUrl = p.fullUrl;
         requestMethod = p.requestMethod;
-        */
+        unChunkResponse = p.unChunkResponse;
         setRequestRawData(p.requestRawData);
         setResponseRawData(p.responseRawData);
     }
@@ -44,6 +41,8 @@ public:
     int port;
     QString requestMethod;
     QString responseStatus;
+
+    QByteArray unChunkResponse;
 
     QByteArray requestRawDataToSend;
 

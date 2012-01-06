@@ -39,12 +39,14 @@ void QiPipe::run(){
 }
 //===========QiPipe_Private
 QiPipe_Private::QiPipe_Private(int descriptor):requestSocket(NULL),responseSocket(NULL){
-    responseHeaderFound = false;
-    requestHeaderFound = false;
+
+    requestState = Initial;
+    responseState = Initial;
+
+    // setup request socket
     requestSocket = new QTcpSocket();
-    //isInMain("QiPipe_Private");
-    pipeData = QSharedPointer<QiConnectionData>(new QiConnectionData);
-    pipeData->socketId = descriptor;
+    connectionData = QSharedPointer<QiConnectionData>(new QiConnectionData);
+    connectionData->socketId = descriptor;
 
     connect(requestSocket,SIGNAL(readyRead()),this,SLOT(onRequestReadReady()));
     connect(requestSocket,SIGNAL(disconnected()),this,SLOT(onRequestClose()));
@@ -54,8 +56,6 @@ QiPipe_Private::QiPipe_Private(int descriptor):requestSocket(NULL),responseSocke
     if(!isSocketValid){
         qWarning()<<"invalid socket descriptor!!";
         return;
-    }else{
-        //qDebug()<<"is validate socket"<<requestSocket->state()<<requestSocket->readAll();
     }
 }
 QiPipe_Private::~QiPipe_Private(){
@@ -63,14 +63,13 @@ QiPipe_Private::~QiPipe_Private(){
     if(requestSocket && requestSocket->isOpen()){
         requestSocket->blockSignals(true);
         requestSocket->abort();
+        delete requestSocket;
     }
     if(responseSocket && responseSocket->isOpen()){
         responseSocket->blockSignals(true);
         responseSocket->abort();
+        delete responseSocket;
     }
-
-    delete requestSocket;
-    delete responseSocket;
 }
 
 
@@ -82,25 +81,74 @@ void QiPipe_Private::onRequestReadReady(){
     //isInMain("onRequestReadReady");
 
     QByteArray newReqData = requestSocket->readAll();
-    qDebug()<<"onRequestReady:"<<pipeData->socketId<<" newContent:"<<newReqData;
-    //update raw data
+    //qDebug()<<"onRequestReady:"<<pipeData->socketId<<" newContent:"<<newReqData;
+    //update raw data?
     requestRawData.append(newReqData);
     parseRequest(newReqData);
 }
 void QiPipe_Private::parseRequest(const QByteArray &newContent){
-    if(!requestHeaderFound){
+    if(requestState != HeaderFound){// no header parse one more time
         parseRequestHeader(newContent);
-        emit(connected(pipeData));
-    }else{
-        //qDebug()<<"browser reuse socket:\n+++----\n"<<newContent<<"\n---\n"<<requestRawData<<"\n----+++";
-
-        if(responseSocket){
-            if(responseSocket->isOpen()){
-                responseSocket->write(newContent);
-                responseSocket->flush();
-            }
+    }
+    if(requestState != HeaderFound){// stile no request header return
+        return;
+    }else{// check if go whole request package
+        QByteArray contentLenght = connectionData->getRequestHeader("Content-Length");
+        requestContentLength = contentLenght.toInt();
+        if(requestContentLength == 0){
+            // no body to send
+            requestState = PackageFound;
         }else{
-            //should no be an else..
+            // need body
+            qDebug()<<"length="<<requestContentLength<<" ba="<<contentLenght;
+            int bufferBodyLength = requestRawData.length() - (requestHeaderSpliterSize + requestHeaderSpliterIndex);
+            requestBodyRemain = requestContentLength - bufferBodyLength;
+            if(requestBodyRemain <= 0){
+                requestState = PackageFound;
+            }
+        }
+    }
+    // parse body
+    // is need to count request length?
+    if(responseState == Connected){
+        connectionData->requestRawDataToSend.append(newContent);
+        responseSocket->write(connectionData->requestRawDataToSend);
+        responseSocket->flush();
+    }else{
+        responseState = Initial;
+        responseRawData.clear();
+        connectionData->requestRawDataToSend.append(requestRawData.mid(requestHeaderSpliterIndex+requestHeaderSpliterSize));
+        //QString reqSig = connectionData->requestMethod+" "+connectionData->path+" "+connectionData->protocol;
+        connectionData->host = connectionData->getRequestHeader("Host");
+        if(connectionData->getRequestHeader("Host") == "127.0.0.1" && connectionData->getRequestHeader("Port")=="8889"){//避免死循环
+            //TODO
+            QByteArray byteToWrite;
+            QString s = "hello Qiddler";
+            int count = s.length();
+            byteToWrite.append(QString("HTTP/1.1 200 OK\r\nServer: Qiddler\r\nContent-Type: text/html\r\nContent-Length: %1\r\n\r\n").arg(count));
+            byteToWrite.append(s);
+            requestSocket->write(byteToWrite);
+            requestSocket->flush();
+            requestSocket->abort();
+            emit(completed(connectionData));
+            return;
+        }else{
+            responseSocket = new QTcpSocket();
+            connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+            connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadReady()));
+            connect(responseSocket,SIGNAL(disconnected()),SLOT(onResponseClose()));
+            connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
+            connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
+
+            QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(connectionData->fullUrl)));
+            for(int i=0,l=proxylist.length();i<l;++i){
+                QNetworkProxy p = proxylist.at(i);
+                responseSocket->setProxy(p);
+                qDebug()<<"proxy="<<p.hostName()<<p.port();
+            }
+            //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
+            responseSocket->connectToHost(connectionData->getRequestHeader("Host"),connectionData->getRequestHeader("Port").toInt());
+
         }
     }
 }
@@ -121,66 +169,32 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
     }else{
         return;
     }
-    requestHeaderFound = true;
-    pipeData->setRequestHeader(header);
 
-    //TODO
-    pipeData->requestRawDataToSend.append(requestRawData.mid(requestHeaderSpliterIndex+requestHeaderSpliterSize));
+    //TODO use setRequestState
+    requestState = HeaderFound;
 
-    /* code below cause bug when arg has %n
-    QString reqSig = QString("%1 %2 %3")
-            .arg(pipeData->requestMethod)
-            .arg(pipeData->path)
-            .arg(pipeData->protocol);
-    */
-    QString reqSig = pipeData->requestMethod+" "+pipeData->path+" "+pipeData->protocol;
-
-    //qDebug()<<"host="<<pipeData->getRequestHeader("Host")<<pipeData->getRequestHeader("Port")<<reqSig;
-    pipeData->host = pipeData->getRequestHeader("Host");
-
-    if(pipeData->getRequestHeader("Host") == "127.0.0.1" && pipeData->getRequestHeader("Port")=="8889"){//避免死循环
-        emit(connected(pipeData));
-        QByteArray byteToWrite;
-        QString s = "hello Qiddler";
-        int count = s.length();
-        byteToWrite.append(QString("HTTP/1.1 200 OK\r\nServer: Qiddler\r\nContent-Type: text/html\r\nContent-Length: %1\r\n\r\n").arg(count));
-        byteToWrite.append(s);
-        requestSocket->write(byteToWrite);
-        requestSocket->flush();
-        requestSocket->abort();
-        emit(completed(pipeData));
-        emit(finished());
-        return;
-    }else{
-        responseSocket = new QTcpSocket();
-        connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
-        connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadReady()));
-        connect(responseSocket,SIGNAL(disconnected()),SLOT(onResponseClose()));
-        connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
-        connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
-
-        QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(pipeData->fullUrl)));
-        for(int i=0,l=proxylist.length();i<l;++i){
-            QNetworkProxy p = proxylist.at(i);
-            responseSocket->setProxy(p);
-            qDebug()<<"proxy="<<p.hostName()<<p.port();
-        }
-        //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
-        responseSocket->connectToHost(pipeData->getRequestHeader("Host"),pipeData->getRequestHeader("Port").toInt());
-
-    }
+    // create new QiConnectionData (will sharedpoiter do clear for old pointer? anwser:YES)
+    connectionData = QSharedPointer<QiConnectionData>(new QiConnectionData());
+    connectionData->setRequestHeader(header);
+    emit connected(connectionData);
 }
 
 void QiPipe_Private::onRequestError(){
-    emit(error(pipeData));
+    emit(error(connectionData));
 }
 void QiPipe_Private::onResponseConnected(){
+
+    // need?
+    QMutexLocker locker(&mutex);
+    Q_UNUSED(locker)
+
+    responseState = Connected;
     // save the server ip address
-    pipeData->serverIP = responseSocket->peerAddress().toString();
+    connectionData->serverIP = responseSocket->peerAddress().toString();
     // emit connect signal
     //qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<pipeData->requestRawDataToSend;
-    responseSocket->write(pipeData->requestRawDataToSend);
-
+    qint64 n = responseSocket->write(connectionData->requestRawDataToSend);
+    connectionData->requestRawDataToSend.remove(0,n);
 }
 void QiPipe_Private::onResponseReadReady(){
 
@@ -199,9 +213,9 @@ void QiPipe_Private::onResponseReadReady(){
     qDebug()<<"***========response========"<<responseSocket->peerName();
     */
     if(parseResponse(ba)){
-        responseSocket->abort();
-        requestSocket->abort();
-        //todo emit
+        // package got end
+        emit completed(connectionData);
+
     }
     locker.unlock();
 }
@@ -209,55 +223,98 @@ void QiPipe_Private::onResponseReadReady(){
 void QiPipe_Private::onResponseError(QAbstractSocket::SocketError e){
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
-    emit(error(pipeData));
+    emit(error(connectionData));
     emit finished();
 }
 void QiPipe_Private::onRequestClose(){
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
-    emit error(pipeData);
+    emit error(connectionData);
     emit finished();
 }
 void QiPipe_Private::onResponseClose(){
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
-    emit error(pipeData);
+    emit error(connectionData);
     emit finished();
 }
 
 bool QiPipe_Private::parseResponse(const QByteArray &newContent){
-    if(!responseHeaderFound){
+    // if got response end return true
+    if(responseState != HeaderFound){
         parseResponseHeader(newContent);
-        if(responseHeaderFound){//check if got end
-
-        }
-    }else{
-        parseResponseBody(newContent);
     }
-    return false;
+
+    if(responseState != HeaderFound){//check if got end
+        return false;
+    }
+    return parseResponseBody(newContent);
 }
 
 void QiPipe_Private::parseResponseHeader(const QByteArray &newContent){
-    Q_UNUSED(newContent);
-    responseHeaderFound = true;
+    Q_UNUSED(newContent)
     responseHeaderSpliterInex = responseRawData.indexOf(QByteArray("\r\n\r\n"));
     if(responseHeaderSpliterInex!=-1){
+        responseState = HeaderFound;
         responseHeaderSpliterSize = 4;
-        pipeData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
+        connectionData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
     }else{
         responseHeaderSpliterInex = responseRawData.indexOf(QByteArray("\r\n\r\n"));
         if(responseHeaderSpliterInex != -1){
-            responseHeaderSpliterSize = 2;
-            pipeData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
-        }else{
-            responseHeaderSpliterInex =-1;
-            responseHeaderFound = false;
+            responseState = HeaderFound;
+            connectionData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
         }
+    }
+    if(responseState == HeaderFound){
+        isResponseChunked = connectionData->getResponseHeader("Transfer-Encoding").toLower() == "chunked";
+        responseContentLength = connectionData->getResponseHeader("Content-Length").toInt();
+        responseComressType = connectionData->getResponseHeader("Content-Encoding");
     }
 }
 
-void QiPipe_Private::parseResponseBody(const QByteArray &body){
+bool QiPipe_Private::parseResponseBody(const QByteArray &newContent){
+    Q_UNUSED(newContent)
     //根据http协议，需由header及body共同判断请求是否结束。
+    if(isResponseChunked){//is chuncked
+        QByteArray theBody = responseRawData.mid(responseHeaderSpliterSize+responseHeaderSpliterInex);
+        theBody.replace("\r\n","\n");
+        int i=0;
+        int l=theBody.length();
+        while(i<=l){//need to valid chunk here?
+            int beginOfLength=theBody.indexOf('\n',i);
+            if(beginOfLength==-1){
+                return false;
+            }
+            int endOfLength = theBody.indexOf('\n',beginOfLength);
+            if(endOfLength==-1){
+                return false;
+            }
+            bool isChunkValid;
+            int chunkSize = theBody.mid(beginOfLength,endOfLength-beginOfLength).toInt(&isChunkValid,16);
+            if(chunkSize==0){
+                return true;
+            }
+            // don't do this until comfirm reponse done
+            /*
+            if(chunkSize+endOfLength+1<=l){
+                connectionData->unChunkResponse.append(theBody.mid(endOfLength+1,chunkSize));
+            }
+            */
+            if(!isChunkValid){
+                return false;
+            }
+            i = chunkSize+endOfLength+1;
+            if(i>l){
+                return false;
+            }
+        }
+    }else{
+        if(responseContentLength<=responseRawData.length()-(responseHeaderSpliterSize+responseHeaderSpliterInex)){
+            return true;
+        }
+    }
+    return false;
+
 }
 void QiPipe_Private::tearDown(){
 }

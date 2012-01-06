@@ -72,7 +72,7 @@ private:
         void parseRequestHeader(const QByteArray & header);
         bool parseResponse(const QByteArray &responseBa);
         void parseResponseHeader(const QByteArray &header);
-        void parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束
+        bool parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束
 
         QByteArray requestRawData;
         QByteArray requestRawDataHeader;
@@ -81,10 +81,16 @@ private:
         bool requestHeaderFound;
         int requestHeaderSpliterSize;
         int requestHeaderSpliterIndex;
+        int requestContentLength;
+        int requestBodyRemain;
 
         bool responseHeaderFound;
         int responseHeaderSpliterSize;
         int responseHeaderSpliterInex;
+        int responseContentLength;
+        int responseBodyRemain;
+        bool isResponseChunked;
+        QByteArray responseComressType;
 
         QByteArray responseRawData;
         QByteArray responseBodyRawData;
@@ -92,9 +98,20 @@ private:
         QTcpSocket* requestSocket;
         QTcpSocket* responseSocket;
 
-        QSharedPointer<QiConnectionData> pipeData;
+        QSharedPointer<QiConnectionData> connectionData;
         RequestInfo requestInfo;
         QMutex mutex;
+
+
+        enum State {
+                Connected,   // response only
+                BodyParsing, // response only
+                Initial,     // both
+                HeaderFound, // both
+                PackageFound // both
+        };
+        State requestState;
+        State responseState;
 };
 
 #endif // QPIPE_H
