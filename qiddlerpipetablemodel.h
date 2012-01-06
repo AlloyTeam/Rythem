@@ -25,7 +25,7 @@ public:
     void removeItems();
     void removeAllItem();
 
-    void updateItem(ConnectionData_ptr p)
+    void updateItem(ConnectionData_ptr p);
 signals:
 
 public slots:
