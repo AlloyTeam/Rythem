@@ -6,8 +6,10 @@
 #include <QObject>
 #include <QNetworkProxy>
 #include <QList>
+#ifdef Q_OS_WIN
 #include <qt_windows.h>
 #include <wininet.h>
+#endif
 #include <QLibrary>
 #include <QUrl>
 #include <QNetworkProxyQuery>

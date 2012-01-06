@@ -21,6 +21,8 @@ SOURCES += main.cpp\
     qiwinhttp.cpp \
     qiconnectiondatadata.cpp
 
+mac:SOURCES -= qiwinhttp.cpp
+
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
     qnetworkproxyfactoryexendforpac.h \
@@ -29,6 +31,8 @@ HEADERS  += mainwindow.h \
     qiresponse.h \
     qiwinhttp.h \
     qiconnectiondata.h
+
+mac:HEADERS -= qiwinhttp.h
 
 FORMS    += mainwindow.ui
 
