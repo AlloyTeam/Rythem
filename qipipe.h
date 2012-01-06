@@ -38,6 +38,7 @@ signals:
         void connected(PipeData_ptr);
 protected:
         void run();
+
         bool stoped;
         QMutex mutex;
 
@@ -50,6 +51,8 @@ class QiPipe_Private:public QObject{
     Q_OBJECT
 public:
     QiPipe_Private(int descriptor);
+    ~QiPipe_Private();
+
 signals:
         void completed(PipeData_ptr);
         void error(PipeData_ptr);

@@ -23,7 +23,7 @@ void PipeData::setRequestHeader(QByteArray header){
     // change http://aaa.com/a/b/c?d to /a/b/c?d
     path = "/";
     int n;
-    qDebug()<<"fullUrl="<<fullUrl;
+    //qDebug()<<"fullUrl="<<fullUrl;
     if(fullUrl.indexOf("://")!=-1){
         n = fullUrl.split("://")[1].indexOf("/");
         if(n!=-1 && n<fullUrl.length()-1){

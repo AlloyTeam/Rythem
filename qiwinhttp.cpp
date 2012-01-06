@@ -219,8 +219,11 @@ void QiWinHttp::init(const QString autoConfigUrl){
     isInited = true;
 }
 QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
-    Q_ASSERT(isInited);
     QList<QNetworkProxy> result;
+    if(!isInited){
+        qWarning()<<"error!!! winhttp not inited";
+        return result;
+    }
     // try to get the proxy config for the URL
     QUrl url = query.url();
     // url could be empty, e.g. from QNetworkProxy::applicationProxy(), that's fine,

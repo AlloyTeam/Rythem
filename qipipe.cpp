@@ -14,16 +14,22 @@
 #include <QByteArray>
 #include <qglobal.h>
 
+static void isInMain(QString info){
+    if(QThread::currentThread() == QApplication::instance()->thread()){
+        qDebug()<<info<<" in main thread.";
+    }else{
+        qDebug()<<info<<" not main thread.";
+    }
+}
 
 QiPipe::QiPipe(int socketDescriptor):_socketDescriptor(socketDescriptor){
     stoped = false;
+    qDebug()<<"socketDescriptor:"<<socketDescriptor;
 }
 
 QiPipe::~QiPipe(){
-    mutex.lock();
-    stoped=true;
-    mutex.unlock();
     emit finished();
+    qDebug()<<"~QPipe wait for QiPipe::run exit";
     wait();
     qDebug()<<"~QPipe in main:"<<((QThread::currentThread()==QApplication::instance()->thread())?"YES":"NO");
 }
@@ -41,32 +47,56 @@ void QiPipe::run(){
     connect(this, SIGNAL(completed(PipeData_ptr)), &eventLoop, SLOT(quit()));
     connect(this, SIGNAL(finished()), &eventLoop, SLOT(quit()));
     eventLoop.exec();
+    //while(!stoped){
+    //    msleep(1);
+        //::Sleep(200);// win api..
+    //}
     qp->deleteLater();
+    //qDebug()<<"exiting QiPipe run";
 }
 //===========QiPipe_Private
-QiPipe_Private::QiPipe_Private(int descriptor):responseSocket(NULL){
+QiPipe_Private::QiPipe_Private(int descriptor):requestSocket(NULL),responseSocket(NULL){
     responseHeaderFound = false;
     requestHeaderFound = false;
     requestSocket = new QTcpSocket();
-    bool isSocketValid = requestSocket->setSocketDescriptor(descriptor);
-    if(!isSocketValid){
-        qWarning()<<"invalid socket descriptor!!";
-        emit(finished());
-        return;
-    }
+    //isInMain("QiPipe_Private");
     pipeData = QSharedPointer<PipeData>(new PipeData);
     pipeData->socketId = descriptor;
+
     connect(requestSocket,SIGNAL(readyRead()),this,SLOT(onRequestReadReady()));
     connect(requestSocket,SIGNAL(disconnected()),this,SLOT(onRequestClose()));
     connect(requestSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(onRequestError()));
-}
 
+    bool isSocketValid = requestSocket->setSocketDescriptor(descriptor);
+    if(!isSocketValid){
+        qWarning()<<"invalid socket descriptor!!";
+        return;
+    }else{
+        //qDebug()<<"is validate socket"<<requestSocket->state()<<requestSocket->readAll();
+    }
+}
+QiPipe_Private::~QiPipe_Private(){
+    QMutexLocker locker(&mutex);
+    if(requestSocket && requestSocket->isOpen()){
+        requestSocket->blockSignals(true);
+        requestSocket->abort();
+    }
+    if(responseSocket && responseSocket->isOpen()){
+        responseSocket->blockSignals(true);
+        responseSocket->abort();
+    }
+
+    delete requestSocket;
+    delete responseSocket;
+}
 
 
 void QiPipe_Private::onRequestReadReady(){
 
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
+
+    //isInMain("onRequestReadReady");
 
     QByteArray newReqData = requestSocket->readAll();
 
@@ -77,9 +107,10 @@ void QiPipe_Private::onRequestReadReady(){
 void QiPipe_Private::parseRequest(const QByteArray &newContent){
     if(!requestHeaderFound){
         parseRequestHeader(newContent);
+        emit(connected(pipeData));
     }else{
         //应该不会来到这一步吧..
-        Q_ASSERT(true);
+        qDebug()<<"Ctrl+F5??:"<<newContent;
         if(responseSocket){
             if(responseSocket->isOpen()){
                 responseSocket->write(newContent);
@@ -121,7 +152,8 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
     */
     QString reqSig = pipeData->requestMethod+" "+pipeData->path+" "+pipeData->protocol;
 
-    qDebug()<<"host="<<pipeData->getRequestHeader("Host")<<pipeData->getRequestHeader("Port")<<reqSig;
+    //qDebug()<<"host="<<pipeData->getRequestHeader("Host")<<pipeData->getRequestHeader("Port")<<reqSig;
+    pipeData->host = pipeData->getRequestHeader("Host");
 
     if(pipeData->getRequestHeader("Host") == "127.0.0.1" && pipeData->getRequestHeader("Port")=="8889"){//避免死循环
         emit(connected(pipeData));
@@ -132,7 +164,7 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
         byteToWrite.append(s);
         requestSocket->write(byteToWrite);
         requestSocket->flush();
-        requestSocket->close();
+        requestSocket->abort();
         emit(completed(pipeData));
         emit(finished());
         return;
@@ -140,9 +172,16 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
         responseSocket = new QTcpSocket();
         connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
         connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadReady()));
+        connect(responseSocket,SIGNAL(disconnected()),SLOT(onResponseClose()));
         connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
         connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
 
+        QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(pipeData->fullUrl)));
+        for(int i=0,l=proxylist.length();i<l;++i){
+            QNetworkProxy p = proxylist.at(i);
+            responseSocket->setProxy(p);
+            qDebug()<<"proxy="<<p.hostName()<<p.port();
+        }
         //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
         responseSocket->connectToHost(pipeData->getRequestHeader("Host"),pipeData->getRequestHeader("Port").toInt());
 
@@ -156,15 +195,16 @@ void QiPipe_Private::onResponseConnected(){
     // save the server ip address
     pipeData->serverIP = responseSocket->peerAddress().toString();
     // emit connect signal
-    emit(connected(pipeData));
     //qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<pipeData->requestRawDataToSend;
     responseSocket->write(pipeData->requestRawDataToSend);
 
 }
 void QiPipe_Private::onResponseReadReady(){
+
     QByteArray ba = responseSocket->readAll();
     responseRawData.append(ba);
 
+    QMutexLocker locker(&mutex);
     //write back to request
     //TODO check if the socket opening..
     requestSocket->write(ba);
@@ -176,19 +216,30 @@ void QiPipe_Private::onResponseReadReady(){
     qDebug()<<"***========response========"<<responseSocket->peerName();
     */
     if(parseResponse(ba)){
-        responseSocket->close();
-        requestSocket->close();
+        responseSocket->abort();
+        requestSocket->abort();
         //todo emit
     }
+    locker.unlock();
 }
 
 void QiPipe_Private::onResponseError(QAbstractSocket::SocketError e){
+    QMutexLocker locker(&mutex);
+    Q_UNUSED(locker);
     emit(error(pipeData));
+    emit finished();
 }
 void QiPipe_Private::onRequestClose(){
-    emit(error(pipeData));
+    QMutexLocker locker(&mutex);
+    Q_UNUSED(locker);
+    emit error(pipeData);
+    emit finished();
 }
 void QiPipe_Private::onResponseClose(){
+    QMutexLocker locker(&mutex);
+    Q_UNUSED(locker);
+    emit error(pipeData);
+    emit finished();
 }
 
 bool QiPipe_Private::parseResponse(const QByteArray &newContent){

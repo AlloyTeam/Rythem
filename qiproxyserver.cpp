@@ -54,7 +54,7 @@ QiPipe* QiProxyServer::addPipe(int socketDescriptor){
 
 bool QiProxyServer::removePipe(int socketId){
     if(pipes.contains(socketId)){
-        qDebug()<<"removePipe contains.."<<socketId;
+        //qDebug()<<"removePipe contains.."<<socketId;
         QiPipe *p = pipes.value(socketId);
         pipes.remove(socketId);
         p->deleteLater();

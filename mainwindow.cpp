@@ -77,21 +77,22 @@ void MainWindow::onNewPipe(PipeData_ptr p){
 }
 void MainWindow::toggleCapture(){
 #ifdef Q_WS_WIN32
+    QiWinHttp::init(previousProxyInfo.isUsingPac);
     if(isUsingCapture){
         isUsingCapture = false;
-
+        /*
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
         proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
         if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
         }
-
+        */
         // hard code just for some crash issue
-        //proxySetting.setValue("ProxyEnable",1);
-        //proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
-        //if( previousProxyInfo.isUsingPac != "0"){
-        //    proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
-        //}
+        proxySetting.setValue("ProxyEnable",1);
+        proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
+        if( previousProxyInfo.isUsingPac != "0"){
+            proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
+        }
     }else{
         isUsingCapture = true;
         previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
@@ -121,7 +122,6 @@ void MainWindow::toggleCapture(){
     proxySetting.sync();
     ::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
-    QiWinHttp::init(previousProxyInfo.isUsingPac);
 #endif
 #ifdef Q_WS_MAC
     /*
