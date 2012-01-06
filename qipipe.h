@@ -11,6 +11,7 @@
 #include <QSharedPointer>
 #include <QNetworkAccessManager>
 #include <QRunnable>
+#include <QEventLoop>
 
 typedef struct RequestInfo{
     QString url;
@@ -33,17 +34,17 @@ public:
         explicit QiPipe(int socketDescriptor = 0);
         ~QiPipe();
 signals:
-        void completed(PipeData_ptr);
-        void error(PipeData_ptr);
-        void connected(PipeData_ptr);
+        void completed(ConnectionData_ptr);
+        void error(ConnectionData_ptr);
+        void connected(ConnectionData_ptr);
+        void pipeFinished();
+public slots:
+        void onPipeFinished();
 protected:
         void run();
 
         bool stoped;
         QMutex mutex;
-
-
-
 };
 
 
@@ -54,9 +55,9 @@ public:
     ~QiPipe_Private();
 
 signals:
-        void completed(PipeData_ptr);
-        void error(PipeData_ptr);
-        void connected(PipeData_ptr);
+        void completed(ConnectionData_ptr);
+        void error(ConnectionData_ptr);
+        void connected(ConnectionData_ptr);
         void finished();// error or completed
 
 public slots:
@@ -73,7 +74,7 @@ private:
         void parseRequestHeader(const QByteArray & header);
         bool parseResponse(const QByteArray &responseBa);
         void parseResponseHeader(const QByteArray &header);
-        void parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束。
+        void parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束�
 
         QByteArray requestRawData;
         QByteArray requestRawDataHeader;
@@ -93,7 +94,7 @@ private:
         QTcpSocket* requestSocket;
         QTcpSocket* responseSocket;
 
-        QSharedPointer<PipeData> pipeData;
+        QSharedPointer<QiConnectionData> pipeData;
         RequestInfo requestInfo;
         QMutex mutex;
 };

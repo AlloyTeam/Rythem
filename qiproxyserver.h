@@ -7,7 +7,7 @@
 #include <pipedata.h>
 #include <QVector>
 class QiPipe;
-class PipeData;
+class QiConnectionData;
 #include <QSharedPointer>
 
 class QiProxyServer : public QTcpServer{
@@ -17,12 +17,12 @@ class QiProxyServer : public QTcpServer{
          ~QiProxyServer();
         
     signals:
-        void newPipe(PipeData_ptr);
-        void pipeUpdate(PipeData_ptr);
+        void newPipe(ConnectionData_ptr);
+        void pipeUpdate(ConnectionData_ptr);
     public slots:
-        void onPipeConnected(PipeData_ptr);
-        void onPipeComplete(PipeData_ptr);
-        void onPipeError(PipeData_ptr);
+        void onPipeConnected(ConnectionData_ptr);
+        void onPipeComplete(ConnectionData_ptr);
+        void onPipeError(ConnectionData_ptr);
     protected:
         void incomingConnection(int handle);
 

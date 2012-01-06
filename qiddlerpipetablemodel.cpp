@@ -21,7 +21,7 @@ int QiddlerPipeTableModel::columnCount(const QModelIndex &parent) const{
 QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
     if(role == Qt::DisplayRole || role == Qt::ToolTipRole){
         int row = index.row();
-        PipeData_ptr p;
+        ConnectionData_ptr p;
         if(pipesVector.count()>row){
             p = pipesVector.at(row);
         }else{
@@ -77,9 +77,9 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
 }
 
 
-void QiddlerPipeTableModel::addItem(PipeData_ptr p){
+void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
     qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
-    PipeData_ptr p1 = p;
+    ConnectionData_ptr p1 = p;
     ++pipeNumber;
     p1->number=pipeNumber;
 
@@ -99,7 +99,7 @@ void QiddlerPipeTableModel::addItem(PipeData_ptr p){
 void QiddlerPipeTableModel::removeAllItem(){
     int l = pipesVector.size();
     for(int i=0;i<l;++i){
-        PipeData_ptr p = pipesVector.at(i);
+        ConnectionData_ptr p = pipesVector.at(i);
         p.clear();
     }
 }

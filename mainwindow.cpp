@@ -38,18 +38,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setColumnWidth(0,30);
     //ui->tableView->setItemDelegate();
     createMenus();
-
-    server  = new QiProxyServer();
-    server->listen(QHostAddress("127.0.0.1"),8889);
-    connect(server,SIGNAL(newPipe(PipeData_ptr)),SLOT(onNewPipe(PipeData_ptr)));
-    connect(server,SIGNAL(pipeUpdate(PipeData_ptr)),SLOT(onPipeUpdate(PipeData_ptr)));
-
     //toggleCapture();
 }
 
 MainWindow::~MainWindow()
 {
-    delete server;
     delete ui;
 }
 void MainWindow::createMenus(){
@@ -67,11 +60,11 @@ void MainWindow::doSomeBug(){
     s.at(10);
 }
 
-void MainWindow::onPipeUpdate(PipeData_ptr pipeData){
+void MainWindow::onPipeUpdate(ConnectionData_ptr pipeData){
     //qDebug()<<"connected";
 }
 
-void MainWindow::onNewPipe(PipeData_ptr p){
+void MainWindow::onNewPipe(ConnectionData_ptr p){
     //pipeTableModel
     pipeTableModel.addItem(p);
 }

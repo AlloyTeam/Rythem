@@ -12,8 +12,8 @@ class QiddlerPipeTableModel : public QAbstractTableModel
 public:
     explicit QiddlerPipeTableModel(QObject *parent = 0);
     ~QiddlerPipeTableModel();
-    QMap<int,PipeData_ptr > pipesMap;
-    QVector<PipeData_ptr > pipesVector;
+    QMap<int,ConnectionData_ptr > pipesMap;
+    QVector<ConnectionData_ptr > pipesVector;
 
     int rowCount( const QModelIndex & parent ) const;
     int columnCount(const QModelIndex &parent) const;
@@ -21,7 +21,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
-    void addItem(PipeData_ptr p);
+    void addItem(ConnectionData_ptr p);
     void removeItems();
     void removeAllItem();
 signals:

@@ -2,12 +2,12 @@
 #include <QDebug>
 #include <QStringList>
 
-PipeData::PipeData(int socketDescriptor):socketId(socketDescriptor){
+QiConnectionData::QiConnectionData(int socketDescriptor):socketId(socketDescriptor){
     qDebug()<<"PipeData contructed:"<<socketId;
 }
 
 
-void PipeData::setRequestHeader(QByteArray header){
+void QiConnectionData::setRequestHeader(QByteArray header){
     header.replace("\r\n","\n");
     int i=0,l=header.length();
     //firstline
@@ -82,7 +82,7 @@ void PipeData::setRequestHeader(QByteArray header){
         i=j+1;
     }
 }
-void PipeData::setResponseHeader(QByteArray header){
+void QiConnectionData::setResponseHeader(QByteArray header){
     //TODO.. Ctrl+c & Ctrl+v from setRequestHeader
     header.replace("\r\n","\n");
     int i=0,l=header.length();
@@ -105,17 +105,17 @@ void PipeData::setResponseHeader(QByteArray header){
 }
 
 
-QByteArray PipeData::getResponseHeader(QByteArray name)const{
+QByteArray QiConnectionData::getResponseHeader(QByteArray name)const{
     return allResponseHeaders[name];
 }
-QByteArray PipeData::getResponseHeader()const{
+QByteArray QiConnectionData::getResponseHeader()const{
 
 }
-QByteArray PipeData::getResponseBody()const{
+QByteArray QiConnectionData::getResponseBody()const{
 
 }
 
-QByteArray PipeData::getRequestHeader() const{
+QByteArray QiConnectionData::getRequestHeader() const{
     if(requestRawData.isEmpty()){
         return requestRawData;
     }
@@ -129,10 +129,10 @@ QByteArray PipeData::getRequestHeader() const{
         return requestRawData.left(i);
     }
 }
-QByteArray PipeData::getRequestHeader(QByteArray name) const{
+QByteArray QiConnectionData::getRequestHeader(QByteArray name) const{
     return allRequestHeaders[name];
 }
-QByteArray PipeData::getRequestBody()const{
+QByteArray QiConnectionData::getRequestBody()const{
     if(requestRawData.isEmpty()){
         return QByteArray();
     }
@@ -151,10 +151,10 @@ QByteArray PipeData::getRequestBody()const{
 
 
 
-void PipeData::setRequestRawData(QByteArray request){//only for copy Ctor
+void QiConnectionData::setRequestRawData(QByteArray request){//only for copy Ctor
 
 }
-void PipeData::setResponseRawData(QByteArray response){//only for copy Ctor
+void QiConnectionData::setResponseRawData(QByteArray response){//only for copy Ctor
 
 }
 

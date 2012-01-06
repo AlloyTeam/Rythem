@@ -11,7 +11,7 @@ namespace Ui {
 }
 class QiProxyServer;
 class QiPipe;
-class PipeData;
+class QiConnectionData;
 
 
 
@@ -27,12 +27,11 @@ private slots:
         void toggleCapture();
         void doSomeBug();
 public:
-    explicit MainWindow(QWidget *parent = 0);
-
+    explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
 public slots:
-        void onNewPipe(PipeData_ptr);
-        void onPipeUpdate(PipeData_ptr);
+        void onNewPipe(ConnectionData_ptr);
+        void onPipeUpdate(ConnectionData_ptr);
 
 
 
