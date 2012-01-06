@@ -23,50 +23,19 @@ static void isInMain(QString info){
 }
 
 QiPipe::QiPipe(int socketDescriptor):_socketDescriptor(socketDescriptor){
-    stoped = false;
-    qDebug()<<"socketDescriptor:"<<socketDescriptor;
 }
 
 QiPipe::~QiPipe(){
-    emit pipeFinished();
-    qDebug()<<"~QPipe wait for QiPipe::run exit";
-    stoped = true;
-    wait(1000);
+    qp->disconnect(this);
+    qp->deleteLater();
     qDebug()<<"~QPipe in main:"<<((QThread::currentThread()==QApplication::instance()->thread())?"YES":"NO");
 }
-void QiPipe::onPipeFinished(){
-    qDebug()<<"onPipeFinished..";
-}
-class MyEventLoop:public QEventLoop{
-public slots:
-    void quit(){
-        qDebug()<<"quite invoked..";
-        QEventLoop::quit();
-    }
-};
 
 void QiPipe::run(){
     qp = new QiPipe_Private(_socketDescriptor);
     connect(qp,SIGNAL(connected(ConnectionData_ptr)),this,SIGNAL(connected(ConnectionData_ptr)));
     connect(qp,SIGNAL(completed(ConnectionData_ptr)),this,SIGNAL(completed(ConnectionData_ptr)));
     connect(qp,SIGNAL(error(ConnectionData_ptr)),this,SIGNAL(error(ConnectionData_ptr)));
-
-    connect(this,SIGNAL(pipeFinished()),qp,SIGNAL(finished()));
-
-    //qDebug()<<"Pipe run:"<<QThread::currentThreadId();
-
-    //TODO WARNING:  QThread: Destroyed while thread is still running
-    connect(this, SIGNAL(error(PipeData_ptr)), this->currentThread(), SLOT(quit()));
-    connect(this, SIGNAL(completed(PipeData_ptr)),this->currentThread(), SLOT(quit()));
-    connect(this, SIGNAL(pipeFinished()), this, SLOT(quit()));
-    connect(this, SIGNAL(pipeFinished()),SLOT(onPipeFinished()));
-    //while(!stoped){
-    //    msleep(1);
-        //::Sleep(200);// win api..
-    //}
-    exec();
-    qp->deleteLater();
-    qDebug()<<"exiting QiPipe run";
 }
 //===========QiPipe_Private
 QiPipe_Private::QiPipe_Private(int descriptor):requestSocket(NULL),responseSocket(NULL){

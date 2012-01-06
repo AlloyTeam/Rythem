@@ -4,7 +4,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTcpServer>
-#include <pipedata.h>
+#include <qiconnectiondata.h>
 #include <QVector>
 class QiPipe;
 class QiConnectionData;
@@ -26,6 +26,7 @@ class QiProxyServer : public QTcpServer{
     protected:
         void incomingConnection(int handle);
 
+        QMap<int,QThread*> threads;
         QMap<int,QiPipe*> pipes;
     private:
         QiPipe* addPipe(int socketDescriptor);
@@ -33,6 +34,16 @@ class QiProxyServer : public QTcpServer{
         void removeAllPipe();
 
         QMutex mutex;
+
+        static QMutex connectionIdMutex;
+        static int connectionId;
+    public:
+        static int nextConnectionId(){
+            QMutexLocker locker(&connectionIdMutex);
+            Q_UNUSED(locker)
+            connectionId++;
+            return connectionId;
+        }
         
 };
 

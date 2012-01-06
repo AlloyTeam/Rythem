@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QTcpServer>
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 #include "qiproxyserver.h"
 #include <QSettings>
 #include <QVariant>

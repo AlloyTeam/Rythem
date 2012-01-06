@@ -5,7 +5,7 @@
 #include <QVector>
 #include <QMap>
 #include <QSharedPointer>
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 class QiddlerPipeTableModel : public QAbstractTableModel
 {
     Q_OBJECT

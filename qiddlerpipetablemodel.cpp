@@ -1,5 +1,5 @@
 #include "qiddlerpipetablemodel.h"
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 #include <QVector>
 #include <QStringList>
 #include <QDebug>

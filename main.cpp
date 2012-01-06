@@ -1,7 +1,7 @@
 #include <QtGui/QApplication>
 #include "mainwindow.h"
 #include <QDebug>
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 #include "qiproxyserver.h"
 
 int main(int argc, char *argv[])

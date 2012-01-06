@@ -1,4 +1,4 @@
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 #include <QDebug>
 #include <QStringList>
 

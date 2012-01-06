@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include "qiddlerpipetablemodel.h"
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 #include <QSettings>
 
 namespace Ui {

@@ -14,21 +14,21 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     qiddlerpipetablemodel.cpp \
-    pipedata.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
     qiproxyserver.cpp \
     qipipe.cpp \
     qiresponse.cpp \
-    qiwinhttp.cpp
+    qiwinhttp.cpp \
+    qiconnectiondatadata.cpp
 
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
-    pipedata.h \
     qnetworkproxyfactoryexendforpac.h \
     qiproxyserver.h \
     qipipe.h \
     qiresponse.h \
-    qiwinhttp.h
+    qiwinhttp.h \
+    qiconnectiondata.h
 
 FORMS    += mainwindow.ui
 
@@ -36,6 +36,10 @@ FORMS    += mainwindow.ui
 
 win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation
+
+
+
+
 
 
 

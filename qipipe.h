@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 #include <QMutex>
 #include <QSslSocket>
 #include <QThread>
@@ -24,13 +24,13 @@ typedef struct RequestInfo{
 
 class QiPipe_Private;
 
-class QiPipe : public QThread
+class QiPipe : public QObject
 {
     Q_OBJECT
 private:
         QiPipe_Private *qp;
         int _socketDescriptor;
-public:
+public://public member functions
         explicit QiPipe(int socketDescriptor = 0);
         ~QiPipe();
 signals:
@@ -38,13 +38,11 @@ signals:
         void error(ConnectionData_ptr);
         void connected(ConnectionData_ptr);
         void pipeFinished();
-public slots:
-        void onPipeFinished();
-protected:
-        void run();
 
-        bool stoped;
-        QMutex mutex;
+public slots:
+        void run();
+public://public variables
+        QMutex mutex;//seems don't need any lock?
 };
 
 
@@ -74,7 +72,7 @@ private:
         void parseRequestHeader(const QByteArray & header);
         bool parseResponse(const QByteArray &responseBa);
         void parseResponseHeader(const QByteArray &header);
-        void parseResponseBody(const QByteArray &body);//鏍规嵁http鍗忚锛岄渶鐢県eader鍙奲ody鍏卞悓鍒ゆ柇璇锋眰鏄惁缁撴潫銆
+        void parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束
 
         QByteArray requestRawData;
         QByteArray requestRawDataHeader;
