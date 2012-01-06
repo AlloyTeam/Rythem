@@ -76,6 +76,9 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
     return QAbstractTableModel::flags(index);
 }
 
+void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
+
+}
 
 void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
     qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();

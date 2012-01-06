@@ -200,7 +200,10 @@ void QiPipe_Private::onResponseReadReady(){
 
     QByteArray ba = responseSocket->readAll();
     responseRawData.append(ba);
-
+    if(responseState == Connected){
+        responseState = BodyParsing;
+    }
+    qDebug()<<ba;
     QMutexLocker locker(&mutex);
     //write back to request
     //TODO check if the socket opening..
@@ -214,6 +217,7 @@ void QiPipe_Private::onResponseReadReady(){
     */
     if(parseResponse(ba)){
         // package got end
+        responseState = Initial;
         emit completed(connectionData);
 
     }

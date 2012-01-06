@@ -62,6 +62,7 @@ void MainWindow::doSomeBug(){
 
 void MainWindow::onPipeUpdate(ConnectionData_ptr pipeData){
     //qDebug()<<"connected";
+    pipeTableModel.updateItem(p);
 }
 
 void MainWindow::onNewPipe(ConnectionData_ptr p){
