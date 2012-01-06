@@ -21,6 +21,8 @@ SOURCES += main.cpp\
     qiresponse.cpp \
     qiwinhttp.cpp
 
+mac:SOURCES -= qiwinhttp.cpp
+
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
     pipedata.h \
@@ -29,6 +31,8 @@ HEADERS  += mainwindow.h \
     qipipe.h \
     qiresponse.h \
     qiwinhttp.h
+
+mac:HEADERS -= qiwinhttp.h
 
 FORMS    += mainwindow.ui
 
