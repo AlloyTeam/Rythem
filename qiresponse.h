@@ -2,7 +2,7 @@
 #define QIRESPONSE_H
 
 #include <QObject>
-#include "pipedata.h"
+#include "qiconnectiondata.h"
 #include <QTcpSocket>
 
 
