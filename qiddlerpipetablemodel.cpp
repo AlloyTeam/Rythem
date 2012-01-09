@@ -36,7 +36,7 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
             case 0:
                 return QString("%1").arg(p->number);
             case 1:
-                return ((p->returnCode==0)?QString("-"):QString("%1").arg(p->returnCode));
+                return ((p->returnCode==-1)?QString("-"):QString("%1").arg(p->returnCode));
             case 2:
                 return p->protocol;
             case 3:

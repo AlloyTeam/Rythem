@@ -4,6 +4,7 @@
 
 QiConnectionData::QiConnectionData(int socketDescriptor):socketId(socketDescriptor){
     qDebug()<<"PipeData contructed:"<<socketId;
+    returnCode = -1;
 }
 
 
@@ -12,10 +13,16 @@ void QiConnectionData::setRequestHeader(QByteArray header){
     int i=0,l=header.length();
     //firstline
     i=header.indexOf('\n');
-    Q_ASSERT(i!=-1);
+    if(i==-1){
+        qDebug()<<"-------- invalid response header  ------"<<header;
+        return;
+    }
     QByteArray firstLine = header.left(i).simplified();
     QList<QByteArray> sigs = firstLine.split(' ');
-    Q_ASSERT(sigs.length() == 3);
+    if(sigs.length() != 3){
+        qDebug()<<"-------- invalid response header  ------"<<header;
+        return;
+    }
     requestMethod = sigs.at(0);
     fullUrl = sigs.at(1);
     protocol = sigs.at(2);
@@ -83,9 +90,19 @@ void QiConnectionData::setRequestHeader(QByteArray header){
     }
 }
 void QiConnectionData::setResponseHeader(QByteArray header){
+
     //TODO.. Ctrl+c & Ctrl+v from setRequestHeader
     header.replace("\r\n","\n");
     int i=0,l=header.length();
+
+    //firstline
+    //HTTP/1.1 302 Found
+    i=header.indexOf('\n');
+    Q_ASSERT(i!=-1);
+    QByteArray firstLine = header.left(i).simplified();
+    QList<QByteArray> sigs = firstLine.split(' ');
+    Q_ASSERT(sigs.length() == 3);
+    returnCode = sigs.at(1).simplified().toInt();
 
     while(i<l){
         int j=header.indexOf('\n',i);

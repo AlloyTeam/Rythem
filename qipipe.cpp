@@ -288,6 +288,12 @@ void QiPipe_Private::parseResponseHeader(const QByteArray &newContent){
 }
 
 bool QiPipe_Private::parseResponseBody(const QByteArray &newContent){
+    if(connectionData->returnCode == 302
+            || connectionData->returnCode == 301
+            || connectionData->returnCode == 307
+            || connectionData->returnCode == 204){//todo
+        return true;
+    }
     Q_UNUSED(newContent)
     //根据http协议，需由header及body共同判断请求是否结束。
     if(isResponseChunked){//is chuncked

@@ -85,16 +85,16 @@ void MainWindow::toggleCapture(){
         // hard code just for some crash issue
         proxySetting.setValue("ProxyEnable",1);
         proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
-        if( previousProxyInfo.isUsingPac != "0"){
+        //if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
-        }
+        //}
     }else{
         isUsingCapture = true;
         previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
         previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
         previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
-        qDebug()<<previousProxyInfo.proxyString;
-        qDebug()<<previousProxyInfo.isUsingPac;
+        //qDebug()<<previousProxyInfo.proxyString;
+        ///qDebug()<<previousProxyInfo.isUsingPac;
         //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
 
         QString proxyServer="127.0.0.1:8889";
@@ -112,7 +112,7 @@ void MainWindow::toggleCapture(){
         }else{
             proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(previousProxyInfo.proxyString);
         }
-        qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
+        //qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
         proxySetting.remove("AutoConfigURL");
         proxySetting.setValue("ProxyEnable",QVariant(1));
         proxySetting.setValue("ProxyServer",proxyServer);
@@ -120,7 +120,7 @@ void MainWindow::toggleCapture(){
     proxySetting.sync();
     ::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
-    qDebug()<<previousProxyInfo.isUsingPac;
+    //qDebug()<<previousProxyInfo.isUsingPac;
 #endif
 #ifdef Q_WS_MAC
     /*
