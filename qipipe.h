@@ -72,7 +72,7 @@ private:
         void parseRequestHeader(const QByteArray & header);
         bool parseResponse(const QByteArray &responseBa);
         void parseResponseHeader(const QByteArray &header);
-        bool parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束
+        bool parseResponseBody(const QByteArray &body);//鏍规嵁http鍗忚锛岄渶鐢県eader鍙奲ody鍏卞悓鍒ゆ柇璇锋眰鏄惁缁撴潫
 
         QByteArray requestRawData;
         QByteArray requestRawDataHeader;
