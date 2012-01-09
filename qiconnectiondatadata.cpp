@@ -98,10 +98,13 @@ void QiConnectionData::setResponseHeader(QByteArray header){
     //firstline
     //HTTP/1.1 302 Found
     i=header.indexOf('\n');
-    Q_ASSERT(i!=-1);
+    Q_ASSERT_X(i!=-1,"setResponseHeader","header invalidate");
     QByteArray firstLine = header.left(i).simplified();
     QList<QByteArray> sigs = firstLine.split(' ');
-    Q_ASSERT(sigs.length() == 3);
+    if(sigs.length() < 3){
+        qDebug()<<"error..."<<firstLine;
+    }
+    Q_ASSERT_X(sigs.length() >=3,"setResponseHeader",firstLine);
     returnCode = sigs.at(1).simplified().toInt();
 
     while(i<l){

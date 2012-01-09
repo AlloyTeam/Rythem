@@ -98,19 +98,23 @@ void MainWindow::toggleCapture(){
         //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
 
         QString proxyServer="127.0.0.1:8889";
-        if(previousProxyInfo.proxyString.indexOf(";")!=-1){
-            proxyServer = QString("http=")+proxyServer;
-            QStringList proxies = previousProxyInfo.proxyString.split(";");
-            for(int i=0;i<proxies.length();++i){
-                QStringList tmp = proxies[i].split("=");
-                if(tmp.at(0).toLower()=="http"){
-                    proxies[i] = proxyServer;
-                    break;
+        if(previousProxyInfo.enable){
+            if(previousProxyInfo.proxyString.indexOf(";")!=-1){
+                proxyServer = QString("http=")+proxyServer;
+                QStringList proxies = previousProxyInfo.proxyString.split(";");
+                for(int i=0;i<proxies.length();++i){
+                    QStringList tmp = proxies[i].split("=");
+                    if(tmp.at(0).toLower()=="http"){
+                        proxies[i] = proxyServer;
+                        break;
+                    }
                 }
+                proxyServer = proxies.join(";");
+            }else{
+                proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(previousProxyInfo.proxyString);
             }
-            proxyServer = proxies.join(";");
         }else{
-            proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(previousProxyInfo.proxyString);
+            proxyServer = "http="+proxyServer;
         }
         //qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
         proxySetting.remove("AutoConfigURL");

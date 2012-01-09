@@ -118,6 +118,9 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         responseSocket->write(connectionData->requestRawDataToSend);
         responseSocket->flush();
     }else{
+        if(responseState != BodyParsing){//TODO...
+
+        }
         responseState = Initial;
         responseRawData.clear();
         connectionData->requestRawDataToSend.append(requestRawData.mid(requestHeaderSpliterIndex+requestHeaderSpliterSize));
@@ -200,28 +203,28 @@ void QiPipe_Private::onResponseConnected(){
     // save the server ip address
     connectionData->serverIP = responseSocket->peerAddress().toString();
     // emit connect signal
-    qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<connectionData->requestRawDataToSend;
+    //qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<connectionData->requestRawDataToSend;
     qint64 n = responseSocket->write(connectionData->requestRawDataToSend);
     connectionData->requestRawDataToSend.remove(0,n);
 }
 void QiPipe_Private::onResponseReadReady(){
 
+    QMutexLocker locker(&mutex);
     QByteArray ba = responseSocket->readAll();
     responseRawData.append(ba);
     if(responseState == Connected){
         responseState = BodyParsing;
     }
-    qDebug()<<ba;
-    QMutexLocker locker(&mutex);
+    //qDebug()<<ba;
     //write back to request
     //TODO check if the socket opening..
     requestSocket->write(ba);
     requestSocket->flush();
 
-    qDebug()<<"========response========***"<<responseSocket->peerName();
-    qDebug()<<connectionData->requestRawDataToSend;
-    qDebug()<<ba;
-    qDebug()<<"***========response========"<<responseSocket->peerName();
+    //qDebug()<<"========response========***"<<responseSocket->peerName()<<connectionData->path;
+    //qDebug()<<connectionData->requestRawDataToSend;
+    //qDebug()<<ba;
+    //qDebug()<<"***========response========"<<responseSocket->peerName()<<connectionData->path;
 
     if(parseResponse(ba)){
         // package got end
@@ -272,11 +275,17 @@ void QiPipe_Private::parseResponseHeader(const QByteArray &newContent){
     if(responseHeaderSpliterInex!=-1){
         responseState = HeaderFound;
         responseHeaderSpliterSize = 4;
+        qDebug()<<"\\r\\n";
+        //qDebug()<<responseRawData;
+        qDebug()<<responseHeaderSpliterInex;
         connectionData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
     }else{
-        responseHeaderSpliterInex = responseRawData.indexOf(QByteArray("\r\n\r\n"));
+        responseHeaderSpliterInex = responseRawData.indexOf(QByteArray("\n\n"));
         if(responseHeaderSpliterInex != -1){
             responseState = HeaderFound;
+            qDebug()<<"\\n\\n";
+            //qDebug()<<responseRawData;
+            qDebug()<<responseHeaderSpliterInex;
             connectionData->setResponseHeader(responseRawData.left(responseHeaderSpliterInex));
         }
     }
@@ -299,8 +308,8 @@ bool QiPipe_Private::parseResponseBody(const QByteArray &newContent){
     if(isResponseChunked){//is chuncked
         QByteArray theBody = responseRawData.mid(responseHeaderSpliterSize+responseHeaderSpliterInex);
         //theBody.replace("\r\n","\n");
-        int i=0;
-        int l=theBody.length();
+        long i=0;
+        long l=theBody.length();
         while(i<=l){//need to valid chunk here?
             qDebug()<<"chunked:"<<i<<" "<<l;
             int beginOfLength=theBody.indexOf('\n',i);
