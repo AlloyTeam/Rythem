@@ -19,10 +19,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-private:
-        QiProxyServer *server;
-        QVector<QiPipe*> *pipes;
-        QiddlerPipeTableModel pipeTableModel;
+
 private slots:
         void toggleCapture();
         void doSomeBug();
@@ -42,19 +39,23 @@ public:
             QString pacUrl;
             QString isUsingPac;
         }ProxyInfo;
-protected:
-        void closeEvent(QCloseEvent *event);
 
-        QSettings proxySetting;
 private:
     Ui::MainWindow *ui;
     void createMenus();
+    QiProxyServer *server;
+    QVector<QiPipe*> *pipes;
+    QiddlerPipeTableModel pipeTableModel;
 
     bool isUsingCapture;
     ProxyInfo previousProxyInfo;
     QMenu *fileMenu;
     QMenu *toolMenu;
     QAction *captureAct;
+protected:
+    void closeEvent(QCloseEvent *event);
+
+    QSettings proxySetting;
 };
 
 #endif // MAINWINDOW_H

@@ -24,10 +24,11 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    ui(new Ui::MainWindow),
     pipes(new QVector<QiPipe*>),
     pipeTableModel(new QiddlerPipeTableModel()),
-    ui(new Ui::MainWindow),
     isUsingCapture(false)
+
 #ifdef Q_OS_WIN
     ,proxySetting("\\HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\",QSettings::NativeFormat)
 #endif
@@ -62,12 +63,12 @@ void MainWindow::doSomeBug(){
 
 void MainWindow::onPipeUpdate(ConnectionData_ptr pipeData){
     //qDebug()<<"connected";
-    pipeTableModel.updateItem(p);
+    pipeTableModel.updateItem(pipeData);
 }
 
-void MainWindow::onNewPipe(ConnectionData_ptr p){
+void MainWindow::onNewPipe(ConnectionData_ptr pipeData){
     //pipeTableModel
-    pipeTableModel.addItem(p);
+    pipeTableModel.addItem(pipeData);
 }
 void MainWindow::toggleCapture(){
 #ifdef Q_WS_WIN32
