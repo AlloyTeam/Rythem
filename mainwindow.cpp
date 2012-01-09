@@ -109,8 +109,10 @@ void MainWindow::toggleCapture(){
                 }
             }
             proxyServer = proxies.join(";");
-            qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
+        }else{
+            proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(previousProxyInfo.proxyString);
         }
+        qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
         proxySetting.remove("AutoConfigURL");
         proxySetting.setValue("ProxyEnable",QVariant(1));
         proxySetting.setValue("ProxyServer",proxyServer);
