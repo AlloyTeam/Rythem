@@ -73,6 +73,8 @@ private:
         bool parseResponse(const QByteArray &responseBa);
         void parseResponseHeader(const QByteArray &header);
         bool parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束
+        void finishConnectionSuccess();
+        void finishConnectionWithError(int errno);
 
         QByteArray requestRawData;
         QByteArray requestRawDataHeader;
@@ -99,6 +101,9 @@ private:
         QTcpSocket* responseSocket;
 
         QSharedPointer<QiConnectionData> connectionData;
+
+        QVector<ConnectionData_ptr> connectionArray;
+
         RequestInfo requestInfo;
         QMutex mutex;
 

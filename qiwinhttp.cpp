@@ -4,6 +4,10 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QStringList>
+#include <QSettings>
+
+#include <QDateTime>
+
 
 
 
@@ -60,14 +64,30 @@ typedef HINTERNET (WINAPI * PtrWinHttpOpen)(LPCWSTR, DWORD, LPCWSTR, LPCWSTR,DWO
 typedef BOOL (WINAPI * PtrWinHttpGetDefaultProxyConfiguration)(WINHTTP_PROXY_INFO*);
 typedef BOOL (WINAPI * PtrWinHttpGetIEProxyConfigForCurrentUser)(WINHTTP_CURRENT_USER_IE_PROXY_CONFIG*);
 typedef BOOL (WINAPI * PtrWinHttpCloseHandle)(HINTERNET);
+typedef BOOL (WINAPI * PtrWinHttpSetDefaultProxyConfiguration)(WINHTTP_PROXY_INFO*);
 static PtrWinHttpGetProxyForUrl ptrWinHttpGetProxyForUrl = 0;
 static PtrWinHttpOpen ptrWinHttpOpen = 0;
 static PtrWinHttpGetDefaultProxyConfiguration ptrWinHttpGetDefaultProxyConfiguration = 0;
 static PtrWinHttpGetIEProxyConfigForCurrentUser ptrWinHttpGetIEProxyConfigForCurrentUser = 0;
 static PtrWinHttpCloseHandle ptrWinHttpCloseHandle = 0;
+static PtrWinHttpSetDefaultProxyConfiguration ptrWinHttpSetDefaultProxyConfiguration = 0;
 static bool isInited=false;
 static QMutex mutex;
 static WINHTTP_AUTOPROXY_OPTIONS autoProxyOptions;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 static QStringList splitSpaceSemicolon(const QString &source)
 {
@@ -131,6 +151,7 @@ static QList<QNetworkProxy> parseServerList(const QNetworkProxyQuery &query, con
     //   ([<scheme>=][<scheme>"://"]<server>[":"<port>])
 
     QList<QNetworkProxy> result;
+    qDebug()<<"parseServerList"<<result.count();
     foreach (const QString &entry, proxyList) {
         int server = 0;
 
@@ -187,77 +208,270 @@ static QList<QNetworkProxy> parseServerList(const QNetworkProxyQuery &query, con
 
 
 
-
+static HINTERNET  sesstion;
 QiWinHttp::QiWinHttp(QObject *parent) :
     QObject(parent){
 }
-void QiWinHttp::init(const QString autoConfigUrl){
-    QMutexLocker locker(&mutex);
-    Q_UNUSED(locker);
-    QLibrary lib("winhttp");
-    bool isLoaded = lib.load();
-    if (!isLoaded){
-       qDebug()<<"cannot load winhttp";
-       return;
-    }else{
-        ptrWinHttpOpen = (PtrWinHttpOpen)lib.resolve("WinHttpOpen");
-        ptrWinHttpCloseHandle = (PtrWinHttpCloseHandle)lib.resolve("WinHttpCloseHandle");
-        ptrWinHttpGetProxyForUrl = (PtrWinHttpGetProxyForUrl)lib.resolve("WinHttpGetProxyForUrl");
-        ptrWinHttpGetDefaultProxyConfiguration = (PtrWinHttpGetDefaultProxyConfiguration)lib.resolve("WinHttpGetDefaultProxyConfiguration");
-        ptrWinHttpGetIEProxyConfigForCurrentUser = (PtrWinHttpGetIEProxyConfigForCurrentUser)lib.resolve("WinHttpGetIEProxyConfigForCurrentUser");
-    }
-    memset(&autoProxyOptions, 0, sizeof autoProxyOptions);
-    autoProxyOptions.fAutoLogonIfChallenged = false;
-    //if (ieProxyConfig.fAutoDetect) {
-    //    autoProxyOptions.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
-    //    autoProxyOptions.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DHCP |
-    //                                         WINHTTP_AUTO_DETECT_TYPE_DNS_A;
-    //} else {
-        autoProxyOptions.dwFlags = WINHTTP_AUTOPROXY_CONFIG_URL;
-        autoProxyOptions.lpszAutoConfigUrl = (LPCWSTR)autoConfigUrl.utf16();
-    //}
-    isInited = true;
-}
-QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
-    QList<QNetworkProxy> result;
-    if(!isInited){
-        qWarning()<<"error!!! winhttp not inited";
-        return result;
-    }
-    // try to get the proxy config for the URL
-    QUrl url = query.url();
-    // url could be empty, e.g. from QNetworkProxy::applicationProxy(), that's fine,
-    // we'll still ask for the proxy.
-    // But for a file url, we know we don't need one.
-    if (url.scheme() == QLatin1String("file") || url.scheme() == QLatin1String("qrc"))
-        return (result<<QNetworkProxy::NoProxy);
-    if (query.queryType() != QNetworkProxyQuery::UrlRequest) {
-        // change the scheme to https, maybe it'll work
-        url.setScheme(QLatin1String("https"));
-    }
 
+//== from souce
 
+class QWindowsSystemProxy
+{
+public:
+    QWindowsSystemProxy();
+    ~QWindowsSystemProxy();
+    void init();
+
+    QMutex mutex;
+
+    HINTERNET hHttpSession;
+    WINHTTP_AUTOPROXY_OPTIONS autoProxyOptions;
     WINHTTP_PROXY_INFO proxyInfo;
-    bool getProxySucceeded = ptrWinHttpGetProxyForUrl(NULL,
-                                            (LPCWSTR)url.toString().utf16(),&autoProxyOptions,&proxyInfo);
+    WINHTTP_CURRENT_USER_IE_PROXY_CONFIG ieProxyConfig;
 
-    if (getProxySucceeded) {
-        // yes, we got a config for this URL
-        QString proxyBypass = QString::fromWCharArray(proxyInfo.lpszProxyBypass);
-        QStringList proxyServerList = splitSpaceSemicolon(QString::fromWCharArray(proxyInfo.lpszProxy));
+    QString autoConfigUrl;
+    QStringList proxyServerList;
+    QStringList proxyBypass;
+    QList<QNetworkProxy> defaultResult;
+
+    bool initialized;
+    bool functional;
+    bool isAutoConfig;
+    bool isAutoDetect;
+};
+
+Q_GLOBAL_STATIC(QWindowsSystemProxy, systemProxy)
+
+QWindowsSystemProxy::QWindowsSystemProxy()
+    : initialized(false), functional(false), isAutoConfig(false)
+{
+    defaultResult << QNetworkProxy::NoProxy;
+}
+
+QWindowsSystemProxy::~QWindowsSystemProxy()
+{
+    if (hHttpSession)
+        ptrWinHttpCloseHandle(hHttpSession);
+}
+
+void QWindowsSystemProxy::init()
+{
+    if (initialized)
+        return;
+    initialized = true;
+
+#ifdef Q_OS_WINCE
+    // Windows CE does not have any of the following API
+    return;
+#else
+    // load the winhttp.dll library
+    QLibrary lib("winhttp");
+    Q_ASSERT(lib.load());
+    if (!lib.load()){
+        return;                 // failed to load
+    }
+
+    ptrWinHttpOpen = (PtrWinHttpOpen)lib.resolve("WinHttpOpen");
+    ptrWinHttpCloseHandle = (PtrWinHttpCloseHandle)lib.resolve("WinHttpCloseHandle");
+    ptrWinHttpGetProxyForUrl = (PtrWinHttpGetProxyForUrl)lib.resolve("WinHttpGetProxyForUrl");
+    ptrWinHttpGetDefaultProxyConfiguration = (PtrWinHttpGetDefaultProxyConfiguration)lib.resolve("WinHttpGetDefaultProxyConfiguration");
+    ptrWinHttpGetIEProxyConfigForCurrentUser = (PtrWinHttpGetIEProxyConfigForCurrentUser)lib.resolve("WinHttpGetIEProxyConfigForCurrentUser");
+    ptrWinHttpSetDefaultProxyConfiguration = (PtrWinHttpSetDefaultProxyConfiguration)lib.resolve("WinHttpSetDefaultProxyConfiguration");
+
+    // Try to obtain the Internet Explorer configuration.
+    if (ptrWinHttpGetIEProxyConfigForCurrentUser(&ieProxyConfig)) {
+        if (ieProxyConfig.lpszAutoConfigUrl) {
+            autoConfigUrl = QString::fromWCharArray(ieProxyConfig.lpszAutoConfigUrl);
+            //GlobalFree(ieProxyConfig.lpszAutoConfigUrl);
+        }
+        if (ieProxyConfig.lpszProxy) {
+            // http://msdn.microsoft.com/en-us/library/aa384250%28VS.85%29.aspx speaks only about a "proxy URL",
+            // not multiple URLs. However we tested this and it can return multiple URLs. So we use splitSpaceSemicolon
+            // on it.
+            proxyServerList = splitSpaceSemicolon(QString::fromWCharArray(ieProxyConfig.lpszProxy));
+            //GlobalFree(ieProxyConfig.lpszProxy);
+        }
+        if (ieProxyConfig.lpszProxyBypass) {
+            proxyBypass = splitSpaceSemicolon(QString::fromWCharArray(ieProxyConfig.lpszProxyBypass));
+            //GlobalFree(ieProxyConfig.lpszProxyBypass);
+        }
+    }
+
+    hHttpSession = NULL;
+    if (ieProxyConfig.fAutoDetect || !autoConfigUrl.isEmpty()) {
+        // using proxy autoconfiguration
+        proxyServerList.clear();
+        proxyBypass.clear();
+
+        // open the handle and obtain the options
+        hHttpSession = ptrWinHttpOpen(L"Qt System Proxy access/1.0",
+                                      WINHTTP_ACCESS_TYPE_NO_PROXY,
+                                      WINHTTP_NO_PROXY_NAME,
+                                      WINHTTP_NO_PROXY_BYPASS,
+                                      0);
+        if (!hHttpSession)
+            return;
+
+        isAutoConfig = true;
+        memset(&autoProxyOptions, 0, sizeof autoProxyOptions);
+        autoProxyOptions.fAutoLogonIfChallenged = false;
+        if (ieProxyConfig.fAutoDetect) {
+            autoProxyOptions.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
+            autoProxyOptions.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DHCP |
+                                                 WINHTTP_AUTO_DETECT_TYPE_DNS_A;
+        } else {
+            autoProxyOptions.dwFlags = WINHTTP_AUTOPROXY_CONFIG_URL;
+            autoProxyOptions.lpszAutoConfigUrl = (LPCWSTR)autoConfigUrl.utf16();
+        }
+    } else {
+        // not auto-detected
+        // attempt to get the static configuration instead
+        if (ptrWinHttpGetDefaultProxyConfiguration(&proxyInfo) &&
+            proxyInfo.dwAccessType == WINHTTP_ACCESS_TYPE_NAMED_PROXY) {
+            // we got information from the registry
+            // overwrite the IE configuration, if any
+
+            proxyBypass = splitSpaceSemicolon(QString::fromWCharArray(proxyInfo.lpszProxyBypass));
+            proxyServerList = splitSpaceSemicolon(QString::fromWCharArray(proxyInfo.lpszProxy));
+        }
+        /*
         if (proxyInfo.lpszProxy)
             GlobalFree(proxyInfo.lpszProxy);
         if (proxyInfo.lpszProxyBypass)
             GlobalFree(proxyInfo.lpszProxyBypass);
-
-        if (isBypassed(query.peerHostName(), splitSpaceSemicolon(proxyBypass)))
-            return (result<<QNetworkProxy::NoProxy);
-        return parseServerList(query, proxyServerList);
+        */
     }
 
-    // GetProxyForUrl failed
-
-    return (result<<QNetworkProxy::NoProxy);
+    functional = isAutoConfig || !proxyServerList.isEmpty();
+#endif
 }
 
+//== end 1
+QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
+    qDebug()<<"querying "<<query.url().toString();
+    QWindowsSystemProxy *sp = systemProxy();
+    if (!sp)
+        return QList<QNetworkProxy>() << QNetworkProxy();
+
+    QMutexLocker locker(&sp->mutex);
+    Q_UNUSED(locker);
+
+    sp->init();
+    if (!sp->functional)
+        return sp->defaultResult;
+    qDebug()<<"isautoconfig?"<<(sp->isAutoConfig?"a":"no");
+    if (sp->isAutoConfig) {
+        WINHTTP_PROXY_INFO proxyInfo;
+
+        // try to get the proxy config for the URL
+        QUrl url = query.url();
+        // url could be empty, e.g. from QNetworkProxy::applicationProxy(), that's fine,
+        // we'll still ask for the proxy.
+        // But for a file url, we know we don't need one.
+        if (url.scheme() == QLatin1String("file") || url.scheme() == QLatin1String("qrc"))
+            return sp->defaultResult;
+        if (query.queryType() != QNetworkProxyQuery::UrlRequest) {
+            // change the scheme to https, maybe it'll work
+            url.setScheme(QLatin1String("https"));
+        }
+        qDebug()<<"getting..";
+        printf("%ls",sp->autoProxyOptions.lpszAutoConfigUrl);
+        LPCWSTR theAuto= L"http://txp-01.tencent.com/lvsproxy.pac";
+        //LPCWSTR theUrl= L"http://gdutbbs.com/";
+        QTime qt = QDateTime::currentDateTime().time();
+        int beg = qt.msec();
+        //LPCWSTR theUrl = (LPCWSTR)url.toString().utf16();
+
+        //sp->autoProxyOptions.lpszAutoConfigUrl = theAuto;
+        bool getProxySucceeded = ptrWinHttpGetProxyForUrl(sp->hHttpSession,
+                                                (LPCWSTR)url.toString().utf16(),
+                                                &sp->autoProxyOptions
+                                                          /*theAuto*/,
+                                                &proxyInfo);
+        QTime endQt = QDateTime::currentDateTime().time();
+        qDebug()<<QString("%1 %2 %3").arg(beg).arg(endQt.msec()).arg(endQt.msec()-beg);
+        DWORD getProxyError = GetLastError();
+        if (!getProxySucceeded
+            && (ERROR_WINHTTP_LOGIN_FAILURE == getProxyError)) {
+            // We first tried without AutoLogon, because this might prevent caching the result.
+            // But now we've to enable it (http://msdn.microsoft.com/en-us/library/aa383153%28v=VS.85%29.aspx)
+            sp->autoProxyOptions.fAutoLogonIfChallenged = TRUE;
+            getProxySucceeded = ptrWinHttpGetProxyForUrl(sp->hHttpSession,
+                                               (LPCWSTR)url.toString().utf16(),
+                                                &sp->autoProxyOptions,
+                                                &proxyInfo);
+            getProxyError = GetLastError();
+        }
+
+        if (getProxySucceeded) {
+            // yes, we got a config for this URL
+            QString proxyBypass = QString::fromWCharArray(proxyInfo.lpszProxyBypass);
+            QStringList proxyServerList = splitSpaceSemicolon(QString::fromWCharArray(proxyInfo.lpszProxy));
+            if (proxyInfo.lpszProxy)
+                //GlobalFree(proxyInfo.lpszProxy);
+            if (proxyInfo.lpszProxyBypass)
+                //GlobalFree(proxyInfo.lpszProxyBypass);
+
+            if (isBypassed(query.peerHostName(), splitSpaceSemicolon(proxyBypass)))
+                return sp->defaultResult;
+            return parseServerList(query, proxyServerList);
+        }
+
+        // GetProxyForUrl failed
+
+        if (ERROR_WINHTTP_AUTODETECTION_FAILED == getProxyError) {
+            //No config file could be retrieved on the network.
+            //Don't search for it next time again.
+            sp->isAutoConfig = false;
+        }
+
+        return sp->defaultResult;
+    }
+
+    // static configuration
+    if (isBypassed(query.peerHostName(), sp->proxyBypass))
+        return sp->defaultResult;
+
+    QList<QNetworkProxy> result = parseServerList(query, sp->proxyServerList);
+    // In some cases, this was empty. See SF task 00062670
+    if (result.isEmpty())
+        return sp->defaultResult;
+
+    return result;
+}
+
+void QiWinHttp::setupProxy(QString host,int port){
+    QWindowsSystemProxy *sp = systemProxy();
+    if (!sp)
+        return ;
+
+    QMutexLocker locker(&sp->mutex);
+    Q_UNUSED(locker);
+}
+void QiWinHttp::restoreProxy(){
+    QWindowsSystemProxy *sp = systemProxy();
+    if (!sp)
+        return ;
+
+    QMutexLocker locker(&sp->mutex);
+    Q_UNUSED(locker);
+    //sp->proxyInfo.lpszProxyBypass = L"<local>;*qq.com;<-loopback>;192.168.*.*";
+    //swprintf_s(sp->proxyInfo.lpszProxyBypass, 25, L"<local>");
+    qDebug()<<"setting proxy config:"
+           <<QString::fromWCharArray(sp->proxyInfo.lpszProxyBypass)
+            <<QString::fromWCharArray(sp->proxyInfo.lpszProxyBypass);
+    BOOL setSuccess = ptrWinHttpSetDefaultProxyConfiguration(&sp->proxyInfo);
+    if(!setSuccess){
+        qDebug()<<"error when setting:"<<GetLastError();
+    }
+}
+
+void QiWinHttp::init(){
+    QWindowsSystemProxy *sp = systemProxy();
+    if (!sp)
+        return;
+    QMutexLocker locker(&sp->mutex);
+    Q_UNUSED(locker);
+    sp->init();
+}
 #endif

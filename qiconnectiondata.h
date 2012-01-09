@@ -15,6 +15,7 @@ public:
     }
 
     inline QiConnectionData(const QiConnectionData& p){//copy ctor
+        qDebug()<<"copy ctor";
         number = p.number;
 
         returnCode = p.returnCode;

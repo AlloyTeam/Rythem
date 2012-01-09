@@ -72,7 +72,7 @@ void MainWindow::onNewPipe(ConnectionData_ptr pipeData){
 }
 void MainWindow::toggleCapture(){
 #ifdef Q_WS_WIN32
-    QiWinHttp::init(previousProxyInfo.isUsingPac);
+    QiWinHttp::init();
     if(isUsingCapture){
         isUsingCapture = false;
         /*
@@ -94,6 +94,7 @@ void MainWindow::toggleCapture(){
         previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
         previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
         qDebug()<<previousProxyInfo.proxyString;
+        qDebug()<<previousProxyInfo.isUsingPac;
         //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
 
         QString proxyServer="127.0.0.1:8889";
@@ -117,6 +118,7 @@ void MainWindow::toggleCapture(){
     proxySetting.sync();
     ::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+    qDebug()<<previousProxyInfo.isUsingPac;
 #endif
 #ifdef Q_WS_MAC
     /*

@@ -6,10 +6,8 @@
 #include <QObject>
 #include <QNetworkProxy>
 #include <QList>
-#ifdef Q_OS_WIN
 #include <qt_windows.h>
 #include <wininet.h>
-#endif
 #include <QLibrary>
 #include <QUrl>
 #include <QNetworkProxyQuery>
@@ -25,8 +23,10 @@ signals:
 public slots:
 
 public:
+    static void init();
     static QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query);
-    static void init(const QString autoConfigUrl);
+    static void setupProxy(QString host,int port);
+    static void restoreProxy();
 };
 
 #endif // QIWINHTTP_H

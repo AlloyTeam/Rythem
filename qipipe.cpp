@@ -45,11 +45,14 @@ QiPipe_Private::QiPipe_Private(int descriptor):requestSocket(NULL),responseSocke
 
     // setup request socket
     requestSocket = new QTcpSocket();
+
     connectionData = QSharedPointer<QiConnectionData>(new QiConnectionData);
+    //connectionArray.push_back(connectionData);
     connectionData->socketId = descriptor;
 
     connect(requestSocket,SIGNAL(readyRead()),this,SLOT(onRequestReadReady()));
     connect(requestSocket,SIGNAL(disconnected()),this,SLOT(onRequestClose()));
+    connect(requestSocket,SIGNAL(aboutToClose()),this,SLOT(onRequestClose()));
     connect(requestSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(onRequestError()));
 
     bool isSocketValid = requestSocket->setSocketDescriptor(descriptor);
@@ -137,8 +140,8 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
             connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
             connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadReady()));
             connect(responseSocket,SIGNAL(disconnected()),SLOT(onResponseClose()));
-            connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
             connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
+            connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
 
 #ifdef Q_OS_WIN
             // TODO add mac pac support
@@ -150,6 +153,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
             }
 #endif
 
+            qDebug()<<"CONNECT TO "<<connectionData->getRequestHeader("Host")<<" "<<connectionData->getRequestHeader("Port");
             //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
             responseSocket->connectToHost(connectionData->getRequestHeader("Host"),connectionData->getRequestHeader("Port").toInt());
 
@@ -196,7 +200,7 @@ void QiPipe_Private::onResponseConnected(){
     // save the server ip address
     connectionData->serverIP = responseSocket->peerAddress().toString();
     // emit connect signal
-    //qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<pipeData->requestRawDataToSend;
+    qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<connectionData->requestRawDataToSend;
     qint64 n = responseSocket->write(connectionData->requestRawDataToSend);
     connectionData->requestRawDataToSend.remove(0,n);
 }
@@ -213,12 +217,12 @@ void QiPipe_Private::onResponseReadReady(){
     //TODO check if the socket opening..
     requestSocket->write(ba);
     requestSocket->flush();
-    /*
+
     qDebug()<<"========response========***"<<responseSocket->peerName();
-    qDebug()<<pipeData->requestRawDataToSend;
+    qDebug()<<connectionData->requestRawDataToSend;
     qDebug()<<ba;
     qDebug()<<"***========response========"<<responseSocket->peerName();
-    */
+
     if(parseResponse(ba)){
         // package got end
         responseState = Initial;
@@ -241,8 +245,11 @@ void QiPipe_Private::onRequestClose(){
     emit finished();
 }
 void QiPipe_Private::onResponseClose(){
+    qDebug()<<"response close";
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
+    requestSocket->disconnect();
+    requestSocket->close();
     emit error(connectionData);
     emit finished();
 }
@@ -285,17 +292,24 @@ bool QiPipe_Private::parseResponseBody(const QByteArray &newContent){
     //根据http协议，需由header及body共同判断请求是否结束。
     if(isResponseChunked){//is chuncked
         QByteArray theBody = responseRawData.mid(responseHeaderSpliterSize+responseHeaderSpliterInex);
-        theBody.replace("\r\n","\n");
+        //theBody.replace("\r\n","\n");
         int i=0;
         int l=theBody.length();
         while(i<=l){//need to valid chunk here?
+            qDebug()<<"chunked:"<<i<<" "<<l;
             int beginOfLength=theBody.indexOf('\n',i);
+            if(beginOfLength == -1){
+                beginOfLength = theBody.indexOf('\r\n',i);
+            }
             if(beginOfLength==-1){
                 return false;
             }
             int endOfLength = theBody.indexOf('\n',beginOfLength);
             if(endOfLength==-1){
-                return false;
+                endOfLength = theBody.indexOf('\r\n',beginOfLength);
+                if(endOfLength == -1){
+                    return false;
+                }
             }
             bool isChunkValid;
             int chunkSize = theBody.mid(beginOfLength,endOfLength-beginOfLength).toInt(&isChunkValid,16);
@@ -325,6 +339,13 @@ bool QiPipe_Private::parseResponseBody(const QByteArray &newContent){
 
 }
 void QiPipe_Private::tearDown(){
+
 }
 
+void QiPipe_Private::finishConnectionSuccess(){
 
+}
+
+void QiPipe_Private::finishConnectionWithError(int errno){
+
+}
