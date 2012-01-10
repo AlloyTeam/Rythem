@@ -19,7 +19,7 @@ SOURCES += main.cpp\
     qipipe.cpp \
     qiresponse.cpp \
     qiwinhttp.cpp \
-    qiconnectiondatadata.cpp
+    qiconnectiondata.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -40,6 +40,8 @@ FORMS    += mainwindow.ui
 
 win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation
+
+
 
 
 

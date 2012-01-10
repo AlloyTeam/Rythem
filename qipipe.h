@@ -70,7 +70,7 @@ public slots:
 private:
         void parseRequest(const QByteArray &requestBa);
         void parseRequestHeader(const QByteArray & header);
-        bool parseResponse(const QByteArray &responseBa);
+        bool parseResponse(const QByteArray responseBa);
         void parseResponseHeader(const QByteArray &header);
         bool parseResponseBody(QByteArray body);//根据http协议，需由header及body共同判断请求是否结束
         void finishConnectionSuccess();
@@ -78,16 +78,16 @@ private:
 
 
         bool requestHeaderFound;
-        int requestHeaderSpliterSize;
-        int requestHeaderSpliterIndex;
-        int requestContentLength;
-        int requestBodyRemain;
+        long requestHeaderSpliterSize;
+        long requestHeaderSpliterIndex;
+        long requestContentLength;
+        long requestBodyRemain;
 
         bool responseHeaderFound;
-        int responseHeaderSpliterSize;
-        int responseHeaderSpliterIndex;
-        int responseContentLength;
-        int responseBodyRemain;
+        long responseHeaderSpliterSize;
+        long responseHeaderSpliterIndex;
+        long responseContentLength;
+        long responseBodyRemain;
         bool isResponseChunked;
         QByteArray responseComressType;
 

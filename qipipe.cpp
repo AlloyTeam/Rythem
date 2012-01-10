@@ -248,6 +248,7 @@ void QiPipe_Private::onResponseReadReady(){
 
     QMutexLocker locker(&mutex);
     QByteArray ba = responseSocket->readAll();
+
     requestSocket->write(ba);
     requestSocket->flush();
 
@@ -294,9 +295,10 @@ void QiPipe_Private::onResponseClose(){
 
 
 
-bool QiPipe_Private::parseResponse(const QByteArray &newContent){
+bool QiPipe_Private::parseResponse(const QByteArray newContent){
     // if got response end return true
     if(responseState != HeaderFound){
+        qDebug()<<"no found header";
         parseResponseHeader(newContent);
     }
 
@@ -322,11 +324,12 @@ void QiPipe_Private::parseResponseHeader(const QByteArray &newContent){
             return;
         }
     }
-
+    //qDebug()<<"got response header";
     // got header : cut buffer & set state to HeaderFound
     responseState = HeaderFound;
     currentConnectionData->setResponseHeader(responseBuffer.left(responseHeaderSpliterIndex));
     responseBuffer.remove(0,responseHeaderSpliterIndex+responseHeaderSpliterSize);
+    //qDebug()<<"after set header:"<<responseBuffer;
 
     // 需要在pipe这里保存一份吗？
     isResponseChunked = currentConnectionData->getResponseHeader("Transfer-Encoding").toLower() == "chunked";
@@ -346,8 +349,10 @@ bool QiPipe_Private::parseResponseBody(QByteArray newContent){
     }
     */
     //根据http协议，需由header及body共同判断请求是否结束。
-    responseBuffer.clear();
-    if(currentSendingConnectionData->appendResponseBody(QByteArray(newContent))){
+    QByteArray ba = responseBuffer;
+    responseBuffer.clear();;
+    if(currentSendingConnectionData->appendResponseBody(ba)){
+        qDebug()<<"PackageFound";
         responseState = PackageFound;
         return true;
     }
