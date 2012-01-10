@@ -209,14 +209,15 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
     newConnectionData->setRequestHeader(header);
     newConnectionData->id = QiProxyServer::nextConnectionId();
     currentConnectionData = newConnectionData;
+    //newConnectionData->serverIP = responseSocket?responseSocket->peerName():"-";
     bufferConnectionArray.append(newConnectionData);
 
-    emit connected(newConnectionData);
+    emit connected(currentConnectionData);
 }
 
 
 void QiPipe_Private::onRequestError(){
-    emit finishedWithError(currentConnectionData);
+    emit finishedWithError(currentSendingConnectionData);
 }
 
 
@@ -260,9 +261,10 @@ void QiPipe_Private::onResponseReadReady(){
         // package got end
         if(bufferConnectionArray.size()>0){
             currentSendingConnectionData = bufferConnectionArray.at(0);
+            currentSendingConnectionData->serverIP = responseSocket->peerAddress().toString();
             bufferConnectionArray.remove(0);
         }
-        emit finishSuccess(currentConnectionData);
+        emit finishSuccess(currentSendingConnectionData);
     }
 }
 
@@ -270,14 +272,14 @@ void QiPipe_Private::onResponseReadReady(){
 void QiPipe_Private::onResponseError(QAbstractSocket::SocketError e){
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
-    emit(finishedWithError(currentConnectionData));
+    emit(finishedWithError(currentSendingConnectionData));
 }
 
 
 void QiPipe_Private::onRequestClose(){
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
-    emit finishSuccess(currentConnectionData);
+    emit finishSuccess(currentSendingConnectionData);
 }
 
 
@@ -287,7 +289,7 @@ void QiPipe_Private::onResponseClose(){
     Q_UNUSED(locker);
     requestSocket->disconnect();
     requestSocket->close();
-    emit finishSuccess(currentConnectionData);
+    emit finishSuccess(currentSendingConnectionData);
 }
 
 

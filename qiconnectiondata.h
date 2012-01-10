@@ -27,6 +27,10 @@ public:
         fullUrl = p.fullUrl;
         requestMethod = p.requestMethod;
         unChunkResponse = p.unChunkResponse;
+        requestRawDataToSend = p.requestRawDataToSend;
+        requestBody = p.requestBody;
+        responseBody = p.responseBody;
+
         setRequestRawData(p.requestRawData);
         setResponseRawData(p.responseRawData);
     }

@@ -28,10 +28,14 @@ void QiProxyServer::onPipeConnected(ConnectionData_ptr p){
     Q_UNUSED(p);
 }
 void QiProxyServer::onPipeComplete(ConnectionData_ptr p){
-    removePipe(p->id);
+    if(p){
+        removePipe(p->id);
+    }
 }
 void QiProxyServer::onPipeError(ConnectionData_ptr p){
-    removePipe(p->id);
+    if(p){
+        removePipe(p->id);
+    }
 }
 
 QiPipe* QiProxyServer::addPipe(int socketDescriptor){
