@@ -157,7 +157,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
 
 #ifdef Q_OS_WIN
             // TODO add mac pac support
-            QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(connectionData->fullUrl)));
+            QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(currentSendingConnectionData->fullUrl)));
             for(int i=0,l=proxylist.length();i<l;++i){
                 QNetworkProxy p = proxylist.at(i);
                 responseSocket->setProxy(p);
