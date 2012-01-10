@@ -89,7 +89,7 @@ void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
     this->beginInsertRows(index(pipeNumber-1, 0),pipeNumber-1,pipeNumber-1);
 
     //TODO thread safe?
-    pipesMap.value(p1->socketId,p1);
+    pipesMap.value(p1->id,p1);
     pipesVector.append(p1);
 
     //QModelIndex index1 = index(pipeNumber-1, 0);

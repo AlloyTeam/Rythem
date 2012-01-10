@@ -53,10 +53,10 @@ public:
     ~QiPipe_Private();
 
 signals:
-        void completed(ConnectionData_ptr);
-        void error(ConnectionData_ptr);
         void connected(ConnectionData_ptr);
-        void finished();// error or completed
+
+        void finishedWithError(ConnectionData_ptr);
+        void finishSuccess(ConnectionData_ptr);
 
 public slots:
         void onRequestReadReady();
@@ -72,13 +72,10 @@ private:
         void parseRequestHeader(const QByteArray & header);
         bool parseResponse(const QByteArray &responseBa);
         void parseResponseHeader(const QByteArray &header);
-        bool parseResponseBody(const QByteArray &body);//根据http协议，需由header及body共同判断请求是否结束
+        bool parseResponseBody(QByteArray body);//根据http协议，需由header及body共同判断请求是否结束
         void finishConnectionSuccess();
         void finishConnectionWithError(int errno);
 
-        QByteArray requestRawData;
-        QByteArray requestRawDataHeader;
-        QByteArray requestRawDataBody;
 
         bool requestHeaderFound;
         int requestHeaderSpliterSize;
@@ -88,21 +85,26 @@ private:
 
         bool responseHeaderFound;
         int responseHeaderSpliterSize;
-        int responseHeaderSpliterInex;
+        int responseHeaderSpliterIndex;
         int responseContentLength;
         int responseBodyRemain;
         bool isResponseChunked;
         QByteArray responseComressType;
 
-        QByteArray responseRawData;
-        QByteArray responseBodyRawData;
+        QByteArray requestBuffer;
+        QByteArray responseBuffer;
+
 
         QTcpSocket* requestSocket;
         QTcpSocket* responseSocket;
 
-        QSharedPointer<QiConnectionData> connectionData;
+        //当前正在发送的http request data
+        ConnectionData_ptr currentSendingConnectionData;
+        //当前http request data
+        ConnectionData_ptr currentConnectionData;
 
-        QVector<ConnectionData_ptr> connectionArray;
+        // 此队列为request buffer
+        QVector<ConnectionData_ptr> bufferConnectionArray;
 
         RequestInfo requestInfo;
         QMutex mutex;
@@ -110,7 +112,7 @@ private:
 
         enum State {
                 Connected,   // response only
-                BodyParsing, // response only
+                Connecting, // response only
                 Initial,     // both
                 HeaderFound, // both
                 PackageFound // both

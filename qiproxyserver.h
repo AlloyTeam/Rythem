@@ -36,9 +36,9 @@ class QiProxyServer : public QTcpServer{
         QMutex mutex;
 
         static QMutex connectionIdMutex;
-        static int connectionId;
+        static long connectionId;
     public:
-        static int nextConnectionId(){
+        static long nextConnectionId(){
             QMutexLocker locker(&connectionIdMutex);
             Q_UNUSED(locker)
             connectionId++;

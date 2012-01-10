@@ -2,8 +2,9 @@
 #include <QDebug>
 #include <QStringList>
 
-QiConnectionData::QiConnectionData(int socketDescriptor):socketId(socketDescriptor){
-    qDebug()<<"PipeData contructed:"<<socketId;
+QiConnectionData::QiConnectionData(int socketDescriptor){
+    qDebug()<<"PipeData contructed:";
+    id=-1;
     returnCode = -1;
 }
 
@@ -83,6 +84,9 @@ void QiConnectionData::setRequestHeader(QByteArray header){
                 allRequestHeaders["Host"] = value;
                 allRequestHeaders["Port"] = "80";
             }
+
+            host = allRequestHeaders["Host"];
+            port = allRequestHeaders["Port"].toInt();
         }else{
             allRequestHeaders[name] = value;
         }
@@ -168,7 +172,58 @@ QByteArray QiConnectionData::getRequestBody()const{
     return QByteArray();
 
 }
+bool QiConnectionData::appendResponseBody(QByteArray newContent){
+    responseBody.append(newContent);
+    if(this->getResponseHeader("Transfer-Encoding").toLower() == "chunked"){
+        // TODO .. move to single function
+        QByteArray theBody = responseBody;
+        //theBody.replace("\r\n","\n");
+        long i=0;
+        long l=theBody.length();
+        while(i<=l){//need to valid chunk here?
+            qDebug()<<"chunked:"<<i<<" "<<l;
+            int beginOfLength=theBody.indexOf('\n',i);
+            if(beginOfLength == -1){
+                beginOfLength = theBody.indexOf('\r\n',i);
+            }
+            if(beginOfLength==-1){
+                return false;
+            }
+            int endOfLength = theBody.indexOf('\n',beginOfLength);
+            if(endOfLength==-1){
+                endOfLength = theBody.indexOf('\r\n',beginOfLength);
+                if(endOfLength == -1){
+                    return false;
+                }
+            }
+            bool isChunkValid;
+            int chunkSize = theBody.mid(beginOfLength,endOfLength-beginOfLength).toInt(&isChunkValid,16);
+            if(chunkSize==0){
+                return true;
+            }
+            // don't do this until comfirm reponse done
+            /*
+            if(chunkSize+endOfLength+1<=l){
+                connectionData->unChunkResponse.append(theBody.mid(endOfLength+1,chunkSize));
+            }
+            */
+            if(!isChunkValid){
+                return false;
+            }
+            i = chunkSize+endOfLength+1;
+            if(i>l){
+                return false;
+            }
+        }
+    }else{
+        return (this->getResponseHeader("Content-Length").toLong() <= responseBody.length());
+    }
+}
+bool QiConnectionData::appendRequestBody(QByteArray newContent){
+    requestBody.append(newContent);
 
+    requestRawDataToSend.append(newContent);
+}
 
 
 void QiConnectionData::setRequestRawData(QByteArray request){//only for copy Ctor

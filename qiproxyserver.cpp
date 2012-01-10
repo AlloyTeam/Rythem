@@ -2,7 +2,8 @@
 #include "qipipe.h"
 #include <QThreadPool>
 
-int QiProxyServer::connectionId = 0;
+long QiProxyServer::connectionId = 0;
+QMutex QiProxyServer::connectionIdMutex;
 
 QiProxyServer::QiProxyServer(QObject *parent) :
     QTcpServer(parent){
@@ -27,10 +28,10 @@ void QiProxyServer::onPipeConnected(ConnectionData_ptr p){
     Q_UNUSED(p);
 }
 void QiProxyServer::onPipeComplete(ConnectionData_ptr p){
-    removePipe(p->socketId);
+    removePipe(p->id);
 }
 void QiProxyServer::onPipeError(ConnectionData_ptr p){
-    removePipe(p->socketId);
+    removePipe(p->id);
 }
 
 QiPipe* QiProxyServer::addPipe(int socketDescriptor){

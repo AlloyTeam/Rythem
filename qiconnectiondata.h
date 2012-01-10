@@ -31,7 +31,7 @@ public:
         setResponseRawData(p.responseRawData);
     }
 
-    int socketId;
+    long id;
     int number;
     int returnCode;
     QString protocol;
@@ -46,16 +46,21 @@ public:
     QByteArray unChunkResponse;
 
     QByteArray requestRawDataToSend;
+    QByteArray requestBody;
+
+    QByteArray responseBody;
 
 
     void setRequestHeader(QByteArray name,QByteArray value);
     void setRequestHeader(QByteArray headerBa);
+    bool appendRequestBody(QByteArray newContent);
     QByteArray getRequestHeader(QByteArray name)const;
     QByteArray getRequestHeader()const;
     QByteArray getRequestBody()const;
 
     void setResponseHeader(QByteArray header);
     void setResponseBody(QByteArray body);
+    bool appendResponseBody(QByteArray newContent);
     QByteArray getResponseHeader(QByteArray name)const;
     QByteArray getResponseHeader()const;
     QByteArray getResponseBody()const;
