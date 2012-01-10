@@ -31,6 +31,9 @@ public:
         requestBody = p.requestBody;
         responseBody = p.responseBody;
 
+        allResponseHeaders = p.allRequestHeaders;
+        allResponseHeaders = p.allResponseHeaders;
+
         setRequestRawData(p.requestRawData);
         setResponseRawData(p.responseRawData);
     }
