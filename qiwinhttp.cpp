@@ -375,7 +375,7 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
             url.setScheme(QLatin1String("https"));
         }
         //qDebug()<<"getting..";
-        printf("%ls",sp->autoProxyOptions.lpszAutoConfigUrl);
+        //printf("%ls",sp->autoProxyOptions.lpszAutoConfigUrl);
         LPCWSTR theAuto= L"http://txp-01.tencent.com/lvsproxy.pac";
         //LPCWSTR theUrl= L"http://gdutbbs.com/";
         QTime qt = QDateTime::currentDateTime().time();

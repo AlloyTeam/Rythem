@@ -264,8 +264,8 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
                 return true;
             }else{
                 if(this->getResponseHeader("Connection")=="close"){
-                    qDebug()<<"connection data : connection close";
-                    qDebug()<<allResponseHeaders;
+                    //qDebug()<<"connection data : connection close";
+                    //qDebug()<<allResponseHeaders;
                     return true;
                 }
             }

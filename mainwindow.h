@@ -30,6 +30,8 @@ public slots:
         void onNewPipe(ConnectionData_ptr);
         void onPipeUpdate(ConnectionData_ptr);
 
+        void toggleProxy();
+
 
 
 public:

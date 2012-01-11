@@ -22,6 +22,8 @@
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
 #endif
 
+#include <QtCore>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -71,9 +73,8 @@ void MainWindow::onNewPipe(ConnectionData_ptr pipeData){
     //pipeTableModel
     pipeTableModel.addItem(pipeData);
 }
-void MainWindow::toggleCapture(){
-#ifdef Q_WS_WIN32
-    QiWinHttp::init();
+
+void MainWindow::toggleProxy(){
     if(isUsingCapture){
         isUsingCapture = false;
         /*
@@ -125,6 +126,13 @@ void MainWindow::toggleCapture(){
     proxySetting.sync();
     ::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+}
+
+void MainWindow::toggleCapture(){
+    captureAct->setChecked(!isUsingCapture);
+#ifdef Q_WS_WIN32
+    QiWinHttp::init();
+    QtConcurrent::run(this,&MainWindow::toggleProxy);
     //qDebug()<<previousProxyInfo.isUsingPac;
 #endif
 #ifdef Q_WS_MAC
@@ -178,8 +186,6 @@ void MainWindow::toggleCapture(){
     plist.setValue("NetworkServices",services);
     plist.sync();//doesn't work.. plist readonly
 #endif
-    captureAct->setChecked(isUsingCapture);
-    qDebug()<<"toggle capture";
 }
 
 
