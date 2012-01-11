@@ -85,7 +85,8 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
     ConnectionData_ptr data = pipeTableModel.getItem(row);
     ui->requestTextEdit->setPlainText(data->requestHeaderRawData +"\r\n\r\n"+data->requestBody );
     ui->responseTextEdit->setPlainText(QString::fromUtf8(
-                                           (data->responseHeaderRawData+"\r\n\r\n"+data->responseBody).data())
+                                           (data->responseHeaderRawData+"\r\n\r\n"
+                                            + (data->unChunkResponse.isEmpty()?data->responseBody:data->unChunkResponse)).data())
                                        );
     data.clear();
 }

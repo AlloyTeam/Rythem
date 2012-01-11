@@ -179,18 +179,20 @@ QByteArray QiConnectionData::getRequestBody()const{
 }
 bool QiConnectionData::appendResponseBody(QByteArray newContent){
     responseBody.append(newContent);
-    qDebug()<<"appending response body:"<<responseBody;
+    //qDebug()<<"appending response body:"<<responseBody;
     if(this->getResponseHeader("Transfer-Encoding").toLower() == "chunked"){
+        unChunkResponse.clear();
         // TODO .. move to single function
         //qDebug()<<"appendResponseBody called:"<<responseBody;
         QByteArray theBody = responseBody;
-        //theBody.replace("\r\n","\n");
         int i=0;
         int l=theBody.length();
+        int NLSize = 1;
         int beginOfLength = 0;
         int endOfLength  = theBody.indexOf('\n',beginOfLength+1);
         if(endOfLength==-1){
             endOfLength = theBody.indexOf("\r\n",beginOfLength+2);
+            NLSize = 2;
             if(endOfLength == -1){
                 return false;
             }
@@ -208,14 +210,15 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
         if(chunkSize == 0){
             return true;
         }
-        i = chunkSize + endOfLength;
-        if(chunkSize + endOfLength > theBody.length()){
+        i = chunkSize + endOfLength + NLSize;
+        if(chunkSize + endOfLength + NLSize > theBody.length()){
             return false;
         }
-
+        unChunkResponse.append(theBody.mid(endOfLength+NLSize,chunkSize));
         do{//need to valid chunk here?
             //qDebug()<<"chunked:"<<i<<" "<<l;
             beginOfLength=theBody.indexOf('\n',i);
+            NLSize = 1;
             if(beginOfLength == -1){
                 beginOfLength = theBody.indexOf("\r\n",i);
             }
@@ -225,6 +228,7 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
             endOfLength = theBody.indexOf('\n',beginOfLength+1);
             if(endOfLength==-1){
                 endOfLength = theBody.indexOf("\r\n",beginOfLength+2);
+                NLSize = 2;
                 if(endOfLength == -1){
                     return false;
                 }
@@ -237,7 +241,10 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
             }
 
             //qDebug()<<chunkSize;
+            unChunkResponse.append(theBody.mid(endOfLength+NLSize,chunkSize));
             if(chunkSize==0){
+                //qDebug()<<"got chunked end";
+                //qDebug()<<unChunkResponse;
                 return true;
             }
             // don't do this until comfirm reponse done
@@ -246,10 +253,7 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
                 connectionData->unChunkResponse.append(theBody.mid(endOfLength+1,chunkSize));
             }
             */
-            if(!isChunkValid){
-                return false;
-            }
-            i = chunkSize+endOfLength+1;
+            i = chunkSize+endOfLength+NLSize;
             if(i>l){
                 return false;
             }
