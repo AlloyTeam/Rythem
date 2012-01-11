@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<ConnectionData_const_ptr>("ConnectionData_const_ptr");
     qRegisterMetaType<ConnectionData_ptr>("ConnectionData_ptr");
 
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF8"));
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF8"));
+    //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF8"));
+    //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF8"));
 
     MainWindow w;
 

@@ -26,7 +26,7 @@ static void isInMain(QString info){
 }
 
 QiPipe::QiPipe(int socketDescriptor):_socketDescriptor(socketDescriptor){
-    qDebug()<<"new QiPipe"<<socketDescriptor;
+    //qDebug()<<"new QiPipe"<<socketDescriptor;
 }
 
 QiPipe::~QiPipe(){
@@ -37,14 +37,14 @@ QiPipe::~QiPipe(){
         qp->deleteLater();
         qp = NULL;
     }
-    qDebug()<<"~QiPipe "<<_socketDescriptor;
+    //qDebug()<<"~QiPipe "<<_socketDescriptor;
 }
 
 void QiPipe::run(){
     qp = new QiPipe_Private(_socketDescriptor);
     connect(qp,SIGNAL(connected(ConnectionData_ptr)),this,SIGNAL(connected(ConnectionData_ptr)));
     connect(qp,SIGNAL(finishSuccess(ConnectionData_ptr)),this,SIGNAL(completed(ConnectionData_ptr)));
-    connect(qp,SIGNAL(finishedWithError(ConnectionData_ptr)),this,SIGNAL(error(ConnectionData_ptr)));
+    connect(qp,SIGNAL(finishedWithError(ConnectionData_ptr)),this,SIGNAL(completed(ConnectionData_ptr)));
     connect(qp,SIGNAL(pipeFinished()),SIGNAL(pipeFinished()));
     //connect(qp,SIGNAL(pipeFinished()),SLOT(onPipeFinished()));
 }
@@ -74,7 +74,7 @@ QiPipe_Private::QiPipe_Private(int descriptor):requestSocket(NULL),responseSocke
     }
 }
 QiPipe_Private::~QiPipe_Private(){
-    qDebug()<<"~QiPipe_Private";
+    //qDebug()<<"~QiPipe_Private";
     tearDown();
 }
 
@@ -103,7 +103,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
             return;
         }
         QByteArray contentLenght = gettingRequestConnectionData->getRequestHeader("Content-Length");
-        qDebug()<<contentLenght;
+        //qDebug()<<contentLenght;
         requestContentLength = contentLenght.toInt();
         requestBodyRemain = requestContentLength;
     }
@@ -123,9 +123,9 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         // need body
         //qDebug()<<"req content-length="<<requestContentLength<<" remain="<<requestBodyRemain;
         int bufferBodyLength = requestBuffer.length();
-        qDebug()<<bufferBodyLength;
+        //qDebug()<<bufferBodyLength;
         requestBodyRemain = requestBodyRemain - bufferBodyLength;
-        qDebug()<<"req content-length="<<requestContentLength<<" remain="<<requestBodyRemain;
+        //qDebug()<<"req content-length="<<requestContentLength<<" remain="<<requestBodyRemain;
         gettingRequestConnectionData->appendRequestBody(requestBuffer);
         if(requestBodyRemain <= 0){
             //TODO connectionData 入栈与requestState相关联，需要setRequestState方法统一
@@ -232,14 +232,14 @@ void QiPipe_Private::parseRequestHeader(const QByteArray &newContent){
     gettingRequestConnectionData = ConnectionData_ptr(new QiConnectionData());
     gettingRequestConnectionData->setRequestHeader(header);
     gettingRequestConnectionData->id = QiProxyServer::nextConnectionId();
-    qDebug()<<"---gettingRequestConnectionData->id = "<<gettingRequestConnectionData->id;
+    //qDebug()<<"---gettingRequestConnectionData->id = "<<gettingRequestConnectionData->id;
 
     emit connected(gettingRequestConnectionData);
 }
 
 
 void QiPipe_Private::onRequestError(){
-    qDebug()<<"onRequestError";
+    //qDebug()<<"onRequestError";
     tearDown();
 }
 
@@ -292,7 +292,9 @@ void QiPipe_Private::onResponseReadReady(){
     responseBuffer.append(ba);
     if(parseResponse(ba)){
         // package got end
-        emit finishSuccess(receivingResponseConnectinoData);
+        //qDebug()<<receivingResponseConnectinoData->responseBody;
+        ConnectionData_ptr tmp = receivingResponseConnectinoData;
+        emit finishSuccess(tmp);
         /*
         if(receivingResponseConnectinoData->getResponseHeader("Connection")=="close"){
             locker.unlock();
@@ -308,19 +310,19 @@ void QiPipe_Private::onResponseReadReady(){
 
 
 void QiPipe_Private::onResponseError(QAbstractSocket::SocketError e){
-    qDebug()<<"responseSocket error"<<e;
+    //qDebug()<<"responseSocket error"<<e;
     tearDown();
 }
 
 
 void QiPipe_Private::onRequestClose(){
-    qDebug()<<"onRequestClose";
+    //qDebug()<<"onRequestClose";
     tearDown();
 }
 
 
 void QiPipe_Private::onResponseClose(){
-    qDebug()<<"response close";
+    //qDebug()<<"response close";
     tearDown();
 }
 
@@ -340,6 +342,10 @@ bool QiPipe_Private::parseResponse(const QByteArray newContent){
             //return false;
         }
         parseResponseHeader(responseBuffer);
+    }
+
+    if(receivingResponseConnectinoData->returnCode == 400){
+        qDebug()<<"response 400\n"<<receivingResponseConnectinoData->requestHeaderRawData;
     }
 
     if(responseState != HeaderFound){//check if got end
@@ -397,8 +403,8 @@ bool QiPipe_Private::parseResponseBody(QByteArray newContent){
 
 //为避免死锁，调用些函数里*必须*解锁mutex
 void QiPipe_Private::tearDown(){
-    QMutexLocker locker(&mutex);
-    Q_UNUSED(locker);
+    //QMutexLocker locker(&mutex);
+    //Q_UNUSED(locker);
     if(requestSocket){
         requestSocket->blockSignals(true);
         requestSocket->disconnect(this);

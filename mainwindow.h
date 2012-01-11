@@ -12,7 +12,7 @@ namespace Ui {
 class QiProxyServer;
 class QiPipe;
 class QiConnectionData;
-
+class QItemSelectionModel;
 
 
 class MainWindow : public QMainWindow
@@ -31,6 +31,8 @@ public slots:
         void onPipeUpdate(ConnectionData_ptr);
 
         void toggleProxy();
+
+        void onSelectionChange(QModelIndex,QModelIndex);
 
 
 
@@ -54,6 +56,7 @@ private:
     QMenu *fileMenu;
     QMenu *toolMenu;
     QAction *captureAct;
+    QItemSelectionModel *itemSelectModel;
 protected:
     void closeEvent(QCloseEvent *event);
 

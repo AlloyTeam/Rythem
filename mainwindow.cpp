@@ -23,6 +23,7 @@
 #endif
 
 #include <QtCore>
+#include <QItemSelectionModel>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -39,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setModel(&pipeTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
+
+    itemSelectModel = ui->tableView->selectionModel();
+
+    connect(itemSelectModel,SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),SLOT(onSelectionChange(QModelIndex,QModelIndex)));
 
     //ui->tableView->setItemDelegate();
     createMenus();
@@ -74,22 +79,32 @@ void MainWindow::onNewPipe(ConnectionData_ptr pipeData){
     pipeTableModel.addItem(pipeData);
 }
 
+void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight){
+    //qDebug()<<"onSelectionChange";
+    int row = topLeft.row();
+    ConnectionData_ptr data = pipeTableModel.getItem(row);
+    ui->requestTextEdit->setPlainText(data->requestHeaderRawData +"\r\n\r\n"+data->requestBody );
+    ui->responseTextEdit->setPlainText( data->responseHeaderRawData+"\r\n\r\n"+data->responseBody);
+    data.clear();
+}
+
 void MainWindow::toggleProxy(){
     if(isUsingCapture){
         isUsingCapture = false;
-        /*
+
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
         proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
         if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
         }
-        */
+        /*
         // hard code just for some crash issue
         proxySetting.setValue("ProxyEnable",1);
         proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
         //if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
         //}
+        */
     }else{
         isUsingCapture = true;
         previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();

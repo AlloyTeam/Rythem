@@ -10,6 +10,7 @@ QiConnectionData::QiConnectionData(int socketDescriptor){
 
 
 void QiConnectionData::setRequestHeader(QByteArray header){
+    requestHeaderRawData = header;
     header.replace("\r\n","\n");
     int i=0,l=header.length();
     //firstline
@@ -178,6 +179,7 @@ QByteArray QiConnectionData::getRequestBody()const{
 }
 bool QiConnectionData::appendResponseBody(QByteArray newContent){
     responseBody.append(newContent);
+    qDebug()<<"appending response body:"<<responseBody;
     if(this->getResponseHeader("Transfer-Encoding").toLower() == "chunked"){
         // TODO .. move to single function
         //qDebug()<<"appendResponseBody called:"<<responseBody;

@@ -15,7 +15,7 @@ public:
     }
 
     inline QiConnectionData(const QiConnectionData& p){//copy ctor
-        //qDebug()<<"connectionData copy ctor";
+        qDebug()<<"connectionData copy ctor";
         number = p.number;
 
         returnCode = p.returnCode;
@@ -36,7 +36,6 @@ public:
 
         responseHeaderRawData = p.responseHeaderRawData;
         requestHeaderRawData = p.requestHeaderRawData;
-
         setRequestRawData(p.requestRawData);
         setResponseRawData(p.responseRawData);
     }

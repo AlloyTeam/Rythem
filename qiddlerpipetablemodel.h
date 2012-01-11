@@ -25,6 +25,8 @@ public:
     void removeItems();
     void removeAllItem();
 
+    ConnectionData_ptr getItem(int column);
+
     void updateItem(ConnectionData_ptr p);
 signals:
 

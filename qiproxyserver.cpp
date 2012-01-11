@@ -108,7 +108,7 @@ void QiProxyServer::removeAllPipe(){
 }
 
 int QiProxyServer::fetchPendingSocket(){
-    qDebug()<<"fetching:"<<pendingSocketHanles.size();
+    //qDebug()<<"fetching:"<<pendingSocketHanles.size();
     if(pendingSocketHanles.size()==0){
         return -1;
     }

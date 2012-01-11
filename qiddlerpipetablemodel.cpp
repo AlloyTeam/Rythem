@@ -76,8 +76,25 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
     return QAbstractTableModel::flags(index);
 }
 
-void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
+ConnectionData_ptr QiddlerPipeTableModel::getItem(int row){
+    //qDebug()<<pipesVector.size()<<row;
+    if(pipesVector.size() >= row){
+        return pipesVector.at(row);
+    }
+    //qDebug()<<row<<" ---";
+    return ConnectionData_ptr(new QiConnectionData());
+}
 
+void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
+    int i = pipesMap.keys().indexOf(p->id);
+    if(i!=-1){
+        ConnectionData_ptr ori = pipesMap[p->id];
+        pipesMap[p->id] = p;
+        int j = pipesVector.indexOf(ori);
+        if(j!=-1){
+            pipesVector.replace(j,p);
+        }
+    }
 }
 
 void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
