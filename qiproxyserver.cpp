@@ -2,7 +2,7 @@
 #include "qipipe.h"
 #include <QThreadPool>
 
-#define MAXSOCKET 20
+#define MAXSOCKET 100
 
 long QiProxyServer::connectionId = 0;
 QMutex QiProxyServer::connectionIdMutex;
@@ -45,7 +45,10 @@ void QiProxyServer::onConnectionError(ConnectionData_ptr p){
 void QiProxyServer::onPipeFinished(){
     QiPipe* pipe = (QiPipe*)sender();
     if(pipe){
-        removePipe(pipe->sockeId());
+        bool isRemoveSuccess = removePipe(pipe->sockeId());
+        if(!isRemoveSuccess){
+            qDebug()<<"remove pipe fail";
+        }
     }else{
         qDebug()<<"ERROR...QiProxyServer::onPipeFinished";
     }
@@ -88,11 +91,12 @@ bool QiProxyServer::removePipe(int connectionId){
         threads.remove(connectionId);
         pipes.remove(connectionId);
 
-        delete p;
+        p->deleteLater();
         t->quit();
-        qDebug()<<"waiting..";
-        t->wait(10);
-        qDebug()<<"quit thread..";
+        //qDebug()<<"waiting..";
+        //t->wait(10);
+        //qDebug()<<"quit thread..";
+        return true;
     }
     return false;
 }
