@@ -151,7 +151,7 @@ static QList<QNetworkProxy> parseServerList(const QNetworkProxyQuery &query, con
     //   ([<scheme>=][<scheme>"://"]<server>[":"<port>])
 
     QList<QNetworkProxy> result;
-    qDebug()<<"parseServerList"<<result.count();
+    //qDebug()<<"parseServerList"<<result.count();
     foreach (const QString &entry, proxyList) {
         int server = 0;
 
@@ -348,7 +348,7 @@ void QWindowsSystemProxy::init()
 
 //== end 1
 QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
-    qDebug()<<"querying "<<query.url().toString();
+    //qDebug()<<"querying "<<query.url().toString();
     QWindowsSystemProxy *sp = systemProxy();
     if (!sp)
         return QList<QNetworkProxy>() << QNetworkProxy();
@@ -359,7 +359,7 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
     sp->init();
     if (!sp->functional)
         return sp->defaultResult;
-    qDebug()<<"isautoconfig?"<<(sp->isAutoConfig?"a":"no");
+    //qDebug()<<"isautoconfig?"<<(sp->isAutoConfig?"a":"no");
     if (sp->isAutoConfig) {
         WINHTTP_PROXY_INFO proxyInfo;
 
@@ -374,7 +374,7 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
             // change the scheme to https, maybe it'll work
             url.setScheme(QLatin1String("https"));
         }
-        qDebug()<<"getting..";
+        //qDebug()<<"getting..";
         printf("%ls",sp->autoProxyOptions.lpszAutoConfigUrl);
         LPCWSTR theAuto= L"http://txp-01.tencent.com/lvsproxy.pac";
         //LPCWSTR theUrl= L"http://gdutbbs.com/";
@@ -389,7 +389,7 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
                                                           /*theAuto*/,
                                                 &proxyInfo);
         QTime endQt = QDateTime::currentDateTime().time();
-        qDebug()<<QString("%1 %2 %3").arg(beg).arg(endQt.msec()).arg(endQt.msec()-beg);
+        //qDebug()<<QString("%1 %2 %3").arg(beg).arg(endQt.msec()).arg(endQt.msec()-beg);
         DWORD getProxyError = GetLastError();
         if (!getProxySucceeded
             && (ERROR_WINHTTP_LOGIN_FAILURE == getProxyError)) {

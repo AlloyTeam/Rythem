@@ -11,11 +11,11 @@ private:
 public:
     QiConnectionData(int socketDescriptor=-1);
     ~QiConnectionData(){
-        qDebug()<<"~PipeData";
+        //qDebug()<<"~connectionData";
     }
 
     inline QiConnectionData(const QiConnectionData& p){//copy ctor
-        qDebug()<<"copy ctor";
+        //qDebug()<<"connectionData copy ctor";
         number = p.number;
 
         returnCode = p.returnCode;
@@ -33,6 +33,9 @@ public:
 
         allResponseHeaders = p.allRequestHeaders;
         allResponseHeaders = p.allResponseHeaders;
+
+        responseHeaderRawData = p.responseHeaderRawData;
+        requestHeaderRawData = p.requestHeaderRawData;
 
         setRequestRawData(p.requestRawData);
         setResponseRawData(p.responseRawData);
@@ -54,8 +57,10 @@ public:
 
     QByteArray requestRawDataToSend;
     QByteArray requestBody;
+    QByteArray requestHeaderRawData;
 
     QByteArray responseBody;
+    QByteArray responseHeaderRawData;
 
 
     void setRequestHeader(QByteArray name,QByteArray value);

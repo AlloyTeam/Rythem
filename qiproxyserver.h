@@ -20,9 +20,10 @@ class QiProxyServer : public QTcpServer{
         void newPipe(ConnectionData_ptr);
         void pipeUpdate(ConnectionData_ptr);
     public slots:
-        void onPipeConnected(ConnectionData_ptr);
-        void onPipeComplete(ConnectionData_ptr);
-        void onPipeError(ConnectionData_ptr);
+        void onConnectionConnected(ConnectionData_ptr);
+        void onConnectionComplete(ConnectionData_ptr);
+        void onConnectionError(ConnectionData_ptr);
+        void onPipeFinished();
     protected:
         void incomingConnection(int handle);
 

@@ -81,7 +81,7 @@ void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
 }
 
 void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
-    qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
+    //qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
     ConnectionData_ptr p1 = p;
     ++pipeNumber;
     p1->number=pipeNumber;

@@ -29,6 +29,17 @@
         <attribute name="title">
          <string>Tab 1</string>
         </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QSplitter" name="splitter_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <widget class="QPlainTextEdit" name="requestTextEdit"/>
+           <widget class="QPlainTextEdit" name="responseTextEdit"/>
+          </widget>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -46,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

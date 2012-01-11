@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setModel(&pipeTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
+
     //ui->tableView->setItemDelegate();
     createMenus();
     //toggleCapture();

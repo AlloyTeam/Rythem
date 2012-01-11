@@ -23,29 +23,41 @@ QiProxyServer::~QiProxyServer(){
     }
     removeAllPipe();
 }
-void QiProxyServer::onPipeConnected(ConnectionData_ptr p){
+void QiProxyServer::onConnectionConnected(ConnectionData_ptr p){
     // do nothing?
     Q_UNUSED(p);
 }
-void QiProxyServer::onPipeComplete(ConnectionData_ptr p){
+void QiProxyServer::onConnectionComplete(ConnectionData_ptr p){
     if(p){
         removePipe(p->id);
     }
 }
-void QiProxyServer::onPipeError(ConnectionData_ptr p){
+void QiProxyServer::onConnectionError(ConnectionData_ptr p){
     if(p){
         removePipe(p->id);
     }
 }
 
+void QiProxyServer::onPipeFinished(){
+    QiPipe* pipe = (QiPipe*)sender();
+    if(pipe){
+        removePipe(pipe->sockeId());
+    }else{
+        qDebug()<<"ERROR...QiProxyServer::onPipeFinished";
+    }
+}
+
+
 QiPipe* QiProxyServer::addPipe(int socketDescriptor){
     QiPipe *pipe = new QiPipe(socketDescriptor);//delete in removePipe(int)
-    connect(pipe,SIGNAL(connected(ConnectionData_ptr)),SLOT(onPipeConnected(ConnectionData_ptr)));
+    connect(pipe,SIGNAL(connected(ConnectionData_ptr)),SLOT(onConnectionConnected(ConnectionData_ptr)));
     connect(pipe,SIGNAL(connected(ConnectionData_ptr)),SIGNAL(newPipe(ConnectionData_ptr)));
-    connect(pipe,SIGNAL(completed(ConnectionData_ptr)),SLOT(onPipeComplete(ConnectionData_ptr)));
+    connect(pipe,SIGNAL(completed(ConnectionData_ptr)),SLOT(onConnectionComplete(ConnectionData_ptr)));
     connect(pipe,SIGNAL(completed(ConnectionData_ptr)),SIGNAL(pipeUpdate(ConnectionData_ptr)));
-    connect(pipe,SIGNAL(error(ConnectionData_ptr)),SLOT(onPipeError(ConnectionData_ptr)));
+    connect(pipe,SIGNAL(error(ConnectionData_ptr)),SLOT(onConnectionError(ConnectionData_ptr)));
     connect(pipe,SIGNAL(error(ConnectionData_ptr)),SIGNAL(pipeUpdate(ConnectionData_ptr)));
+
+    connect(pipe,SIGNAL(pipeFinished()),SLOT(onPipeFinished()));
 
 
     pipes[socketDescriptor]=pipe;
@@ -59,19 +71,19 @@ QiPipe* QiProxyServer::addPipe(int socketDescriptor){
     return pipe;
 }
 
-bool QiProxyServer::removePipe(int socketId){
-    if(pipes.contains(socketId)){
+bool QiProxyServer::removePipe(int connectionId){
+    if(pipes.contains(connectionId)){
         //qDebug()<<"removePipe contains.."<<socketId;
-        QiPipe *p = pipes.value(socketId);
-        QThread *t = threads.value(socketId);
+        QiPipe *p = pipes.value(connectionId);
+        QThread *t = threads.value(connectionId);
 
-        threads.remove(socketId);
-        pipes.remove(socketId);
+        threads.remove(connectionId);
+        pipes.remove(connectionId);
 
-        p->deleteLater();
+        //p->deleteLater();
         t->quit();
         t->wait(100);
-        //delete p;
+        delete p;
     }
     return false;
 }

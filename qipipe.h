@@ -33,6 +33,9 @@ private:
 public://public member functions
         explicit QiPipe(int socketDescriptor = 0);
         ~QiPipe();
+        int sockeId()const{
+            return _socketDescriptor;
+        }
 signals:
         void completed(ConnectionData_ptr);
         void error(ConnectionData_ptr);
@@ -43,6 +46,8 @@ public slots:
         void run();
 public://public variables
         QMutex mutex;//seems don't need any lock?
+private slots:
+        void onPipeFinished();
 };
 
 
@@ -57,6 +62,8 @@ signals:
 
         void finishedWithError(ConnectionData_ptr);
         void finishSuccess(ConnectionData_ptr);
+
+        void pipeFinished();
 
 public slots:
         void onRequestReadReady();
@@ -75,6 +82,7 @@ private:
         bool parseResponseBody(QByteArray body);//根据http协议，需由header及body共同判断请求是否结束
         void finishConnectionSuccess();
         void finishConnectionWithError(int errno);
+        ConnectionData_ptr nextConnectionData();
 
 
         bool requestHeaderFound;
@@ -89,6 +97,9 @@ private:
         long responseContentLength;
         long responseBodyRemain;
         bool isResponseChunked;
+
+        QString serverIp;
+
         QByteArray responseComressType;
 
         QByteArray requestBuffer;
@@ -98,12 +109,11 @@ private:
         QTcpSocket* requestSocket;
         QTcpSocket* responseSocket;
 
-        //当前正在发送的http request data
-        ConnectionData_ptr currentSendingConnectionData;
-        //当前http request data
-        ConnectionData_ptr currentConnectionData;
-
-        // 此队列为request buffer
+        //当前未接收完毕请求内容的http包
+        ConnectionData_ptr gettingRequestConnectionData;
+        //当前未接收完毕返回内容的http包
+        ConnectionData_ptr receivingResponseConnectinoData;
+        // 此队列为已接收完毕请求内容的http包
         QVector<ConnectionData_ptr> bufferConnectionArray;
 
         RequestInfo requestInfo;

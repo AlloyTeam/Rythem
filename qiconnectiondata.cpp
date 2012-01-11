@@ -3,7 +3,7 @@
 #include <QStringList>
 
 QiConnectionData::QiConnectionData(int socketDescriptor){
-    qDebug()<<"PipeData contructed:";
+    //qDebug()<<"connectionData contructed:";
     id=-1;
     returnCode = -1;
 }
@@ -94,7 +94,7 @@ void QiConnectionData::setRequestHeader(QByteArray header){
     }
 }
 void QiConnectionData::setResponseHeader(QByteArray header){
-
+    responseHeaderRawData = header;
     //TODO.. Ctrl+c & Ctrl+v from setRequestHeader
     header.replace("\r\n","\n");
     int i=0,l=header.length();
@@ -188,7 +188,7 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
         int beginOfLength = 0;
         int endOfLength  = theBody.indexOf('\n',beginOfLength+1);
         if(endOfLength==-1){
-            endOfLength = theBody.indexOf('\r\n',beginOfLength+2);
+            endOfLength = theBody.indexOf("\r\n",beginOfLength+2);
             if(endOfLength == -1){
                 return false;
             }
@@ -197,6 +197,10 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
         int chunkSize = theBody.mid(beginOfLength,endOfLength-beginOfLength).trimmed().toInt(&isChunkValid,16);
         if(!isChunkValid){
             qDebug()<<"invalid chunk data"<<theBody;
+            qDebug()<<"res header ="<<responseHeaderRawData;
+            qDebug()<<"req header:"<<requestHeaderRawData;
+            qDebug()<<getRequestHeader("Content-Length");
+            qDebug()<<allRequestHeaders;
             return false;
         }
         if(chunkSize == 0){
@@ -211,14 +215,14 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
             //qDebug()<<"chunked:"<<i<<" "<<l;
             beginOfLength=theBody.indexOf('\n',i);
             if(beginOfLength == -1){
-                beginOfLength = theBody.indexOf('\r\n',i);
+                beginOfLength = theBody.indexOf("\r\n",i);
             }
             if(beginOfLength==-1){
                 return false;
             }
             endOfLength = theBody.indexOf('\n',beginOfLength+1);
             if(endOfLength==-1){
-                endOfLength = theBody.indexOf('\r\n',beginOfLength+2);
+                endOfLength = theBody.indexOf("\r\n",beginOfLength+2);
                 if(endOfLength == -1){
                     return false;
                 }
@@ -248,8 +252,26 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
             }
         }while(i<=l);
     }else{
-        return (this->getResponseHeader("Content-Length").toInt() <= responseBody.length());
+        bool isCoverSuccess=false;
+        int contentlength = this->getResponseHeader("Content-Length").toInt(&isCoverSuccess);
+        if(!isCoverSuccess){//无content-length
+            if(returnCode == 304
+                    || returnCode == 301
+                    || returnCode == 302
+                    || returnCode == 307
+                    || returnCode == 204){//todo
+                return true;
+            }else{
+                if(this->getResponseHeader("Connection")=="close"){
+                    //qDebug()<<"connection close";
+                    return true;
+                }
+            }
+            return true;
+        }
+        return contentlength <= responseBody.length();
     }
+    return true;
 }
 bool QiConnectionData::appendRequestBody(QByteArray newContent){
     requestBody.append(newContent);
