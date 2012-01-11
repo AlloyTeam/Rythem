@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     qipipe.cpp \
     qiresponse.cpp \
     qiwinhttp.cpp \
-    qiconnectiondata.cpp
+    qiconnectiondata.cpp \
+    qirulemanager.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -30,7 +31,8 @@ HEADERS  += mainwindow.h \
     qipipe.h \
     qiresponse.h \
     qiwinhttp.h \
-    qiconnectiondata.h
+    qiconnectiondata.h \
+    qirulemanager.h
 
 mac:HEADERS -= qiwinhttp.h
 
@@ -38,7 +40,7 @@ FORMS    += mainwindow.ui
 
 
 
-win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
+win32:LIBS += G:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation
 
 
