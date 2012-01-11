@@ -2,6 +2,8 @@
 #include "qipipe.h"
 #include <QThreadPool>
 
+#define MAXSOCKET 20
+
 long QiProxyServer::connectionId = 0;
 QMutex QiProxyServer::connectionIdMutex;
 
@@ -12,7 +14,9 @@ QiProxyServer::QiProxyServer(QObject *parent) :
 void QiProxyServer::incomingConnection(int socketId){
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
-    addPipe(socketId);
+    if(pushSocket(socketId) == socketId){
+        addPipe(socketId);
+    }
 }
 QiProxyServer::~QiProxyServer(){
     this->close();
@@ -44,6 +48,10 @@ void QiProxyServer::onPipeFinished(){
         removePipe(pipe->sockeId());
     }else{
         qDebug()<<"ERROR...QiProxyServer::onPipeFinished";
+    }
+    int handle = fetchPendingSocket();
+    if(handle!=-1){
+        addPipe(handle);
     }
 }
 
@@ -80,10 +88,11 @@ bool QiProxyServer::removePipe(int connectionId){
         threads.remove(connectionId);
         pipes.remove(connectionId);
 
-        //p->deleteLater();
-        t->quit();
-        t->wait(100);
         delete p;
+        t->quit();
+        qDebug()<<"waiting..";
+        t->wait(10);
+        qDebug()<<"quit thread..";
     }
     return false;
 }
@@ -92,4 +101,24 @@ void QiProxyServer::removeAllPipe(){
         int key = pipes.begin().key();
         removePipe(key);
     }
+}
+
+int QiProxyServer::fetchPendingSocket(){
+    qDebug()<<"fetching:"<<pendingSocketHanles.size();
+    if(pendingSocketHanles.size()==0){
+        return -1;
+    }
+    int n = pendingSocketHanles.at(0);
+    pendingSocketHanles.remove(0,1);
+    return n;
+}
+
+//如果需要等待，返回-1，否则返回handle
+int QiProxyServer::pushSocket(int handle){
+    if(pipes.size() >= MAXSOCKET){
+        qDebug()<<"socket length more than "<<MAXSOCKET;
+        pendingSocketHanles.append(handle);
+        return -1;
+    }
+    return handle;
 }

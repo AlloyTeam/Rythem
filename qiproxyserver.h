@@ -33,6 +33,9 @@ class QiProxyServer : public QTcpServer{
         QiPipe* addPipe(int socketDescriptor);
         bool removePipe(int socketId);
         void removeAllPipe();
+        int fetchPendingSocket();
+        int pushSocket(int handle);
+        QVector<int> pendingSocketHanles;
 
         QMutex mutex;
 

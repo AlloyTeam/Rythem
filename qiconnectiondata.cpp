@@ -230,7 +230,8 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
             QByteArray sizeBA = theBody.mid(beginOfLength,endOfLength-beginOfLength).trimmed();
             chunkSize = sizeBA.toInt(&isChunkValid,16);
             if(!isChunkValid){
-                qDebug()<<"no valid:"<<isChunkValid<<sizeBA;
+                //qDebug()<<"no valid:"<<isChunkValid<<sizeBA;
+                return false;
             }
 
             //qDebug()<<chunkSize;
@@ -263,7 +264,8 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
                 return true;
             }else{
                 if(this->getResponseHeader("Connection")=="close"){
-                    //qDebug()<<"connection close";
+                    qDebug()<<"connection data : connection close";
+                    qDebug()<<allResponseHeaders;
                     return true;
                 }
             }
@@ -277,6 +279,7 @@ bool QiConnectionData::appendRequestBody(QByteArray newContent){
     requestBody.append(newContent);
 
     requestRawDataToSend.append(newContent);
+    return true;
 }
 
 
