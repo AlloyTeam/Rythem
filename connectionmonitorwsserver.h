@@ -16,6 +16,9 @@ public slots:
 	void handleConnectionAdd(ConnectionData_ptr p);
 	void handleConnectionUpdate(ConnectionData_ptr p);
 	void handleConnectionRemove(ConnectionData_ptr p);
+
+protected:
+	void sendConnectionChangePackageToClients(ConnectionData_ptr p);
 	
 };
 

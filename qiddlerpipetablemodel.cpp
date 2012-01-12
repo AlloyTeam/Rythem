@@ -86,9 +86,9 @@ ConnectionData_ptr QiddlerPipeTableModel::getItem(int row){
 }
 
 void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
-    int i = pipesMap.keys().indexOf(p->id);
+	int i = pipesMap.keys().indexOf(p->id);
     if(i!=-1){
-        ConnectionData_ptr ori = pipesMap[p->id];
+		ConnectionData_ptr ori = pipesMap[p->id];
         pipesMap[p->id] = p;
         int j = pipesVector.indexOf(ori);
         if(j!=-1){
@@ -107,8 +107,8 @@ void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
     this->beginInsertRows(index(pipeNumber-1, 0),pipeNumber-1,pipeNumber-1);
 
     //TODO thread safe?
-    pipesMap.value(p1->id,p1);
-    pipesVector.append(p1);
+	pipesMap[p1->id] = p1;
+	pipesVector.append(p1);
 
     //QModelIndex index1 = index(pipeNumber-1, 0);
     //QModelIndex index2 = index(pipeNumber-1, 7);

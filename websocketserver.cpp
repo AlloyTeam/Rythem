@@ -41,6 +41,17 @@ void WebSocketServer::incomingConnection(int handle){
 	clients->append(client);
 }
 
+void WebSocketServer::sendToAllClients(const char *message){
+	sendToAllClients(QByteArray(message));
+}
+
+void WebSocketServer::sendToAllClients(const QByteArray &message){
+	int i=0, len=clients->length();
+	for(i; i<len; i++){
+		clients->at(0)->sendMessage(message);
+	}
+}
+
 void WebSocketServer::onClientMessage(const QByteArray message){
 	//echo message back to client
 	WebSocketClient *client = (WebSocketClient *)sender();

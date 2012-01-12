@@ -7,13 +7,19 @@ ConnectionMonitorWSServer::ConnectionMonitorWSServer(QObject *parent) :
 }
 
 void ConnectionMonitorWSServer::handleConnectionAdd(ConnectionData_ptr p){
-	qDebug() << "connection added";
+	sendConnectionChangePackageToClients(p);
 }
 
 void ConnectionMonitorWSServer::handleConnectionUpdate(ConnectionData_ptr p){
-	qDebug() << "connecton updated";
+	sendConnectionChangePackageToClients(p);
 }
 
-void ConnectionMonitorWSServer::handleConnectionRemove(ConnectionData_ptr p){
+void ConnectionMonitorWSServer::handleConnectionRemove(ConnectionData_ptr){
 	qDebug() << "connection removed";
+}
+
+void ConnectionMonitorWSServer::sendConnectionChangePackageToClients(ConnectionData_ptr p){
+	QString package;
+	package.sprintf("id:%ld, status:%d", p->id, p->returnCode);
+	sendToAllClients(package.toLocal8Bit());
 }

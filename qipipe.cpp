@@ -150,7 +150,8 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         //所以这里可以简单处理
         if((!receivingResponseConnectinoData.isNull()) && receivingResponseConnectinoData->getRequestHeader("Host") == "127.0.0.1" && receivingResponseConnectinoData->getRequestHeader("Port")=="8889"){//避免死循环
             requestSocket->abort();
-            emit(finishSuccess(receivingResponseConnectinoData));
+			ConnectionData_ptr tmp = receivingResponseConnectinoData;
+			emit(finishSuccess(tmp));
             receivingResponseConnectinoData.clear();
             return;
         }
@@ -166,8 +167,9 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
             byteToWrite.append(s);
             requestSocket->write(byteToWrite);
             requestSocket->flush();
-            requestSocket->abort();
-            emit(finishSuccess(receivingResponseConnectinoData));
+			requestSocket->abort();
+			ConnectionData_ptr tmp = receivingResponseConnectinoData;
+			emit(finishSuccess(tmp));
             receivingResponseConnectinoData.clear();
             return;
         }else{

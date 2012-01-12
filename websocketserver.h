@@ -22,6 +22,8 @@ public slots:
 
 protected:
 	void incomingConnection(int handle);
+	void sendToAllClients(const char *message);
+	void sendToAllClients(const QByteArray &message);
 
 protected slots:
 	void onClientMessage(const QByteArray message);
