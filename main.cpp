@@ -1,8 +1,10 @@
 #include <QtGui/QApplication>
+#include <QtGui/QStatusBar>
 #include "mainwindow.h"
 #include <QDebug>
 #include "qiconnectiondata.h"
 #include "qiproxyserver.h"
+#include "websocketserver.h"
 #include <QDateTime>
 #include <QtCore>
 
@@ -55,6 +57,13 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(newPipe(ConnectionData_ptr)),&w,SLOT(onNewPipe(ConnectionData_ptr)));
     server->connect(server,SIGNAL(pipeUpdate(ConnectionData_ptr)),&w,SLOT(onPipeUpdate(ConnectionData_ptr)));
     w.show();
+
+	WebSocketServer *wsServer = new WebSocketServer();
+	wsServer->start();
+
+	QString status;
+	status.sprintf("proxy listening on port %d, control waiting on port %d", server->serverPort(), wsServer->serverPort());
+	w.statusBar()->showMessage(status);
 
     return a.exec();
 }

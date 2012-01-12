@@ -142,8 +142,10 @@ void MainWindow::toggleProxy(){
         proxySetting.setValue("ProxyServer",proxyServer);
     }
     proxySetting.sync();
-    ::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
+#ifdef Q_WS_WIN32
+	::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
     ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+#endif
 }
 
 void MainWindow::toggleCapture(){

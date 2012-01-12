@@ -20,7 +20,10 @@ SOURCES += main.cpp\
     qiresponse.cpp \
     qiwinhttp.cpp \
     qiconnectiondata.cpp \
-    qirulemanager.cpp
+    qirulemanager.cpp \
+    bytearray.cpp \
+    websocketserver.cpp \
+    websocketclient.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -32,7 +35,10 @@ HEADERS  += mainwindow.h \
     qiresponse.h \
     qiwinhttp.h \
     qiconnectiondata.h \
-    qirulemanager.h
+    qirulemanager.h \
+    bytearray.h \
+    websocketserver.h \
+    websocketclient.h
 
 mac:HEADERS -= qiwinhttp.h
 
