@@ -94,6 +94,7 @@ void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
         if(j!=-1){
             pipesVector.replace(j,p);
         }
+		emit connectionUpdated(p);
     }
 }
 
@@ -114,6 +115,7 @@ void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
 
     this->endInsertRows();
     //emit(dataChanged(index1,index2));
+	emit connectionAdded(p);
 }
 
 void QiddlerPipeTableModel::removeAllItem(){
@@ -121,6 +123,7 @@ void QiddlerPipeTableModel::removeAllItem(){
     for(int i=0;i<l;++i){
         ConnectionData_ptr p = pipesVector.at(i);
         p.clear();
+		//TODO emit connection removed signal here ?
     }
 }
 void QiddlerPipeTableModel::removeItems(){

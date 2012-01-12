@@ -4,7 +4,7 @@
 #include <QDebug>
 #include "qiconnectiondata.h"
 #include "qiproxyserver.h"
-#include "websocketserver.h"
+#include "connectionmonitorwsserver.h"
 #include <QDateTime>
 #include <QtCore>
 
@@ -58,11 +58,14 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(pipeUpdate(ConnectionData_ptr)),&w,SLOT(onPipeUpdate(ConnectionData_ptr)));
     w.show();
 
-	WebSocketServer *wsServer = new WebSocketServer();
-	wsServer->start();
+	ConnectionMonitorWSServer wsServer;
+	wsServer.start();
+	QObject::connect(&w.pipeTableModel, SIGNAL(connectionAdded(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionAdd(ConnectionData_ptr)));
+	QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionUpdate(ConnectionData_ptr)));
+	QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionRemove(ConnectionData_ptr)));
 
 	QString status;
-	status.sprintf("proxy listening on port %d, control waiting on port %d", server->serverPort(), wsServer->serverPort());
+	status.sprintf("proxy listening on port %d, control waiting on port %d", server->serverPort(), wsServer.serverPort());
 	w.statusBar()->showMessage(status);
 
     return a.exec();

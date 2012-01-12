@@ -28,7 +28,12 @@ public:
     ConnectionData_ptr getItem(int column);
 
     void updateItem(ConnectionData_ptr p);
+
 signals:
+	//signals emit when connections are added/updated/removed
+	void connectionAdded(ConnectionData_ptr p);
+	void connectionUpdated(ConnectionData_ptr p);
+	void connectionRemoved(ConnectionData_ptr p);
 
 public slots:
 

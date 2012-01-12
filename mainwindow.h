@@ -37,19 +37,19 @@ public slots:
 
 
 public:
-        typedef struct __proxyInfo{
-            int enable;
-            QString proxyString;
-            QString pacUrl;
-            QString isUsingPac;
-        }ProxyInfo;
+	typedef struct __proxyInfo{
+		int enable;
+		QString proxyString;
+		QString pacUrl;
+		QString isUsingPac;
+	}ProxyInfo;
+	QiddlerPipeTableModel pipeTableModel;
 
 private:
     Ui::MainWindow *ui;
     void createMenus();
     QiProxyServer *server;
-    QVector<QiPipe*> *pipes;
-    QiddlerPipeTableModel pipeTableModel;
+	QVector<QiPipe*> *pipes;
 
     bool isUsingCapture;
     ProxyInfo previousProxyInfo;

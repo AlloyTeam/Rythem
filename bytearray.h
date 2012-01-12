@@ -6,7 +6,7 @@
 class ByteArray
 {
 public:
-	explicit ByteArray(const QByteArray &bytes);
+	ByteArray(const QByteArray &bytes);
 	~ByteArray();
 	int skip(int len);
 	unsigned int bytesAvailable() const;

@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     qirulemanager.cpp \
     bytearray.cpp \
     websocketserver.cpp \
-    websocketclient.cpp
+    websocketclient.cpp \
+    connectionmonitorwsserver.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -38,7 +39,8 @@ HEADERS  += mainwindow.h \
     qirulemanager.h \
     bytearray.h \
     websocketserver.h \
-    websocketclient.h
+    websocketclient.h \
+    connectionmonitorwsserver.h
 
 mac:HEADERS -= qiwinhttp.h
 
