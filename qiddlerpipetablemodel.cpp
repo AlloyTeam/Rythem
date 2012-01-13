@@ -86,15 +86,19 @@ ConnectionData_ptr QiddlerPipeTableModel::getItem(int row){
 }
 
 void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
-	int i = pipesMap.keys().indexOf(p->id);
+    int i = pipesMap.keys().indexOf(p->id);
+    //TODO
+    emit dataChanged(index(i,0),index(i,7));
     if(i!=-1){
-		ConnectionData_ptr ori = pipesMap[p->id];
+        /*
+        ConnectionData_ptr ori = pipesMap[p->id];
         pipesMap[p->id] = p;
         int j = pipesVector.indexOf(ori);
         if(j!=-1){
             pipesVector.replace(j,p);
         }
-		emit connectionUpdated(p);
+        */
+        emit connectionUpdated(p);
     }
 }
 
