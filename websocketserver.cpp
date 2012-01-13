@@ -17,7 +17,6 @@ WebSocketServer::~WebSocketServer(){
 	delete clients;
 }
 
-//startup the websocket server and start listening on specify port
 bool WebSocketServer::start(int port){
 	if(isListening()){
 		close();
@@ -29,14 +28,11 @@ bool WebSocketServer::start(int port){
 	return rs;
 }
 
-//close the server
 void WebSocketServer::close(){
 	QTcpServer::close();
 	emit closed();
 }
 
-//create a new websocket to handle incoming connection
-//the client is responsible for process websocket handshake and receive/send data frame from/to remote endpoint
 void WebSocketServer::incomingConnection(int handle){
 	WebSocketClient *client = new WebSocketClient();
 	connect(client, SIGNAL(message(QByteArray)), this, SLOT(onClientMessage(QByteArray)));
@@ -45,10 +41,10 @@ void WebSocketServer::incomingConnection(int handle){
 	clients->append(client);
 }
 
-//send specify message to all connected websocket clients
 void WebSocketServer::sendToAllClients(const char *message){
 	sendToAllClients(QByteArray(message));
 }
+
 void WebSocketServer::sendToAllClients(const QByteArray &message){
 	int i=0, len=clients->length();
 	for(i; i<len; i++){

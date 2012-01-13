@@ -28,7 +28,6 @@ WebSocketClient::~WebSocketClient(){
 	delete buffer;
 }
 
-//send message to client
 void WebSocketClient::sendMessage(const char *message){
 	this->write(generateMessagePackage(message));
 	this->flush();
@@ -38,25 +37,21 @@ void WebSocketClient::sendMessage(const QByteArray &message){
 	this->flush();
 }
 
-//emit finished signal when websocket is disconnected
 void WebSocketClient::onDisconnected(){
 	qDebug() << "disconnected";
 	emit finished();
 }
 
-//websocket error handler
 void WebSocketClient::onError(QAbstractSocket::SocketError socketError){
 	qWarning() << "error" << socketError;
 }
 
-//read all received data and process them
 void WebSocketClient::onReadyRead(){
 	QByteArray request = this->readAll();
 	buffer->append(request);
 	processReceivedData();
 }
 
-//process received data, handshake with client or decode data frame
 void WebSocketClient::processReceivedData(){
 	if(handshaked){
 		//process data frame
@@ -76,17 +71,12 @@ void WebSocketClient::processReceivedData(){
 				return;
 
 			case DATAFRAME_OPCODE_CONNECTION_LOST:
-				//close the underlying socket when received a close frame
 				this->close();
 				return;
 
 			default:
-				//decode data frame and emit a message signal when a complete data frame is received
-				bool mask = buffer->at(1) >> 7;
-				 //0-125:payload length
-				//126:read the next 2bytes as payload length
-				//127:read the next 8bytes as payload length
-				uint64_t payloadLen = buffer->at(1) & 0x7F;
+				bool mask = buffer->at(1) >> 7; //whether payload data is masked
+				uint64_t payloadLen = buffer->at(1) & 0x7F; //0-125:payload length, 126:read the next 2bytes as payload length, 127:read the next 8bytes as payload length
 				ByteArray stream(*buffer);
 				stream.skip(2);
 
@@ -131,8 +121,8 @@ void WebSocketClient::processReceivedData(){
 	else{
 		//process handshake header
 		if(buffer->indexOf("\r\n\r\n") != -1){
+			//handshake request received, process the header
 			qDebug() << "[WebSocketClient] handshaking ...";
-			//format header fields
 			QString handshakeRequest(*buffer);
 			QStringList components = handshakeRequest.split("\r\n");
 			QMap<QString, QString> header;
@@ -142,13 +132,10 @@ void WebSocketClient::processReceivedData(){
 					header.insert(headerKV.at(0), headerKV.at(1));
 				}
 			}
-			//close the underlying socket if this is not a valid websocket handshake request
 			if(!header.contains("Upgrade") || header.value("Upgrade") != "websocket"){
-				qWarning() << "[WebSocketClient] INVALID HANDSHAKE REQUEST";
+				qWarning() << "[WebSocketClient] INVAILD HANDSHAKE REQUEST";
 				this->close();
 			}
-			//otherwise generate an accept hash base on the Sec-WebSocket-Key and send
-			//the handshake response back to client to finish the handshake process
 			else{
 				QByteArray hash = generateAcceptHash(header.value("Sec-WebSocket-Key"));
 				sendHandshakeResponse(hash);
@@ -160,7 +147,6 @@ void WebSocketClient::processReceivedData(){
 	}
 }
 
-//accept hash = base64(sha1(key + MAGIC_TOKEN))
 QByteArray WebSocketClient::generateAcceptHash(const QString &key) const{
 	QByteArray input;
 	input.append(key);
@@ -169,7 +155,6 @@ QByteArray WebSocketClient::generateAcceptHash(const QString &key) const{
 	return sha1.toBase64();
 }
 
-//create a data frame with the specify message content
 QByteArray WebSocketClient::generateMessagePackage(const char *message, bool){
 	QByteArray bytes;
 	QDataStream stream(&bytes, QIODevice::WriteOnly);
