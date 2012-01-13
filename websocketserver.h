@@ -1,6 +1,7 @@
 #ifndef WEBSOCKETSERVER_H
 #define WEBSOCKETSERVER_H
 
+#include <vector.h>
 #include <QTcpServer>
 #include <QtCore>
 #include "websocketclient.h"
@@ -30,7 +31,7 @@ protected slots:
 	void onClientFinished();
 
 private:
-	QList<WebSocketClient *> *clients;
+	vector<WebSocketClient *> *clients;
 };
 
 #endif // WEBSOCKETSERVER_H

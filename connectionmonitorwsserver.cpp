@@ -18,6 +18,10 @@ void ConnectionMonitorWSServer::handleConnectionRemove(ConnectionData_ptr){
 	qDebug() << "connection removed";
 }
 
+void ConnectionMonitorWSServer::handleConnectionChange(QModelIndex &topLeft, QModelIndex &bottomRight){
+
+}
+
 void ConnectionMonitorWSServer::sendConnectionChangePackageToClients(ConnectionData_ptr p){
 	char s[] = ", ";
 	QString package;

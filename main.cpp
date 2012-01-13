@@ -60,9 +60,10 @@ int main(int argc, char *argv[])
 
 	ConnectionMonitorWSServer wsServer;
 	wsServer.start();
-	QObject::connect(&w.pipeTableModel, SIGNAL(connectionAdded(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionAdd(ConnectionData_ptr)));
-	QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionUpdate(ConnectionData_ptr)));
-	QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionRemove(ConnectionData_ptr)));
+	QObject::connect(&w.pipeTableModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), &wsServer, SLOT(handleConnectionChange(QModelIndex, QModelIndex)));
+	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionAdded(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionAdd(ConnectionData_ptr)));
+	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionUpdate(ConnectionData_ptr)));
+	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionRemove(ConnectionData_ptr)));
 
 	QString status;
 	status.sprintf("proxy listening on port %d, control waiting on port %d", server->serverPort(), wsServer.serverPort());

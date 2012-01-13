@@ -1,5 +1,6 @@
 #ifndef CONNECTIONMONITORWSSERVER_H
 #define CONNECTIONMONITORWSSERVER_H
+#include <QtCore>
 #include "websocketserver.h"
 #include "qiconnectiondata.h"
 
@@ -16,6 +17,7 @@ public slots:
 	void handleConnectionAdd(ConnectionData_ptr p);
 	void handleConnectionUpdate(ConnectionData_ptr p);
 	void handleConnectionRemove(ConnectionData_ptr p);
+	void handleConnectionChange(QModelIndex &topLeft, QModelIndex &bottomRight);
 
 protected:
 	void sendConnectionChangePackageToClients(ConnectionData_ptr p);

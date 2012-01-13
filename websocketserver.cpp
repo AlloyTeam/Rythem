@@ -7,7 +7,7 @@
 WebSocketServer::WebSocketServer(QObject *parent) :
 	QTcpServer(parent)
 {
-	clients = new QList<WebSocketClient *>();
+	clients = new vector<WebSocketClient *>();
 }
 
 WebSocketServer::~WebSocketServer(){
@@ -42,7 +42,7 @@ void WebSocketServer::incomingConnection(int handle){
 	connect(client, SIGNAL(message(QByteArray)), this, SLOT(onClientMessage(QByteArray)));
 	connect(client, SIGNAL(finished()), this, SLOT(onClientFinished()));
 	client->setSocketDescriptor(handle);
-	clients->append(client);
+	clients->push_back(client);
 }
 
 //send specify message to all connected websocket clients
@@ -50,9 +50,9 @@ void WebSocketServer::sendToAllClients(const char *message){
 	sendToAllClients(QByteArray(message));
 }
 void WebSocketServer::sendToAllClients(const QByteArray &message){
-	int i=0, len=clients->length();
-	for(i; i<len; i++){
-		clients->at(0)->sendMessage(message);
+	vector<WebSocketClient *>::iterator it;
+	for(it = clients->begin(); it < clients->end(); it++){
+		((WebSocketClient *)(*it))->sendMessage(message);
 	}
 }
 
@@ -65,6 +65,12 @@ void WebSocketServer::onClientMessage(const QByteArray message){
 void WebSocketServer::onClientFinished(){
 	//remove disconnected client
 	WebSocketClient *client = (WebSocketClient *)sender();
-	clients->removeOne(client);
+	vector<WebSocketClient *>::iterator it;
+	for(it = clients->begin(); it < clients->end(); it++){
+		if(*it == client){
+			clients->erase(it);
+			break;
+		}
+	}
 	client->deleteLater();
 }
