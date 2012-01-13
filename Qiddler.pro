@@ -51,6 +51,14 @@ FORMS    += mainwindow.ui
 win32:LIBS += G:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation
 
+RESOURCES += \
+    httpfiles.qrc
+
+OTHER_FILES += \
+    websocket.html \
+    test.js \
+    index.html
+
 
 
 

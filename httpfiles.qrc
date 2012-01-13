@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/httpfiles">
+        <file>websocket.html</file>
+        <file>test.js</file>
+    </qresource>
+    <qresource prefix="/httpfiles/websocketclient">
+        <file>index.html</file>
+    </qresource>
+</RCC>

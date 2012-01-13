@@ -16,6 +16,7 @@
 #include <QByteArray>
 #include <qglobal.h>
 #include "qiproxyserver.h"
+#include <QFile>
 
 static void isInMain(QString info){
     if(QThread::currentThread() == QApplication::instance()->thread()){
@@ -144,58 +145,66 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
     if(receivingResponseConnectinoData.isNull()){
         receivingResponseConnectinoData = nextConnectionData();
     }
+    if((!receivingResponseConnectinoData.isNull()) && receivingResponseConnectinoData->getRequestHeader("Host") == "127.0.0.1" && receivingResponseConnectinoData->getRequestHeader("Port")=="8889"){//避免死循环
+        //TODO
+
+        // output content
+        QByteArray s;
+        QString returnStatus = "200 OK";
+
+        QByteArray byteToWrite;
+        QString filePath = receivingResponseConnectinoData->path;
+        if(filePath.endsWith("/")){
+            filePath.append("index.html");
+        }
+        filePath.prepend(":/httpfiles");
+        QFile file(filePath);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            returnStatus = "404 NOT FOUND";
+            s.append(filePath + " Not Found");
+        }else{
+            s = file.readAll();
+        }
+
+        int count = s.size();
+        byteToWrite.append(QString("HTTP/1.1 %1\r\nServer: Qiddler\r\nContent-Type: text/html\r\nContent-Length: %2\r\n\r\n").arg(returnStatus).arg(count));
+        receivingResponseConnectinoData->setResponseHeader(byteToWrite);
+        byteToWrite.append(s);
+        receivingResponseConnectinoData->appendResponseBody(s);
+        emit(finishSuccess(receivingResponseConnectinoData));
+        receivingResponseConnectinoData.clear();
+        requestSocket->write(byteToWrite);
+        return;
+    }
+
     if(responseState != Initial && responseState != Connecting){
         //同一个socket中发起n个请求的情况
         //条件是：当第二个同域请求发起时，有已经连接成功并返回数据的数据
         //所以这里可以简单处理
-        if((!receivingResponseConnectinoData.isNull()) && receivingResponseConnectinoData->getRequestHeader("Host") == "127.0.0.1" && receivingResponseConnectinoData->getRequestHeader("Port")=="8889"){//避免死循环
-            requestSocket->abort();
-			ConnectionData_ptr tmp = receivingResponseConnectinoData;
-			emit(finishSuccess(tmp));
-            receivingResponseConnectinoData.clear();
-            return;
-        }
         responseSocket->write(newContent);
         responseSocket->flush();
     }else if(responseState == Initial){
-        if(receivingResponseConnectinoData->getRequestHeader("Host") == "127.0.0.1" && receivingResponseConnectinoData->getRequestHeader("Port")=="8889"){//避免死循环
-            //TODO
-            QByteArray byteToWrite;
-            QString s = "hello script<script src='a7.js'></a><script src='a6.js'></a><script src='a5.js'></a><script src='a4.js'></a><script src='a3.js'></a><script src='a2.js'></a>";
-            int count = s.length();
-            byteToWrite.append(QString("HTTP/1.1 200 OK\r\nServer: Qiddler\r\nContent-Type: text/html\r\nContent-Length: %1\r\n\r\n").arg(count));
-            byteToWrite.append(s);
-            requestSocket->write(byteToWrite);
-            requestSocket->flush();
-			requestSocket->abort();
-			ConnectionData_ptr tmp = receivingResponseConnectinoData;
-			emit(finishSuccess(tmp));
-            receivingResponseConnectinoData.clear();
-            return;
-        }else{
-            responseState = Connecting;
-            responseSocket = new QTcpSocket();
-            connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
-            connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadReady()));
-            connect(responseSocket,SIGNAL(disconnected()),SLOT(onResponseClose()));
-            connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
-            connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
+        responseState = Connecting;
+        responseSocket = new QTcpSocket();
+        connect(responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+        connect(responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadReady()));
+        connect(responseSocket,SIGNAL(disconnected()),SLOT(onResponseClose()));
+        connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
+        connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
 
 #ifdef Q_OS_WIN
-            // TODO add mac pac support
-            QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(receivingResponseConnectinoData->fullUrl)));
-            for(int i=0,l=proxylist.length();i<l;++i){
-                QNetworkProxy p = proxylist.at(i);
-                responseSocket->setProxy(p);
-                //qDebug()<<"proxy="<<p.hostName()<<p.port();
-            }
+        // TODO add mac pac support
+        QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(receivingResponseConnectinoData->fullUrl)));
+        for(int i=0,l=proxylist.length();i<l;++i){
+            QNetworkProxy p = proxylist.at(i);
+            responseSocket->setProxy(p);
+            //qDebug()<<"proxy="<<p.hostName()<<p.port();
+        }
 #endif
 
-            //qDebug()<<"CONNECT TO "<<receivingResponseConnectinoData->getRequestHeader("Host")<<receivingResponseConnectinoData->getRequestHeader("Port");
-            //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
-            responseSocket->connectToHost(receivingResponseConnectinoData->getRequestHeader("Host"),receivingResponseConnectinoData->getRequestHeader("Port").toInt());
-
-        }
+        //qDebug()<<"CONNECT TO "<<receivingResponseConnectinoData->getRequestHeader("Host")<<receivingResponseConnectinoData->getRequestHeader("Port");
+        //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
+        responseSocket->connectToHost(receivingResponseConnectinoData->getRequestHeader("Host"),receivingResponseConnectinoData->getRequestHeader("Port").toInt());
     }
 }
 
