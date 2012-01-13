@@ -57,7 +57,8 @@ RESOURCES += \
 OTHER_FILES += \
     websocket.html \
     test.js \
-    index.html
+    index.html \
+    websocket.manifest
 
 
 

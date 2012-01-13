@@ -5,5 +5,9 @@
     </qresource>
     <qresource prefix="/httpfiles/websocketclient">
         <file>index.html</file>
+        <file>1366.jpg</file>
+        <file>websocket.manifest</file>
+        <file>talkbg_2.jpg</file>
+        <file>family.png</file>
     </qresource>
 </RCC>

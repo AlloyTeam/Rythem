@@ -147,10 +147,22 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
     }
     if((!receivingResponseConnectinoData.isNull()) && receivingResponseConnectinoData->getRequestHeader("Host") == "127.0.0.1" && receivingResponseConnectinoData->getRequestHeader("Port")=="8889"){//避免死循环
         //TODO
+        QMap<QString,QString> contentTypeMapping;
+        contentTypeMapping["jpg"] = "image/jpeg";
+        contentTypeMapping["js"] = "application/javascript";
+        contentTypeMapping["png"] = "image/png";
+        contentTypeMapping["gif"] = "image/gif";
+        contentTypeMapping["css"] = "text/css";
+        contentTypeMapping["html"] = "text/html";
+        contentTypeMapping["htm"] = "text/html";
+        contentTypeMapping["txt"] = "text/plain";
+        contentTypeMapping["jpeg"] = "image/jpeg";
+        contentTypeMapping["manifest"] = "text/cache-manifest";
 
         // output content
         QByteArray s;
         QString returnStatus = "200 OK";
+        QString contentType = "text/html";
 
         QByteArray byteToWrite;
         QString filePath = receivingResponseConnectinoData->path;
@@ -159,21 +171,37 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         }
         filePath.prepend(":/httpfiles");
         QFile file(filePath);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        if (!file.open(QIODevice::ReadOnly )){
             returnStatus = "404 NOT FOUND";
             s.append(filePath + " Not Found");
         }else{
+            s.clear();
             s = file.readAll();
         }
+        file.close();
+        int postFixIndex = filePath.lastIndexOf(".");
+        if(postFixIndex!=-1){
+            QString postFix = filePath.mid(postFixIndex+1);
+            contentType = contentTypeMapping.value(postFix,"text/plain");
+        }
 
-        int count = s.size();
-        byteToWrite.append(QString("HTTP/1.1 %1\r\nServer: Qiddler\r\nContent-Type: text/html\r\nContent-Length: %2\r\n\r\n").arg(returnStatus).arg(count));
+
+        int count = s.length();
+
+        byteToWrite.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n").arg(returnStatus).arg(contentType).arg(count));
         receivingResponseConnectinoData->setResponseHeader(byteToWrite);
         byteToWrite.append(s);
+
+        QByteArray tmp = byteToWrite;
+        qDebug()<<tmp.replace("\r","\\r");
+
         receivingResponseConnectinoData->appendResponseBody(s);
+        //qDebug(byteToWrite);
         emit(finishSuccess(receivingResponseConnectinoData));
         receivingResponseConnectinoData.clear();
-        requestSocket->write(byteToWrite);
+        int n = requestSocket->write(byteToWrite)<<s.size();
+        qDebug()<<n << byteToWrite.size();
+        requestSocket->flush();
         return;
     }
 
