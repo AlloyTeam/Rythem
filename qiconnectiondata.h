@@ -50,7 +50,7 @@ public:
     QString fullUrl;
     int port;
     QString requestMethod;
-    QString responseStatus;
+	QString responseStatus;
 
     QByteArray unChunkResponse;
 
@@ -74,12 +74,12 @@ public:
     bool appendResponseBody(QByteArray newContent);
     QByteArray getResponseHeader(QByteArray name)const;
     QByteArray getResponseHeader()const;
-    QByteArray getResponseBody()const;
+	QByteArray getResponseBody()const;
 private:
     QByteArray requestRawData;
-    QByteArray responseRawData;
-    QMap<QByteArray,QByteArray> allRequestHeaders;
-    QMap<QByteArray,QByteArray> allResponseHeaders;
+	QByteArray responseRawData;
+	QMap<QByteArray,QByteArray> allRequestHeaders;
+	QMap<QByteArray,QByteArray> allResponseHeaders;
 
     void setRequestRawData(QByteArray request);//only for copy Ctor
     void setResponseRawData(QByteArray response);//only for copy Ctor

@@ -19,7 +19,11 @@ void ConnectionMonitorWSServer::handleConnectionRemove(ConnectionData_ptr){
 }
 
 void ConnectionMonitorWSServer::sendConnectionChangePackageToClients(ConnectionData_ptr p){
+	char s[] = ", ";
 	QString package;
-	package.sprintf("id:%ld, status:%d", p->id, p->returnCode);
+	QTextStream (&package) << p->id << s
+						   << p->requestMethod << s
+						   << p->returnCode << s
+						   << p->getRequestHeader("Content-Type");
 	sendToAllClients(package.toLocal8Bit());
 }

@@ -145,7 +145,9 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
     if(receivingResponseConnectinoData.isNull()){
         receivingResponseConnectinoData = nextConnectionData();
     }
-    if((!receivingResponseConnectinoData.isNull()) && receivingResponseConnectinoData->getRequestHeader("Host") == "127.0.0.1" && receivingResponseConnectinoData->getRequestHeader("Port")=="8889"){//避免死循环
+	if((!receivingResponseConnectinoData.isNull()) &&
+			(receivingResponseConnectinoData->getRequestHeader("Host") == "127.0.0.1" || receivingResponseConnectinoData->host == "localhost") &&
+			receivingResponseConnectinoData->getRequestHeader("Port")=="8889"){//避免死循环
         //TODO
         QMap<QString,QString> contentTypeMapping;
         contentTypeMapping["jpg"] = "image/jpeg";
@@ -310,7 +312,6 @@ void QiPipe_Private::onResponseConnected(){
 
 
 void QiPipe_Private::onResponseReadReady(){
-
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker)
     QByteArray ba = responseSocket->readAll();
