@@ -8,6 +8,8 @@
 #include <QDateTime>
 #include <QtCore>
 
+#include "qirulemanager.h"
+
 
 
 void myMessageHandler(QtMsgType type, const char *msg)
