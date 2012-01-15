@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
 
 private slots:
         void toggleCapture();
-        void doSomeBug();
+        void showSettingsDialog();
 public:
     explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
