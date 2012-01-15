@@ -72,5 +72,6 @@ void WebSocketServer::onClientFinished(){
 			break;
 		}
 	}
+	client->disconnect(this);
 	client->deleteLater();
 }
