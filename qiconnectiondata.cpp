@@ -32,11 +32,11 @@ void QiConnectionData::setRequestHeader(QByteArray header){
     // change http://aaa.com/a/b/c?d to /a/b/c?d
     path = "/";
     int n;
-    //qDebug()<<"fullUrl="<<fullUrl;
+	//qDebug()<<"fullUrl="<<fullUrl;
     if(fullUrl.indexOf("://")!=-1){
         n = fullUrl.split("://")[1].indexOf("/");
         if(n!=-1 && n<fullUrl.length()-1){
-            path = fullUrl.split("://")[1].mid(n);
+			path = fullUrl.split("://")[1].mid(n);
         }
     }else{
         n = fullUrl.indexOf("/");
@@ -44,6 +44,13 @@ void QiConnectionData::setRequestHeader(QByteArray header){
             path = fullUrl.mid(n);
         }
     }
+	//remove ?xxx
+	int queryIndex = path.indexOf('?');
+	if(queryIndex != -1) path = path.left(queryIndex);
+
+	//remote #xxx
+	int hashIndex = path.indexOf('#');
+	if(hashIndex != -1) path = path.left(hashIndex);
 
     //TODO..
 
