@@ -190,7 +190,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
 
         int count = s.length();
 
-        byteToWrite.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n").arg(returnStatus).arg(contentType).arg(count));
+        byteToWrite.append(QString("HTTP/1.0 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n").arg(returnStatus).arg(contentType).arg(count));
         receivingResponseConnectinoData->setResponseHeader(byteToWrite);
         byteToWrite.append(s);
 

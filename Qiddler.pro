@@ -56,3 +56,8 @@ mac:LIBS += -framework SystemConfiguration -framework coreFoundation
 
 RESOURCES += \
     httpfiles.qrc
+
+OTHER_FILES += \
+    wsAPI/index.css \
+    wsAPI/index.html \
+    wsAPI/index.js

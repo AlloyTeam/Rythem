@@ -84,7 +84,7 @@ QiPipe* QiProxyServer::addPipe(int socketDescriptor){
 
 bool QiProxyServer::removePipe(int connectionId){
     if(pipes.contains(connectionId)){
-        //qDebug()<<"removePipe contains.."<<socketId;
+        qDebug()<<"removePipe contains.."<<connectionId;
         QiPipe *p = pipes.value(connectionId);
         QThread *t = threads.value(connectionId);
 
