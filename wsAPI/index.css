@@ -1,0 +1,15 @@
+html{
+	font-family: Arial;
+}
+.button{
+	display: inline-block;
+	padding: 4px 10px;
+	color: #333;
+	border: 1px solid #CCC;
+	-webkit-border-radius: 6px;
+	background-color: #FFF;
+}
+.button:hover{
+	border-color: #999;
+	background-color: #CCC;
+}

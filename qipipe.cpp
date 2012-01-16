@@ -171,7 +171,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         if(filePath.endsWith("/")){
             filePath.append("index.html");
         }
-        filePath.prepend(":/httpfiles");
+		filePath.prepend(":/");
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly )){
             returnStatus = "404 NOT FOUND";
