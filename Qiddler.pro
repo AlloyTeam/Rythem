@@ -24,8 +24,7 @@ SOURCES += main.cpp\
     bytearray.cpp \
     websocketserver.cpp \
     websocketclient.cpp \
-    connectionmonitorwsserver.cpp \
-    qirulesettingsdialog.cpp
+    connectionmonitorwsserver.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -41,13 +40,11 @@ HEADERS  += mainwindow.h \
     bytearray.h \
     websocketserver.h \
     websocketclient.h \
-    connectionmonitorwsserver.h \
-    qirulesettingsdialog.h
+    connectionmonitorwsserver.h
 
 mac:HEADERS -= qiwinhttp.h
 
-FORMS    += mainwindow.ui \
-    rule_config.ui
+FORMS    += mainwindow.ui
 
 
 

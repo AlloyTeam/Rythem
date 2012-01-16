@@ -1,11 +1,10 @@
 #ifndef WEBSOCKETSERVER_H
 #define WEBSOCKETSERVER_H
 
-#include <vector>
+#include <vector.h>
 #include <QTcpServer>
 #include <QtCore>
 #include "websocketclient.h"
-using namespace std;
 
 class WebSocketServer : public QTcpServer
 {

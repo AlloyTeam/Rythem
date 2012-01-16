@@ -25,8 +25,6 @@
 #include <QtCore>
 #include <QItemSelectionModel>
 
-#include "qirulesettingsdialog.h"
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -61,15 +59,14 @@ void MainWindow::createMenus(){
     captureAct = new QAction(tr("&Capture"),this);
     captureAct->setCheckable(true);
     fileMenu->addAction(captureAct);
-    QAction *a = fileMenu->addAction(tr("&rules"));
-    connect(a,SIGNAL(triggered()),SLOT(showSettingsDialog()));
+    QAction *a = fileMenu->addAction(tr("&get error"));
+    connect(a,SIGNAL(triggered()),SLOT(doSomeBug()));
     connect(captureAct,SIGNAL(triggered()),SLOT(toggleCapture()));
 }
 
-void MainWindow::showSettingsDialog(){
-    QiRuleSettingsDialog dialog(this);
-    dialog.exec();
-
+void MainWindow::doSomeBug(){
+    QStringList s;
+    s.at(10);
 }
 
 void MainWindow::onPipeUpdate(ConnectionData_ptr pipeData){

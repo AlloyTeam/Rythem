@@ -8,8 +8,6 @@
 #include <QDateTime>
 #include <QtCore>
 
-#include "qirulemanager.h"
-
 
 
 void myMessageHandler(QtMsgType type, const char *msg)
@@ -53,11 +51,11 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-    QiProxyServer server;
+    QiProxyServer *server = new QiProxyServer();
     // TODO listne should be a slot
-    server.listen(QHostAddress("127.0.0.1"),8889);
-    server.connect(&server,SIGNAL(newPipe(ConnectionData_ptr)),&w,SLOT(onNewPipe(ConnectionData_ptr)));
-    server.connect(&server,SIGNAL(pipeUpdate(ConnectionData_ptr)),&w,SLOT(onPipeUpdate(ConnectionData_ptr)));
+    server->listen(QHostAddress("127.0.0.1"),8889);
+    server->connect(server,SIGNAL(newPipe(ConnectionData_ptr)),&w,SLOT(onNewPipe(ConnectionData_ptr)));
+    server->connect(server,SIGNAL(pipeUpdate(ConnectionData_ptr)),&w,SLOT(onPipeUpdate(ConnectionData_ptr)));
     w.show();
 
 	ConnectionMonitorWSServer wsServer;
@@ -68,7 +66,7 @@ int main(int argc, char *argv[])
 	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionRemove(ConnectionData_ptr)));
 
 	QString status;
-        status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
+	status.sprintf("proxy listening on port %d, control waiting on port %d", server->serverPort(), wsServer.serverPort());
 	w.statusBar()->showMessage(status);
 
     return a.exec();
