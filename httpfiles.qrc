@@ -8,17 +8,15 @@
         <file>talkbg_2.jpg</file>
         <file>family.png</file>
     </qresource>
-    <qresource prefix="/web/lib/jo2">
+    <qresource prefix="/web">
+        <file>wsAPI/index.css</file>
+        <file>wsAPI/index.html</file>
+        <file>wsAPI/index.js</file>
         <file>jo2_lib/jo2.console.js</file>
         <file>jo2_lib/jo2.css</file>
         <file>jo2_lib/jo2.dom.js</file>
         <file>jo2_lib/jo2.js</file>
         <file>jo2_lib/jo2.string.js</file>
         <file>jo2_lib/jo2.template.js</file>
-    </qresource>
-    <qresource prefix="/web/wsAPI">
-        <file>wsAPI/index.css</file>
-        <file>wsAPI/index.html</file>
-        <file>wsAPI/index.js</file>
     </qresource>
 </RCC>
