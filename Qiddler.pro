@@ -25,7 +25,9 @@ SOURCES += main.cpp\
     websocketserver.cpp \
     websocketclient.cpp \
     connectionmonitorwsserver.cpp \
-    qirulesettingsdialog.cpp
+    qirulesettingsdialog.cpp \
+    qiresponsefactory.cpp \
+    qiremoteresponseworker.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -42,7 +44,10 @@ HEADERS  += mainwindow.h \
     websocketserver.h \
     websocketclient.h \
     connectionmonitorwsserver.h \
-    qirulesettingsdialog.h
+    qirulesettingsdialog.h \
+    qiresponsefactory.h \
+    iqiresponseworker.h \
+    qiremoteresponseworker.h
 
 mac:HEADERS -= qiwinhttp.h
 
