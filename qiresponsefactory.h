@@ -7,7 +7,7 @@
 class QiResponseFactory
 {
 public:
-	static IQiResponseWorker getResponseWorker(QString &fullPath);
+	static IQiResponseWorker *getResponseWorker(const QString &url, const int port = 80);
 };
 
 #endif // QIRESPONSEFACTORY_H

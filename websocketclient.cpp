@@ -19,6 +19,7 @@ WebSocketClient::WebSocketClient(QObject *parent) :
 	handshaked = false;
 	buffer = new QByteArray();
 	connect(this, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+	connect(this, SIGNAL(aboutToClose()), this, SLOT(onDisconnected()));
 	connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 	qDebug() << "[WebSocketClient] connected";
@@ -77,7 +78,7 @@ void WebSocketClient::processReceivedData(){
 
 			case DATAFRAME_OPCODE_CONNECTION_LOST:
 				//close the underlying socket when received a close frame
-				this->close();
+				this->abort();
 				return;
 
 			default:
@@ -145,7 +146,7 @@ void WebSocketClient::processReceivedData(){
 			//close the underlying socket if this is not a valid websocket handshake request
 			if(!header.contains("Upgrade") || header.value("Upgrade") != "websocket"){
 				qWarning() << "[WebSocketClient] INVALID HANDSHAKE REQUEST";
-				this->close();
+				this->abort();
 			}
 			//otherwise generate an accept hash base on the Sec-WebSocket-Key and send
 			//the handshake response back to client to finish the handshake process

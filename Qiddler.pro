@@ -27,7 +27,9 @@ SOURCES += main.cpp\
     connectionmonitorwsserver.cpp \
     qirulesettingsdialog.cpp \
     qiresponsefactory.cpp \
-    qiremoteresponseworker.cpp
+    qiremoteresponseworker.cpp \
+    iqiresponseworker.cpp \
+    qilocalfileresponseworker.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -47,7 +49,8 @@ HEADERS  += mainwindow.h \
     qirulesettingsdialog.h \
     qiresponsefactory.h \
     iqiresponseworker.h \
-    qiremoteresponseworker.h
+    qiremoteresponseworker.h \
+    qilocalfileresponseworker.h
 
 mac:HEADERS -= qiwinhttp.h
 
