@@ -11,7 +11,6 @@
 #include "qirulemanager.h"
 
 
-
 void myMessageHandler(QtMsgType type, const char *msg)
 {
         QString txt;
@@ -39,7 +38,7 @@ void myMessageHandler(QtMsgType type, const char *msg)
 #define DEBUG true
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+	QApplication a(argc, argv);
 
     if(!DEBUG){
         qInstallMsgHandler(myMessageHandler);

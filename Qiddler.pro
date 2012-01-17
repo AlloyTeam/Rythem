@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     qiresponsefactory.cpp \
     qiremoteresponseworker.cpp \
     iqiresponseworker.cpp \
-    qilocalfileresponseworker.cpp
+    qilocalfileresponseworker.cpp \
+    httpdecoder.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     qiresponsefactory.h \
     iqiresponseworker.h \
     qiremoteresponseworker.h \
-    qilocalfileresponseworker.h
+    qilocalfileresponseworker.h \
+    httpdecoder.h
 
 mac:HEADERS -= qiwinhttp.h
 
