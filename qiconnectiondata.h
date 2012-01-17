@@ -23,6 +23,7 @@ public:
         serverIP = p.serverIP;
         host = p.host;
         path = p.path;
+        pathWithQueryAndHash = p.pathWithQueryAndHash;
         port = p.port;
         fullUrl = p.fullUrl;
         requestMethod = p.requestMethod;
@@ -47,6 +48,7 @@ public:
     QString serverIP;
     QString host;
     QString path;
+    QString pathWithQueryAndHash;
     QString fullUrl;
     int port;
     QString requestMethod;

@@ -34,9 +34,10 @@ void QiConnectionData::setRequestHeader(QByteArray header){
     int n;
 	//qDebug()<<"fullUrl="<<fullUrl;
     if(fullUrl.indexOf("://")!=-1){
-        n = fullUrl.split("://")[1].indexOf("/");
+        int tmp = fullUrl.indexOf("://")+3;
+        n = fullUrl.mid(tmp).indexOf("/");
         if(n!=-1 && n<fullUrl.length()-1){
-			path = fullUrl.split("://")[1].mid(n);
+            path = fullUrl.mid(tmp).mid(n);
         }
     }else{
         n = fullUrl.indexOf("/");
@@ -44,6 +45,7 @@ void QiConnectionData::setRequestHeader(QByteArray header){
             path = fullUrl.mid(n);
         }
     }
+    pathWithQueryAndHash = path;
 	//remove ?xxx
 	int queryIndex = path.indexOf('?');
 	if(queryIndex != -1) path = path.left(queryIndex);
@@ -56,7 +58,7 @@ void QiConnectionData::setRequestHeader(QByteArray header){
 
     requestRawDataToSend = QByteArray().append(requestMethod)
             .append(' ')
-            .append(path)
+            .append(pathWithQueryAndHash)
             .append(' ')
             .append(protocol);
     requestRawDataToSend.append(header.mid(i));
