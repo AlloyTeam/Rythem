@@ -45,20 +45,11 @@ void QiConnectionData::setRequestHeader(QByteArray header){
             path = fullUrl.mid(n);
         }
     }
-    pathWithQueryAndHash = path;
-	//remove ?xxx
-	int queryIndex = path.indexOf('?');
-	if(queryIndex != -1) path = path.left(queryIndex);
-
-	//remote #xxx
-	int hashIndex = path.indexOf('#');
-	if(hashIndex != -1) path = path.left(hashIndex);
-
     //TODO..
 
     requestRawDataToSend = QByteArray().append(requestMethod)
             .append(' ')
-            .append(pathWithQueryAndHash)
+            .append(path)
             .append(' ')
             .append(protocol);
     requestRawDataToSend.append(header.mid(i));

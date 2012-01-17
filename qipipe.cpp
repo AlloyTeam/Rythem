@@ -168,6 +168,14 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
 
         QByteArray byteToWrite;
         QString filePath = receivingResponseConnectinoData->path;
+        //remove ?xxx
+        int queryIndex = filePath.indexOf('?');
+        if(queryIndex != -1) filePath = filePath.left(queryIndex);
+
+        //remote #xxx
+        int hashIndex = filePath.indexOf('#');
+        if(hashIndex != -1) filePath = filePath.left(hashIndex);
+
         if(filePath.endsWith("/")){
             filePath.append("index.html");
         }
