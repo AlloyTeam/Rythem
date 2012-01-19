@@ -44,6 +44,8 @@ bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_pt
     }else if(type == RuleType_LocalContentReplace){
         //qDebug()<<"fullUrl="<<connectionData->fullUrl;
         return rx.exactMatch(connectionData->fullUrl);
+    }else if(type == RuleType_RemoteContentReplace){
+        return rx.exactMatch(connectionData->fullUrl);
     }
 
     return false;

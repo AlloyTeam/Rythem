@@ -61,7 +61,7 @@ public:
         QiRuleConent_type rule1;
         rule1[ConfigKey_RuleType] = RuleType_RemoteContentReplace;
         rule1[ConfigKey_RulePattern] = QString("http://www.qq.com/");
-        rule1[ConfigKey_RuleReplace] = QString("http://ippan.web.qq.com/ip_config.json");
+        rule1[ConfigKey_RuleReplace] = QString("http://w.qq.com/js/main.js");
 
         QiRuleConent_type rule2;
         rule2[ConfigKey_RuleType] = RuleType_SimpleAddressReplace;
@@ -95,6 +95,7 @@ public:
 
     bool isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_ptr connectionData);
     static bool isRuleNeedBlockOrientResponse(int ruleType){
+        //qDebug()<<ruleType;
         switch(ruleType){
             case RuleType_SimpleAddressReplace:
             case RuleType_ComplexAddressReplace:

@@ -12,7 +12,7 @@
 #include <QNetworkAccessManager>
 #include <QRunnable>
 #include <QEventLoop>
-#include <QHostAddress>
+#include <QNetworkAccessManager>
 
 typedef struct RequestInfo{
     QString url;
@@ -124,6 +124,8 @@ private:
 
         RequestInfo requestInfo;
         QMutex mutex;
+
+        QNetworkAccessManager networkManager;
 
 
         enum State {
