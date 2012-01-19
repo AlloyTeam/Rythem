@@ -47,7 +47,7 @@ void QiProxyServer::onPipeFinished(){
     if(pipe){
         bool isRemoveSuccess = removePipe(pipe->sockeId());
         if(!isRemoveSuccess){
-            qDebug()<<"remove pipe fail";
+            //qDebug()<<"remove pipe fail";
         }
     }else{
         qDebug()<<"ERROR...QiProxyServer::onPipeFinished";
@@ -84,7 +84,7 @@ QiPipe* QiProxyServer::addPipe(int socketDescriptor){
 
 bool QiProxyServer::removePipe(int connectionId){
     if(pipes.contains(connectionId)){
-        qDebug()<<"removePipe contains.."<<connectionId;
+        //qDebug()<<"removePipe contains.."<<connectionId;
         QiPipe *p = pipes.value(connectionId);
         QThread *t = threads.value(connectionId);
 

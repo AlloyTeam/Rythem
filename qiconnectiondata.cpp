@@ -289,6 +289,21 @@ bool QiConnectionData::appendRequestBody(QByteArray newContent){
 }
 
 
+//apis for replace rule
+void QiConnectionData::setHost(QString newHost){
+    //QString oldHost = host;
+    host = newHost;
+    allRequestHeaders["Host"] = QByteArray().append(newHost);
+}
+
+void QiConnectionData::setRemoteAddress(QString address,int port){
+
+}
+
+void QiConnectionData::setPath(QString path){
+
+}
+
 void QiConnectionData::setRequestRawData(QByteArray request){//only for copy Ctor
 
 }

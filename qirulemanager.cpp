@@ -17,6 +17,7 @@ QMap<QiRuleManager::ConfigKey,QVariant> QiRuleManager::getRule(ConnectionData_pt
             QiRuleConent_type rule = qVariantValue<QiRuleConent_type> (ruleVariant);
             if( isRuleMatch(rule,connectionData) ){
                 *isMatch = true;
+                //qDebug()<<"rule MATCHED..........----------";
                 return rule;
             }
         }
@@ -25,15 +26,23 @@ QMap<QiRuleManager::ConfigKey,QVariant> QiRuleManager::getRule(ConnectionData_pt
 }
 
 bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_ptr connectionData){
-    RuleType type = qVariantValue<RuleType>(rule[ConfigKey_RuleType]);
+    int type = qVariantValue<int>(rule[ConfigKey_RuleType]);
     //TODO
     QString entry = rule[ConfigKey_RulePattern].toString();
+    QString replace = rule[ConfigKey_RuleReplace].toString();
+    //qDebug()<<type<<entry<<replace;
+
     QRegExp rx(entry, Qt::CaseInsensitive, QRegExp::Wildcard);
     if( type == RuleType_SimpleAddressReplace){
+        //qDebug()<<"host="<<connectionData->host;
         if (rx.exactMatch(connectionData->host)){
             return true;
         }
     }else if(type == RuleType_ComplexAddressReplace){
+        //qDebug()<<"fullUrl="<<connectionData->fullUrl;
+        return rx.exactMatch(connectionData->fullUrl);
+    }else if(type == RuleType_LocalContentReplace){
+        //qDebug()<<"fullUrl="<<connectionData->fullUrl;
         return rx.exactMatch(connectionData->fullUrl);
     }
 
