@@ -23,6 +23,10 @@
 			}
 		};
 
+        //expode sendMsg
+        window.sendMsg = sendMsg;
+
+
 		function sendMsgFromMsgField(){
 			sendMsg(msgField.value);
 			msgField.value = '';

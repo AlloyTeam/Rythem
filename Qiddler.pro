@@ -70,4 +70,5 @@ RESOURCES += \
 OTHER_FILES += \
     wsAPI/index.css \
     wsAPI/index.html \
-    wsAPI/index.js
+    wsAPI/index.js \
+    index.html
