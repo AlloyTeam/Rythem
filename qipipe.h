@@ -12,6 +12,7 @@
 #include <QNetworkAccessManager>
 #include <QRunnable>
 #include <QEventLoop>
+#include <QHostAddress>
 
 typedef struct RequestInfo{
     QString url;
@@ -73,6 +74,11 @@ public slots:
         void onResponseReadReady();
         void onResponseError(QAbstractSocket::SocketError);
         void onResponseClose();
+        /*
+        void onResponseHostFound(){
+            qDebug()<<"onResponseHostFound"<<responseSocket->peerAddress().toString();
+        }
+        */
         void tearDown();
 private:
         void parseRequest(const QByteArray &requestBa);

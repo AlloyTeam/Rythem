@@ -355,13 +355,14 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
     if (!sp)
         return QList<QNetworkProxy>() << QNetworkProxy();
 
-    QMutexLocker locker(&sp->mutex);
-    Q_UNUSED(locker);
+    //QMutexLocker locker(&sp->mutex);
+    //Q_UNUSED(locker);
 
     qint64 beginTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
 
-    sp->init();
+    //sp->init();
+    //locker.unlock();
     if (!sp->functional)
         return sp->defaultResult;
     //qDebug()<<"isautoconfig?"<<(sp->isAutoConfig?"a":"no");
@@ -392,8 +393,6 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
                                                 &sp->autoProxyOptions
                                                           /*theAuto*/,
                                                 &proxyInfo);
-        QTime endQt = QDateTime::currentDateTime().time();
-        //qDebug()<<QString("%1 %2 %3").arg(beg).arg(endQt.msec()).arg(endQt.msec()-beg);
         DWORD getProxyError = GetLastError();
         if (!getProxySucceeded
             && (ERROR_WINHTTP_LOGIN_FAILURE == getProxyError)) {

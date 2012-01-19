@@ -28,7 +28,7 @@ static void isInMain(QString info){
 }
 
 QiPipe::QiPipe(int socketDescriptor):_socketDescriptor(socketDescriptor){
-    qDebug()<<"new QiPipe"<<socketDescriptor;
+    //qDebug()<<"new QiPipe"<<socketDescriptor;
 }
 
 QiPipe::~QiPipe(){
@@ -98,7 +98,7 @@ void QiPipe_Private::onRequestReadReady(){
 // 检查请求数据中是否有header，如果有header则检查请求包是否完整，并重置requestBuffer
 void QiPipe_Private::parseRequest(const QByteArray &newContent){
 
-    qDebug()<<"requesting"<< requestSocket->socketDescriptor()<<newContent;
+    //qDebug()<<"requesting"<< requestSocket->socketDescriptor()<<newContent;
 
     if(requestState != HeaderFound){// no header, parse one more time ( state =  Initial || PackageFound
         requestBodyRemain = 0;
@@ -275,7 +275,6 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         //2012.1.19 ippan:需先判断是否需替换内容
         responseSocket->write(newContent);
         responseSocket->flush();
-        qDebug()<<"going to get rule";
 
     }else if(responseState == Initial){
         responseState = Connecting;
@@ -286,6 +285,8 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         connect(responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
         connect(responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onResponseError(QAbstractSocket::SocketError)));
 
+        //connect(responseSocket,SIGNAL(hostFound()),SLOT(onResponseHostFound()));
+        //connect(responseSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),SLOT(onResponseHostFound()));
 #ifdef Q_OS_WIN
         // TODO add mac pac support
         QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(receivingResponseConnectinoData->fullUrl)));
@@ -354,7 +355,13 @@ void QiPipe_Private::onResponseConnected(){
     // need?
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker)
-
+    /*
+    if(serverIp.isEmpty()){
+        serverIp = responseSocket->peerAddress().toString();
+        receivingResponseConnectinoData->serverIP = serverIp;
+    }
+    qDebug()<<responseSocket->peerName()<<serverIp;
+    */
     responseState = Connected;
     if(receivingResponseConnectinoData.isNull()){
         receivingResponseConnectinoData = nextConnectionData();
@@ -382,8 +389,11 @@ void QiPipe_Private::onResponseReadReady(){
 
 
     //qDebug()<<"when readReady:"<<responseSocket->peerAddress().toString();
-    serverIp = responseSocket->peerAddress().toString();
-    receivingResponseConnectinoData->serverIP = serverIp;
+    if(serverIp.isEmpty()){
+        serverIp = responseSocket->peerAddress().toString();
+        receivingResponseConnectinoData->serverIP = serverIp;
+    }
+    //qDebug()<<responseSocket->peerName()<<serverIp;
 
     requestSocket->write(ba);
     requestSocket->flush();
