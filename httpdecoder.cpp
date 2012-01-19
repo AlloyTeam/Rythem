@@ -16,7 +16,8 @@ bool HTTPDecoder::decode(const QByteArray &package, bool *headerComplete, QMap<Q
 		QStringList headerMap = header.split("\r\n");
 		QStringList firstLine = headerMap.at(0).split(" "); //"GET xxx HTTP/1.1" or "HTTP/1.1 200 OK"
 		for(int i=1; i<headerMap.length(); i++){
-			QStringList keyValue = headerMap.at(i).split(": "); //xxx: xxx
+			// ippan: will cause problem when parse cookie header containing ":"
+			QStringList keyValue = headerMap.at(i).split(": "); //xxx: xxx 
 			headerItems->insert(keyValue.at(0), keyValue.at(1));
 		}
 
