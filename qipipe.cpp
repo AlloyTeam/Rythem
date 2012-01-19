@@ -17,6 +17,7 @@
 #include <qglobal.h>
 #include "qiproxyserver.h"
 #include <QFile>
+#include <qirulemanager.h>
 
 static void isInMain(QString info){
     if(QThread::currentThread() == QApplication::instance()->thread()){
@@ -27,7 +28,7 @@ static void isInMain(QString info){
 }
 
 QiPipe::QiPipe(int socketDescriptor):_socketDescriptor(socketDescriptor){
-    //qDebug()<<"new QiPipe"<<socketDescriptor;
+    qDebug()<<"new QiPipe"<<socketDescriptor;
 }
 
 QiPipe::~QiPipe(){
@@ -96,6 +97,9 @@ void QiPipe_Private::onRequestReadReady(){
 
 // 检查请求数据中是否有header，如果有header则检查请求包是否完整，并重置requestBuffer
 void QiPipe_Private::parseRequest(const QByteArray &newContent){
+
+    qDebug()<<"requesting"<< requestSocket->socketDescriptor()<<newContent;
+
     if(requestState != HeaderFound){// no header, parse one more time ( state =  Initial || PackageFound
         requestBodyRemain = 0;
         parseRequestHeader(newContent);//如果获取新header,则放入bufferConnectionArray
@@ -215,12 +219,64 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         return;
     }
 
+
+    bool gotRule;
+    QMap<QiRuleManager::ConfigKey,QVariant> rule = QiRuleManager::instance()->getRule( receivingResponseConnectinoData,&gotRule );
+    if(gotRule){
+        qDebug()<<"got rule";
+        int type = rule[ QiRuleManager::ConfigKey_RuleType].toInt();
+        qDebug()<<"rultype="<<type;
+        switch(type){
+            case QiRuleManager::RuleType_DomainReplace:
+                receivingResponseConnectinoData->setHost(rule[QiRuleManager::ConfigKey_RuleReplace].toString());
+                qDebug()<<receivingResponseConnectinoData->host;
+                break;
+            case QiRuleManager::RuleType_SimpleAddressReplace:
+                break;
+             case QiRuleManager::RuleType_LocalContentReplace:
+                QString replaceLocalFilePath = rule[QiRuleManager::ConfigKey_RuleReplace].toString();
+                QFile f(replaceLocalFilePath);
+                bool fileCanOpen = f.open(QFile::ReadOnly);
+                QByteArray byteToWrite;
+                QByteArray body;
+                QString status = "200 OK";
+
+                if(fileCanOpen){
+                    body = f.readAll();
+                    f.close();
+                }else{
+                    status = "404 Not Found";
+                    body.append(QString("file:%1 not found").arg(replaceLocalFilePath));
+                }
+                int count = body.size();
+                byteToWrite.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: text/html \r\nContent-Length: %2 \r\n\r\n").arg(status).arg(count));
+                receivingResponseConnectinoData->setResponseHeader(byteToWrite);
+                byteToWrite.append(body);
+                receivingResponseConnectinoData->appendResponseBody(body);
+                requestSocket->write(byteToWrite);
+                requestSocket->flush();
+                emit finishSuccess(receivingResponseConnectinoData);
+                break;
+        }
+
+        if(QiRuleManager::isRuleNeedBlockOrientResponse(type)){
+            qDebug()<<"discard this request";
+            receivingResponseConnectinoData.clear();
+            return;
+        }
+    }
+
+
     if(responseState != Initial && responseState != Connecting){
         //同一个socket中发起n个请求的情况
         //条件是：当第二个同域请求发起时，有已经连接成功并返回数据的数据
         //所以这里可以简单处理
+
+        //2012.1.19 ippan:需先判断是否需替换内容
         responseSocket->write(newContent);
         responseSocket->flush();
+        qDebug()<<"going to get rule";
+
     }else if(responseState == Initial){
         responseState = Connecting;
         responseSocket = new QTcpSocket();

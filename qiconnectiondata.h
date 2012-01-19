@@ -62,6 +62,8 @@ public:
     QByteArray responseHeaderRawData;
 
 
+
+
     void setRequestHeader(QByteArray name,QByteArray value);
     void setRequestHeader(QByteArray headerBa);
     bool appendRequestBody(QByteArray newContent);
@@ -74,7 +76,14 @@ public:
     bool appendResponseBody(QByteArray newContent);
     QByteArray getResponseHeader(QByteArray name)const;
     QByteArray getResponseHeader()const;
-	QByteArray getResponseBody()const;
+    QByteArray getResponseBody()const;
+
+    //apis for replace rule
+    void setHost(QString newHost);
+    void setRemoteAddress(QString address,int port = 80);
+    void setPath(QString path);
+
+
 private:
     QByteArray requestRawData;
 	QByteArray responseRawData;

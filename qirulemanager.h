@@ -14,7 +14,7 @@ class QiRuleManager : public QObject
 public:
         enum ConfigKey{
             //配置组信息，需用户提供
-            ConfigKey_Author,
+            ConfigKey_Author = 0,
             ConfigKey_RemoteHost,
             ConfigKey_RemoteAddress,
             ConfigKey_RemotePath,
@@ -31,7 +31,7 @@ public:
             ConfigKey_RuleReplace
         };
         enum RuleType{
-            RuleType_SimpleAddressReplace,   // 替换远程ip地址 一个域名对应一个host
+            RuleType_SimpleAddressReplace = 0,   // 替换远程ip地址 一个域名对应一个host
             RuleType_ComplexAddressReplace,  // 替换远程ip地址一个域名对应多个host
             RuleType_LocalContentReplace,    // 替换本地内容
             RuleType_RemoteContentReplace,   // 替换远程内容   （本地预读取还是远程获取？本地预读需处理“更新”逻辑)
@@ -40,13 +40,14 @@ public:
             RuleType_DomainReplace           // 域名重定向(仅替换域名) 如 http://domain.NOT.deploy.com/cgi 重定向至 http://domain.deploy.com/
         };
         enum ContentReplaceRuleType{
-            ContentReplaceRuleType_SingleReplace,          //单个文件替换
+            ContentReplaceRuleType_SingleReplace = 0,          //单个文件替换
             ContentReplaceRuleType_MutiReplace             //多文件合并替换
         };
     //typedef QVector< QMap<QiRuleManager::ConfigKey,QVariant> > QiRulesVector_type;
     //typedef QList< QMap<ConfigKey,QVariant> > QiRulesList_type;
     typedef QMap<QiRuleManager::ConfigKey,QVariant> QiRuleConent_type;
     inline QiRuleManager(QObject *parent = 0):QObject(parent){
+        qRegisterMetaType<QiRuleManager::RuleType>("QiRuleManager::RuleType");
 
         // data for test only
         QMap<ConfigKey,QVariant> configGroup;
@@ -61,12 +62,23 @@ public:
         rule1[ConfigKey_RuleType] = RuleType_RemoteContentReplace;
         rule1[ConfigKey_RulePattern] = QString("http://www.qq.com/");
         rule1[ConfigKey_RuleReplace] = QString("http://ippan.web.qq.com/ip_config.json");
+
         QiRuleConent_type rule2;
         rule2[ConfigKey_RuleType] = RuleType_SimpleAddressReplace;
-        rule2[ConfigKey_RulePattern] = QString("ippan.web.qq.com");
+        rule2[ConfigKey_RulePattern] = QString("www.qq.com");
         rule2[ConfigKey_RuleReplace] = QString("183.60.11.120");
+
+        //http://iptton.sinaapp.com/a0.js
+        QiRuleConent_type rule3;
+        rule3[ConfigKey_RuleType] = RuleType_LocalContentReplace;
+        qDebug()<<"rule3="<<rule3[ConfigKey_RuleType];
+        rule3[ConfigKey_RulePattern] = QString("http://iptton.sinaapp.com/a0.js");
+        rule3[ConfigKey_RuleReplace] = QString("/Users/emrelax/a.js");
+
+
         theRules.append(qVariantFromValue(rule1));
         theRules.append(qVariantFromValue(rule2));
+        theRules.append(qVariantFromValue(rule3));
 
         //theRules.append(rule2);
 
@@ -82,7 +94,7 @@ public:
     QMap<ConfigKey,QVariant> getRule(ConnectionData_ptr connectionData,bool* isMatch=0);
 
     bool isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_ptr connectionData);
-    bool isRuleNeedBlockOrientResponse(RuleType ruleType){
+    static bool isRuleNeedBlockOrientResponse(int ruleType){
         switch(ruleType){
             case RuleType_SimpleAddressReplace:
             case RuleType_ComplexAddressReplace:
