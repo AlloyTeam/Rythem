@@ -51,6 +51,7 @@
         }
     }
     function addRule(){
+        $('selectFile
         var msg = $('ruleType').value+'\x01'+$('pattern').value+'\x01'+$('replace').value;
         sendMsg(msg);
     }
