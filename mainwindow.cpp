@@ -6,6 +6,8 @@
 #include "qiproxyserver.h"
 #include <QSettings>
 #include <QVariant>
+#include <QUrl>
+
 
 #include <QNetworkConfigurationManager>
 #include <QMAp>
@@ -42,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setModel(&pipeTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
+    ui->webView->load(QUrl("http://127.0.0.1:8889/wsAPI/"));
 
     itemSelectModel = ui->tableView->selectionModel();
 

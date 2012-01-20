@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network script
+QT       += core gui network script webkit
 
 
 TARGET = Qiddler

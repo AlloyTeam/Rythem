@@ -134,17 +134,23 @@ void WebSocketClient::processReceivedData(){
 		if(buffer->indexOf("\r\n\r\n") != -1){
 			qDebug() << "[WebSocketClient] handshaking ...";
 			//format header fields
-			QString handshakeRequest(*buffer);
-			QStringList components = handshakeRequest.split("\r\n");
+            QString handshakeRequest(*buffer);
+            qDebug()<<*buffer;
+            QStringList components = handshakeRequest.split("\r\n");
 			QMap<QString, QString> header;
 			for(int i=1; i<components.length(); i++){
 				if(components.at(i).length()){
 					QStringList headerKV = components.at(i).split(": ");
+                    if(headerKV.size()<2){
+                        qDebug()<<"invalid header"<<components.at(i);
+                        continue;
+                    }
+                    qDebug()<<headerKV.at(0);
 					header.insert(headerKV.at(0), headerKV.at(1));
 				}
 			}
 			//close the underlying socket if this is not a valid websocket handshake request
-			if(!header.contains("Upgrade") || header.value("Upgrade") != "websocket"){
+            if(!header.contains("Upgrade") || header.value("Upgrade").toLower() != "websocket"){
 				qWarning() << "[WebSocketClient] INVALID HANDSHAKE REQUEST";
 				this->abort();
 			}
