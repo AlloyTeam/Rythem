@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->tableView->setItemDelegate();
     createMenus();
     //toggleCapture();
+
+    connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
+    connect(ui->actionRemoveAll,SIGNAL(triggered()),&pipeTableModel,SLOT(removeAllItem()));
 }
 
 MainWindow::~MainWindow()
@@ -97,20 +100,21 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
 void MainWindow::toggleProxy(){
     if(isUsingCapture){
         isUsingCapture = false;
-
+        /*
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
         proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
         if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
         }
-        /*
+        */
+        ///*
         // hard code just for some crash issue
         proxySetting.setValue("ProxyEnable",1);
         proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
         //if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
         //}
-        */
+        //*/
     }else{
         isUsingCapture = true;
         previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();

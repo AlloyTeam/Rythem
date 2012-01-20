@@ -131,8 +131,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         //qDebug()<<bufferBodyLength;
         requestBodyRemain = requestBodyRemain - bufferBodyLength;
         //qDebug()<<"req content-length="<<requestContentLength<<" remain="<<requestBodyRemain;
-        gettingRequestConnectionData->appendRequestBody(requestBuffer);
-        if(requestBodyRemain <= 0){
+        if(gettingRequestConnectionData->appendRequestBody(requestBuffer)){
             //TODO connectionData 入栈与requestState相关联，需要setRequestState方法统一
             requestState = PackageFound;
             bufferConnectionArray.push_back(gettingRequestConnectionData);
@@ -259,7 +258,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
                 count = body.size();
                 byteToWrite.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
                                    .arg(status)
-                                   .arg( reply->header(QNetworkRequest::ContentTypeHeader).toString() )
+                                   .arg("text/html") // TODO reuse contentTypeMapping above
                                    .arg(count));
                 receivingResponseConnectinoData->setResponseHeader(byteToWrite);
                 qDebug()<<"body="<<body;
@@ -402,6 +401,9 @@ void QiPipe_Private::onResponseConnected(){
     //    qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<receivingResponseConnectinoData->requestRawDataToSend;
     //}
     while(receivingResponseConnectinoData->requestRawDataToSend.size()>0){
+        if(receivingResponseConnectinoData->host == "id.qq.com"){
+            qDebug()<<"id.qq.com"<<receivingResponseConnectinoData->requestRawDataToSend;
+        }
         qint64 n = responseSocket->write(receivingResponseConnectinoData->requestRawDataToSend);
         responseSocket->flush();
         if(n==-1){

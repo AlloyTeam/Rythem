@@ -55,6 +55,10 @@ void QiConnectionData::setRequestHeader(QByteArray header){
     requestRawDataToSend.append(header.mid(i));
 
     requestRawDataToSend.replace(QString("Proxy-Connection: keep-alive\n"),QByteArray(""));
+    requestRawDataToSend.replace(QString("Proxy-Connection: keep-alive\r\n"),QByteArray(""));
+
+    requestRawDataToSend.replace(QString("Proxy-Connection: Keep-Alive\n"),QByteArray(""));
+    requestRawDataToSend.replace(QString("Proxy-Connection: Keep-Alive\r\n"),QByteArray(""));
     requestRawDataToSend.replace(QString("\n"),QByteArray("\r\n"));
     requestRawDataToSend.append(QByteArray("\r\n\r\n"));
     /*
@@ -283,9 +287,15 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
 }
 bool QiConnectionData::appendRequestBody(QByteArray newContent){
     requestBody.append(newContent);
-
     requestRawDataToSend.append(newContent);
-    return true;
+
+    QByteArray contentLenght = getRequestHeader("Content-Length");
+    qDebug()<<contentLenght<<requestBody.size();
+    int requestContentLength = contentLenght.toInt();
+    if(requestContentLength <= requestBody.size()){
+        return true;
+    }
+    return false;
 }
 
 

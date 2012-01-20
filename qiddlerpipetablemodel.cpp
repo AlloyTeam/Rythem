@@ -8,6 +8,7 @@ QiddlerPipeTableModel::QiddlerPipeTableModel(QObject *parent) :
     QAbstractTableModel(parent),pipeNumber(0){
 }
 QiddlerPipeTableModel::~QiddlerPipeTableModel(){
+    blockSignals(true);
     removeAllItem();
     qDebug()<<"~QiddlerPipeTableModel";
 }
@@ -21,6 +22,7 @@ int QiddlerPipeTableModel::columnCount(const QModelIndex &parent) const{
 QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
     if(role == Qt::DisplayRole || role == Qt::ToolTipRole){
         int row = index.row();
+        int column = index.column();
         ConnectionData_ptr p;
         if(pipesVector.count()>row){
             p = pipesVector.at(row);
@@ -32,9 +34,9 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
         }
         //return tr("AAAAAAAA");
 
-        switch(index.column()){
+        switch(column){
             case 0:
-                return QString("%1").arg(p->number);
+                return QString("%1").arg(row/*p->number*/);
             case 1:
                 return ((p->returnCode==-1)?QString("-"):QString("%1").arg(p->returnCode));
             case 2:
@@ -123,11 +125,11 @@ void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
 
 void QiddlerPipeTableModel::removeAllItem(){
     int l = pipesVector.size();
-    for(int i=0;i<l;++i){
-        ConnectionData_ptr p = pipesVector.at(i);
-        p.clear();
-		//TODO emit connection removed signal here ?
-    }
+    pipesMap.clear();
+    pipesVector.clear();
+    qDebug()<<"length="<<pipesVector.count();
+    //emit dataChanged(index(0,0),index(l-1,7));
+    emit reset();
 }
 void QiddlerPipeTableModel::removeItems(){
 
