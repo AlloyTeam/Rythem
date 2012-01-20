@@ -59,6 +59,8 @@ mac:HEADERS -= qiwinhttp.h
 FORMS    += mainwindow.ui \
     rule_config.ui
 
+mac:CONFIG += app_bundle
+
 
 
 win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
