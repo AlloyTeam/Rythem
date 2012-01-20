@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
     if(!DEBUG){
         qInstallMsgHandler(myMessageHandler);
     }
+    QiRuleManager::instance();
+
     // register metatypes
     qRegisterMetaType<ConnectionData_const_ptr>("ConnectionData_const_ptr");
     qRegisterMetaType<ConnectionData_ptr>("ConnectionData_ptr");

@@ -275,8 +275,12 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
                 reply = networkManager.get(QNetworkRequest(QUrl(replace)));
                 connect(&networkManager,SIGNAL(finished(QNetworkReply*)),&theLoop,SLOT(quit()));
                 theLoop.exec();
-                byteToWrite.append(QString("HTTP/1.1 200 FROM REMOTE REPLACE \r\nServer: Qiddler \r\nContent-Type: text/html \r\nContent-Length: %2 \r\n\r\n")
-                                   .arg(reply->header(QNetworkRequest::ContentLengthHeader).toString()));
+                int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() || 404;
+                QByteArray resone = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toByteArray();
+                byteToWrite.append(QString("HTTP/1.1 %1 FROM REMOTE REPLACE \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+                        .arg(status)
+                        .arg(reply->header(QNetworkRequest::ContentTypeHeader).toString())
+                        .arg(reply->header(QNetworkRequest::ContentLengthHeader).toString()));
                 receivingResponseConnectinoData->setResponseHeader(byteToWrite);
                 body = reply->readAll();
                 byteToWrite.append(body);

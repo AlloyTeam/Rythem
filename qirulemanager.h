@@ -5,6 +5,7 @@
 #include <QtCore>
 #include <QMap>
 #include <qiconnectiondata.h>
+#include <QApplication>
 
 
 
@@ -31,10 +32,10 @@ public:
             ConfigKey_RuleReplace
         };
         enum RuleType{
-            RuleType_SimpleAddressReplace = 0,   // 替换远程ip地址 一个域名对应一个host
-            RuleType_ComplexAddressReplace,  // 替换远程ip地址一个域名对应多个host
-            RuleType_LocalContentReplace,    // 替换本地内容
+            RuleType_LocalContentReplace = 0,    // 替换本地内容
             RuleType_RemoteContentReplace,   // 替换远程内容   （本地预读取还是远程获取？本地预读需处理“更新”逻辑)
+            RuleType_SimpleAddressReplace ,   // 替换远程ip地址 一个域名对应一个host
+            RuleType_ComplexAddressReplace,  // 替换远程ip地址一个域名对应多个host
             // TODO
             RuleType_PathReplace,            // 路径重定向(仅保留域名) 如 http://qplus.com/cgi_developing_or_has_error 重定向至 http://qplus.com/cgi_ok_but_will_discard
             RuleType_DomainReplace           // 域名重定向(仅替换域名) 如 http://domain.NOT.deploy.com/cgi 重定向至 http://domain.deploy.com/
@@ -51,39 +52,64 @@ public:
 
         // data for test only
         QMap<ConfigKey,QVariant> configGroup;
-        configGroup[ConfigKey_Author] = "ippan";
-        configGroup[ConfigKey_RemoteHost] = "ippan.web.qq.com";
-        configGroup[ConfigKey_RemoteAddress] = "183.60.11.120.";
-        configGroup[ConfigKey_RemotePath] = "ip_config.json";
 
-        QList<QVariant> theRules;
-        //QList< QMap<ConfigKey,QVariant> > theRules;
-        QiRuleConent_type rule1;
-        rule1[ConfigKey_RuleType] = RuleType_RemoteContentReplace;
-        rule1[ConfigKey_RulePattern] = QString("http://www.qq.com/");
-        rule1[ConfigKey_RuleReplace] = QString("http://w.qq.com/js/main.js");
+        QString configFilePath = QApplication::instance()->applicationDirPath()+"/config.txt";
+        qDebug()<<configFilePath;
+        QFile configFile(configFilePath);
+        if(configFile.exists() && configFile.open(QFile::ReadOnly)){
+            qDebug()<<"config file exists";
+            configGroup[ConfigKey_Author] = "ippan";
+            configGroup[ConfigKey_LocalConfigFile] = configFilePath;
+            QList<QVariant> theRules;
+            while(!configFile.atEnd()){
+                QiRuleConent_type rule;
+                QByteArray line = configFile.readLine().trimmed();
+                rule[ConfigKey_RuleType] = line.toInt();
+                if(configFile.atEnd()){
+                    break;
+                }
+                line = configFile.readLine().trimmed();
+                rule[ConfigKey_RulePattern] = QString(line);
+                if(configFile.atEnd()){
+                    break;
+                }
+                line = configFile.readLine().trimmed();
+                rule[ConfigKey_RuleReplace] = QString(line);
+                theRules.append(qVariantFromValue(rule));
+            }
+            configGroup[ConfigKey_Rules] = qVariantFromValue(theRules);
+        }else{
+            configGroup[ConfigKey_Author] = "ippan";
+            configGroup[ConfigKey_RemoteHost] = "ippan.web.qq.com";
+            configGroup[ConfigKey_RemoteAddress] = "183.60.11.120.";
+            configGroup[ConfigKey_RemotePath] = "ip_config.json";
+            QList<QVariant> theRules;
+            //QList< QMap<ConfigKey,QVariant> > theRules;
+            QiRuleConent_type rule1;
+            rule1[ConfigKey_RuleType] = RuleType_RemoteContentReplace;
+            rule1[ConfigKey_RulePattern] = QString("http://www.qq.com/");
+            rule1[ConfigKey_RuleReplace] = QString("http://w.qq.com/js/main.js");
 
-        QiRuleConent_type rule2;
-        rule2[ConfigKey_RuleType] = RuleType_SimpleAddressReplace;
-        rule2[ConfigKey_RulePattern] = QString("www.qq.com");
-        rule2[ConfigKey_RuleReplace] = QString("183.60.11.120");
+            QiRuleConent_type rule2;
+            rule2[ConfigKey_RuleType] = RuleType_SimpleAddressReplace;
+            rule2[ConfigKey_RulePattern] = QString("www.qq.com");
+            rule2[ConfigKey_RuleReplace] = QString("183.60.11.120");
 
-        //http://iptton.sinaapp.com/a0.js
-        QiRuleConent_type rule3;
-        rule3[ConfigKey_RuleType] = RuleType_LocalContentReplace;
-        qDebug()<<"rule3="<<rule3[ConfigKey_RuleType];
-        rule3[ConfigKey_RulePattern] = QString("http://iptton.sinaapp.com/a0.js");
-        rule3[ConfigKey_RuleReplace] = QString("/Users/emrelax/a.js");
+            //http://iptton.sinaapp.com/a0.js
+            QiRuleConent_type rule3;
+            rule3[ConfigKey_RuleType] = RuleType_LocalContentReplace;
+            rule3[ConfigKey_RulePattern] = QString("http://iptton.sinaapp.com/a0.js");
+            rule3[ConfigKey_RuleReplace] = QString("/Users/emrelax/a.js");
 
 
-        theRules.append(qVariantFromValue(rule1));
-        theRules.append(qVariantFromValue(rule2));
-        theRules.append(qVariantFromValue(rule3));
+            theRules.append(qVariantFromValue(rule1));
+            theRules.append(qVariantFromValue(rule2));
+            theRules.append(qVariantFromValue(rule3));
 
-        //theRules.append(rule2);
+            //theRules.append(rule2);
 
-        configGroup[ConfigKey_Rules] = qVariantFromValue(theRules);
-
+            configGroup[ConfigKey_Rules] = qVariantFromValue(theRules);
+        }
         configGroups.append(configGroup);
     }
     static QiRuleManager* instance();
