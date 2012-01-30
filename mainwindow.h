@@ -5,6 +5,7 @@
 #include "qiddlerpipetablemodel.h"
 #include "qiconnectiondata.h"
 #include <QSettings>
+#include <QWebFrame>
 
 namespace Ui {
     class MainWindow;
@@ -61,6 +62,10 @@ protected:
     void closeEvent(QCloseEvent *event);
 
     QSettings proxySetting;
+
+private slots:
+    void addJsObject();
+    void doAction(QString &msgType,QString &msg);
 };
 
 #endif // MAINWINDOW_H

@@ -44,7 +44,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setModel(&pipeTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
-    ui->webView->load(QUrl("http://127.0.0.1:8889/wsAPI/"));
+
+    connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
+    ui->webView->load(QUrl("http://127.0.0.1:8889/test/"));
+
 
     itemSelectModel = ui->tableView->selectionModel();
 
@@ -224,4 +227,13 @@ void MainWindow::closeEvent(QCloseEvent *event){
         toggleCapture();
     }
     QMainWindow::closeEvent(event);
+}
+
+void MainWindow::addJsObject(){
+    ui->webView->page()->mainFrame()->addToJavaScriptWindowObject(QString("doAction"),this);
+}
+
+void MainWindow::doAction(QString &msgType,QString &msg){
+    qDebug()<<msgType<<msg;
+
 }
