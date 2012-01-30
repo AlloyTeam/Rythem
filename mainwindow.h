@@ -6,6 +6,7 @@
 #include "qiconnectiondata.h"
 #include <QSettings>
 #include <QWebFrame>
+#include <QFileDialog>
 
 namespace Ui {
     class MainWindow;
@@ -19,6 +20,12 @@ class QiJsBridge:public QObject{
     public slots:
         void doAction(const QString &msgType,const QString msg=""){
             qDebug()<<"doAction "<<msgType<< msg;
+        }
+        QString getFile(){
+            return QFileDialog::getOpenFileName();
+        }
+        QString getDir(){
+            return QFileDialog::getExistingDirectory();
         }
 };
 

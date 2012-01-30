@@ -14,12 +14,15 @@
 <div class="container">
     <div>
         <label for="pattern">规则</label><input type="text" id="pattern" /><br/>
-        <label for="replace">规则</label><input type="text" id="replace" /><input type="file" style="display:none" id="selectFile"/><br/>
+        <label for="replace">规则</label><input type="text" id="replace" />
+        <button id="selectFile" style="display:none">getFile</button>
+        <button id="selectDir" style="display:none">getDir</button><br/>
         <label for="ruleType">规则</label><select id="ruleType">
             <option value="1">simple host</option>
             <option value="2" title="可以cgi路径为同一domain设置host">complex host</option>
-            <option value="3">local content replace</option>
-            <option value="4">remote content repalce</option>
+            <option value="3">local content replace(file)</option>
+            <option value="4">local content replace(dir)</option>
+            <option value="5">remote content repalce</option>
         </select><br/>
         <button onclick="addRule(event)">add rule</button>
     </div>
@@ -29,13 +32,21 @@
     function init(){
         $('ruleType').onchange=function(){
             if(this.value == 3){
+                $('selectDir').style["display"]="none";
                 $('selectFile').style["display"]="";
+            }else if(this.value== 4){
+                $('selectFile').style["display"]="none";
+                $('selectDir').style["display"]="";
             }else{
                 $('selectFile').style["display"]="none";
+                $('selectDir').style["display"]="none";
             }
         }
-        $('selectFile').onchange=function(){
-            $('replace').value = this.value;
+        $('selectFile').onclick=function(){
+            $('replace').value = App.getFile();
+        }
+        $('selectDir').onclick=function(){
+            $('replace').value = App.getDir();
         }
     }
     function addRule(){
