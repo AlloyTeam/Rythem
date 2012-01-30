@@ -2,8 +2,7 @@
 <html manifest="./websocket.manifest">
 <head>
     <title>Qiddler 类Fiddler工具</title>
-    <link rel="stylesheet" type="text/css" href="../jo2_lib/jo2.css">
-    <link rel="stylesheet" type="text/css" href="../wsAPI/index.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style>
         .container{
             display:-webkit-box;
@@ -12,17 +11,6 @@
     </style>
 </head>
 <body>
-    <input type="text" id="addr" value="ws://127.0.0.1:9828"/>
-    <div class="button" id="connectBtn">connect</div>
-    <input type="text" id="message" value="say something"/>
-    <div class="button" id="sendBtn">send</div>
-    <div class="button" id="closeBtn">close</div>
-    <script src="../jo2_lib/jo2.js"></script>
-<script src="../jo2_lib/jo2.string.js"></script>
-    <script src="../jo2_lib/jo2.template.js"></script>
-    <script src="../jo2_lib/jo2.dom.js"></script>
-    <script src="../jo2_lib/jo2.console.js"></script>
-    <script src="../wsAPI/index.js"></script>
 <div class="container">
     <div>
         <label for="pattern">规则</label><input type="text" id="pattern" /><br/>
@@ -51,8 +39,9 @@
         }
     }
     function addRule(){
-        var msg = $('ruleType').value+'\x01'+$('pattern').value+'\x01'+$('replace').value;
-        sendMsg(msg);
+        var msg = $('ruleType').value+'\0x01'+$('pattern').value+'\0x01'+$('replace').value;
+        alert(typeof(App));
+        window.App.doAction("addRule",msg);
     }
     window.onload = init;
 </script>

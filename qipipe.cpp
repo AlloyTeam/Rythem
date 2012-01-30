@@ -206,7 +206,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         byteToWrite.append(s);
 
         QByteArray tmp = byteToWrite;
-        qDebug()<<tmp.replace("\r","\\r");
+        //qDebug()<<tmp.replace("\r","\\r");
 
         receivingResponseConnectinoData->appendResponseBody(s);
         //qDebug(byteToWrite);

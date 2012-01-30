@@ -14,7 +14,13 @@ class QiProxyServer;
 class QiPipe;
 class QiConnectionData;
 class QItemSelectionModel;
-
+class QiJsBridge:public QObject{
+        Q_OBJECT
+    public slots:
+        void doAction(const QString &msgType,const QString msg=""){
+            qDebug()<<"doAction "<<msgType<< msg;
+        }
+};
 
 class MainWindow : public QMainWindow
 {
@@ -48,6 +54,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QiJsBridge *jsBridge;
     void createMenus();
     QiProxyServer *server;
 	QVector<QiPipe*> *pipes;
@@ -65,7 +72,6 @@ protected:
 
 private slots:
     void addJsObject();
-    void doAction(QString &msgType,QString &msg);
 };
 
 #endif // MAINWINDOW_H

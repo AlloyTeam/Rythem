@@ -29,6 +29,8 @@
 
 #include "qirulesettingsdialog.h"
 
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -45,6 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
 
+    jsBridge = new QiJsBridge();
+
+    addJsObject();
     connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
     ui->webView->load(QUrl("http://127.0.0.1:8889/test/"));
 
@@ -63,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete jsBridge;
     delete ui;
 }
 void MainWindow::createMenus(){
@@ -230,10 +236,6 @@ void MainWindow::closeEvent(QCloseEvent *event){
 }
 
 void MainWindow::addJsObject(){
-    ui->webView->page()->mainFrame()->addToJavaScriptWindowObject(QString("doAction"),this);
+    ui->webView->page()->mainFrame()->addToJavaScriptWindowObject(QString("App"),jsBridge);
 }
 
-void MainWindow::doAction(QString &msgType,QString &msg){
-    qDebug()<<msgType<<msg;
-
-}
