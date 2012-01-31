@@ -278,7 +278,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
                 QByteArray resone = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toByteArray();
                 byteToWrite.append(QString("HTTP/1.1 %1 %2 \r\nServer: Qiddler \r\nContent-Type: %3 \r\nContent-Length: %4 \r\n\r\n")
                         .arg(status)
-                        .arg(resone)
+                        .arg(QString(resone))
                         .arg(reply->header(QNetworkRequest::ContentTypeHeader).toString())
                         .arg(reply->header(QNetworkRequest::ContentLengthHeader).toString()));
                 receivingResponseConnectinoData->setResponseHeader(byteToWrite);
