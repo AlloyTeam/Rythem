@@ -37,7 +37,6 @@ QiPipe::~QiPipe(){
     if(qp){
         qp->disconnect(this);
         qp->deleteLater();
-        qp = NULL;
     }
     //qDebug()<<"~QiPipe "<<_socketDescriptor;
 }
@@ -277,8 +276,9 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
                 theLoop.exec();
                 int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() || 404;
                 QByteArray resone = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toByteArray();
-                byteToWrite.append(QString("HTTP/1.1 %1 FROM REMOTE REPLACE \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+                byteToWrite.append(QString("HTTP/1.1 %1 %2 \r\nServer: Qiddler \r\nContent-Type: %3 \r\nContent-Length: %4 \r\n\r\n")
                         .arg(status)
+                        .arg(QString(resone))
                         .arg(reply->header(QNetworkRequest::ContentTypeHeader).toString())
                         .arg(reply->header(QNetworkRequest::ContentLengthHeader).toString()));
                 receivingResponseConnectinoData->setResponseHeader(byteToWrite);
