@@ -7,7 +7,7 @@
 QT       += core gui network script webkit
 
 
-TARGET = Qiddler
+TARGET = Rythem
 TEMPLATE = app
 
 
