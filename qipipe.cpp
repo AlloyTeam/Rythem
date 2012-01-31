@@ -240,6 +240,8 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
                 //qDebug()<<receivingResponseConnectinoData->host;
                 break;
             case QiRuleManager::RuleType_SimpleAddressReplace:
+                serverIp = replace;
+                receivingResponseConnectinoData->serverIP = serverIp;
                 break;
              case QiRuleManager::RuleType_LocalContentReplace:
                 f.setFileName(replace);
@@ -337,7 +339,12 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
 
         //qDebug()<<"CONNECT TO "<<receivingResponseConnectinoData->getRequestHeader("Host")<<receivingResponseConnectinoData->getRequestHeader("Port");
         //responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8888));
-        responseSocket->connectToHost(receivingResponseConnectinoData->getRequestHeader("Host"),receivingResponseConnectinoData->getRequestHeader("Port").toInt());
+        if(serverIp.isEmpty()){
+            responseSocket->connectToHost(receivingResponseConnectinoData->getRequestHeader("Host"),receivingResponseConnectinoData->getRequestHeader("Port").toInt());
+        }else{
+            qDebug()<<"connect to "<<serverIp;
+            responseSocket->connectToHost(serverIp,receivingResponseConnectinoData->getRequestHeader("Port").toInt());
+        }
     }
 }
 
@@ -393,13 +400,11 @@ void QiPipe_Private::onResponseConnected(){
     // need?
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker)
-    /*
     if(serverIp.isEmpty()){
         serverIp = responseSocket->peerAddress().toString();
         receivingResponseConnectinoData->serverIP = serverIp;
     }
     qDebug()<<responseSocket->peerName()<<serverIp;
-    */
     responseState = Connected;
     if(receivingResponseConnectinoData.isNull()){
         receivingResponseConnectinoData = nextConnectionData();
@@ -430,10 +435,10 @@ void QiPipe_Private::onResponseReadReady(){
 
 
     //qDebug()<<"when readReady:"<<responseSocket->peerAddress().toString();
-    if(serverIp.isEmpty()){
-        serverIp = responseSocket->peerAddress().toString();
-        receivingResponseConnectinoData->serverIP = serverIp;
-    }
+    //if(serverIp.isEmpty()){
+    //    serverIp = responseSocket->peerAddress().toString();
+    //    receivingResponseConnectinoData->serverIP = serverIp;
+    //}
     //qDebug()<<responseSocket->peerName()<<serverIp;
 
     requestSocket->write(ba);

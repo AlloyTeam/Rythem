@@ -81,7 +81,7 @@ public:
         }else{
             configGroup[ConfigKey_Author] = "ippan";
             configGroup[ConfigKey_RemoteHost] = "ippan.web.qq.com";
-            configGroup[ConfigKey_RemoteAddress] = "183.60.11.120.";
+            configGroup[ConfigKey_RemoteAddress] = "113.108.4.143";
             configGroup[ConfigKey_RemotePath] = "ip_config.json";
             QList<QVariant> theRules;
             //QList< QMap<ConfigKey,QVariant> > theRules;
@@ -92,8 +92,8 @@ public:
 
             QiRuleConent_type rule2;
             rule2[ConfigKey_RuleType] = RuleType_SimpleAddressReplace;
-            rule2[ConfigKey_RulePattern] = QString("www.qq.com");
-            rule2[ConfigKey_RuleReplace] = QString("183.60.11.120");
+            rule2[ConfigKey_RulePattern] = QString("ippan.web.qq.com");
+            rule2[ConfigKey_RuleReplace] = QString("113.108.4.143");
 
             //http://iptton.sinaapp.com/a0.js
             QiRuleConent_type rule3;
