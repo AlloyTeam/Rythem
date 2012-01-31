@@ -28,8 +28,9 @@ protected:
 	//process received handshake or data package
 	void processReceivedData();
 	QByteArray generateAcceptHash(const QString &key) const;
+    QByteArray generateAcceptHash(QString key1,QString key2,QString str);
 	QByteArray generateMessagePackage(const char *message, bool mask = false);
-	void sendHandshakeResponse(const QByteArray &acceptHash);
+    void sendHandshakeResponse(const QByteArray &acceptHash,bool isNewProtocol=false);
 
 protected slots:
 	void onDisconnected();

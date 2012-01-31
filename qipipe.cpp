@@ -274,7 +274,11 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
                 reply = networkManager.get(QNetworkRequest(QUrl(replace)));
                 connect(&networkManager,SIGNAL(finished(QNetworkReply*)),&theLoop,SLOT(quit()));
                 theLoop.exec();
-                int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() || 404;
+                bool isStatusOk;
+                int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(&isStatusOk);
+                if(!isStatusOk){
+                    status = 2000;
+                }
                 QByteArray resone = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toByteArray();
                 byteToWrite.append(QString("HTTP/1.1 %1 %2 \r\nServer: Qiddler \r\nContent-Type: %3 \r\nContent-Length: %4 \r\n\r\n")
                         .arg(status)

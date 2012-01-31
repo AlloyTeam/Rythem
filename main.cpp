@@ -16,33 +16,33 @@ void myMessageHandler(QtMsgType type, const char *msg)
         QString txt;
         switch (type) {
         case QtDebugMsg:
-                txt = QString("Debug: %1").arg(msg);
+                txt = QString("Debug: %1\r\n").arg(msg);
                 break;
         case QtWarningMsg:
-                txt = QString("Warning: %1").arg(msg);
+                txt = QString("Warning: %1\r\n").arg(msg);
         break;
         case QtCriticalMsg:
-                txt = QString("Critical: %1").arg(msg);
+                txt = QString("Critical: %1\r\n").arg(msg);
         break;
         case QtFatalMsg:
-                txt = QString("Fatal: %1").arg(msg);
+                txt = QString("Fatal: %1\r\n").arg(msg);
                 abort();
         }
-        QString fileName = QString("log-").arg(QDateTime::currentDateTime().toMSecsSinceEpoch());
+        QString fileName = QString("log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
         QFile outFile(fileName);
         outFile.open(QIODevice::WriteOnly | QIODevice::Append);
         QTextStream ts(&outFile);
         ts << txt << endl;
+        outFile.close();
 }
 
-#define DEBUG true
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-    if(!DEBUG){
-        qInstallMsgHandler(myMessageHandler);
-    }
+#ifdef DEBUGTOFILE
+    qInstallMsgHandler(myMessageHandler);
+#endif
     QiRuleManager::instance();
 
     // register metatypes

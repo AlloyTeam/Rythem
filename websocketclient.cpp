@@ -59,6 +59,10 @@ void WebSocketClient::onReadyRead(){
 
 //process received data, handshake with client or decode data frame
 void WebSocketClient::processReceivedData(){
+    /*
+    http://blog.csdn.net/fenglibing/article/details/6699154
+    判断新旧版本可以通过是否包含“Sec-WebSocket-Key1”和“Sec-WebSocket-Key2”
+    */
 	if(handshaked){
 		//process data frame
 		if(buffer->size() >= 2){
@@ -131,6 +135,10 @@ void WebSocketClient::processReceivedData(){
 	}
 	else{
 		//process handshake header
+
+        // 新版websocket
+        QString randomStr;
+
 		if(buffer->indexOf("\r\n\r\n") != -1){
 			qDebug() << "[WebSocketClient] handshaking ...";
 			//format header fields
@@ -142,7 +150,7 @@ void WebSocketClient::processReceivedData(){
 				if(components.at(i).length()){
 					QStringList headerKV = components.at(i).split(": ");
                     if(headerKV.size()<2){
-                        qDebug()<<"invalid header"<<components.at(i);
+                        randomStr = headerKV.at(0);
                         continue;
                     }
                     qDebug()<<headerKV.at(0);
@@ -156,9 +164,17 @@ void WebSocketClient::processReceivedData(){
 			}
 			//otherwise generate an accept hash base on the Sec-WebSocket-Key and send
 			//the handshake response back to client to finish the handshake process
-			else{
-				QByteArray hash = generateAcceptHash(header.value("Sec-WebSocket-Key"));
-				sendHandshakeResponse(hash);
+            else{
+                QByteArray hash;
+                if(!randomStr.isEmpty()){
+                    QString str1 = header.value("Sec-WebSocket-Key1");
+                    QString str2 = header.value("Sec-WebSocket-Key2");
+                    hash = generateAcceptHash(str1,str2,randomStr);
+                    sendHandshakeResponse(hash,true);
+                }else{
+                    hash = generateAcceptHash(header.value("Sec-WebSocket-Key"));
+                    sendHandshakeResponse(hash);
+                }
 				handshaked = true;
 				qDebug() << "[WebSocketClient] handshake complete";
 			}
@@ -174,6 +190,31 @@ QByteArray WebSocketClient::generateAcceptHash(const QString &key) const{
 	input.append(MAGIC_TOKEN);
 	QByteArray sha1 = QCryptographicHash::hash(input, QCryptographicHash::Sha1);
 	return sha1.toBase64();
+}
+QByteArray WebSocketClient::generateAcceptHash(QString key1,QString key2,QString str){
+    QByteArray input;
+
+    long long kDNum1 = key1.count(' ');
+    QString str2 = key1.remove(QRegExp("[^\\d]*"));
+    qDebug()<<"str1="<<str2;
+    long long kNum1 = str2.toLongLong();
+    qDebug()<<kNum1<<kDNum1;
+
+    long long kDNum2 = key2.count(' ');
+    str2 = key2.remove(QRegExp("[^\\d]*"));
+    qDebug()<<"str2="<<str2;
+    long long kNum2 = str2.toLongLong();
+    qDebug()<<kNum2<<kDNum2;
+    QString str3("%1%2%3");
+    str3 = str3.arg(kNum1/kDNum1).arg(kNum2/kDNum2).arg(str);
+
+    input.append(str3);
+
+    qDebug()<<input;
+
+    QByteArray md5 = QCryptographicHash::hash(input,QCryptographicHash::Md5);
+    qDebug()<<md5;
+    return md5;
 }
 
 //create a data frame with the specify message content
@@ -201,12 +242,30 @@ QByteArray WebSocketClient::generateMessagePackage(const char *message, bool){
 	return bytes;
 }
 
-void WebSocketClient::sendHandshakeResponse(const QByteArray &acceptHash){
-	this->write("HTTP/1.1 101 Switching Protocols\r\n");
-	this->write("Upgrade: websocket\r\n");
-	this->write("Connection: Upgrade\r\n");
-	this->write("Sec-WebSocket-Accept: ");
-	this->write(acceptHash);
-	this->write("\r\n\r\n");
-	this->flush();
+void WebSocketClient::sendHandshakeResponse(const QByteArray &acceptHash,bool isNewProtocol){
+/* new protocol should return something like this
+HTTP/1.1 101 WebSocket Protocol Handshake
+Upgrade: WebSocket
+Connection: Upgrade
+Sec-WebSocket-Origin: http://example.com
+Sec-WebSocket-Location: ws://example.com/demo
+Sec-WebSocket-Protocol: sample
+8jKS’y:G*Co,Wxa-
+*/
+    if(isNewProtocol){
+        this->write("HTTP/1.1 101 Switching Protocols\r\n");
+        this->write("Upgrade: WebSocket\r\n");
+        this->write("Connection: Upgrade\r\n");
+        this->write(acceptHash);
+        this->write("\r\n\r\n");
+        this->flush();
+    }else{
+        this->write("HTTP/1.1 101 Switching Protocols\r\n");
+        this->write("Upgrade: websocket\r\n");
+        this->write("Connection: Upgrade\r\n");
+        this->write("Sec-WebSocket-Accept: ");
+        this->write(acceptHash);
+        this->write("\r\n\r\n");
+        this->flush();
+    }
 }
