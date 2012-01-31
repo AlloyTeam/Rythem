@@ -34,13 +34,13 @@ bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_pt
 
     QRegExp rx(entry, Qt::CaseInsensitive, QRegExp::Wildcard);
     if( type == RuleType_SimpleAddressReplace){
-        qDebug()<<"host="<<connectionData->host;
-        if (rx.exactMatch(connectionData->host)){
+        qDebug()<<"--- host="<<connectionData->host<<entry;
+        if (entry == connectionData->host){
             return true;
         }
     }else if(type == RuleType_ComplexAddressReplace){
         qDebug()<<"fullUrl="<<connectionData->fullUrl;
-        return rx.exactMatch(connectionData->fullUrl);
+        return (entry.indexOf(connectionData->fullUrl) != -1);// TODO
     }else if(type == RuleType_LocalContentReplace){
         qDebug()<<"fullUrl="<<connectionData->fullUrl;
         return rx.exactMatch(connectionData->fullUrl);
