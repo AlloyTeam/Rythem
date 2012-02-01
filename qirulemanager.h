@@ -37,6 +37,7 @@ public:
         enum RuleType{
             RuleType_LocalContentSingleReplace  = 0,  // 替换本地内容
             RuleType_LocalContentMergeReplace   = 6,  // 合并替换本地内容，格式兼容qzmin
+            RuleType_LocalContentDirReplace     = 7,
             RuleType_RemoteContentReplace       = 1,  // 替换远程内容   （本地预读取还是远程获取？本地预读需处理“更新”逻辑)
             RuleType_SimpleAddressReplace       = 2,  // 替换远程ip地址 一个域名对应一个host
             RuleType_ComplexAddressReplace      = 3,  // 替换远程ip地址一个域名对应多个host
@@ -85,14 +86,15 @@ public:
             }
             configGroup[ConfigKey_Rules] = qVariantFromValue(theRules);
         }else{
-
+            /*
+              TODO write a default config file
             QStringList configForDebug;
             configForDebug<<"0"<<"http://www.itisme.com"<<"./config.txt";
             configForDebug<<"0"<<"http://iptton.sinaapp.com/a0.js"<<"./a.js";
             configForDebug<<"1"<<"http://www.qq.com"<<"http://w.qq.com/js/main.js";
             configForDebug<<"6"<<"http://rythem.com/"<<"./rythem.merge.qzmin";
             configForDebug.join("\r\n");
-
+            */
             configGroup[ConfigKey_Author] = "ippan";
             configGroup[ConfigKey_RemoteHost] = "ippan.web.qq.com";
             configGroup[ConfigKey_RemoteAddress] = "113.108.4.143";
@@ -151,7 +153,7 @@ public:
         }
     }
 
-    static QPair<QByteArray,QByteArray> getReplaceContent(QMap<ConfigKey,QVariant> rule);
+    static QPair<QByteArray,QByteArray> getReplaceContent(QMap<ConfigKey,QVariant> rule,ConnectionData_ptr data=ConnectionData_ptr(new QiConnectionData));
 
 private:
 

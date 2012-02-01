@@ -52,12 +52,16 @@ bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_pt
         return rx.exactMatch(connectionData->fullUrl);
     }else if(type == RuleType_LocalContentMergeReplace){
         return rx.exactMatch(connectionData->fullUrl);
+    }else if(type == RuleType_LocalContentDirReplace){
+        return (entry.indexOf(connectionData->fullUrl)!=-1);
     }
 
     return false;
 }
+QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVariant> rule,ConnectionData_ptr connectionData){
 
-QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVariant> rule){
+    //TODO 重构
+
     QPair<QByteArray,QByteArray> headerAndContent;
     QByteArray header;
     QByteArray body;
@@ -73,9 +77,15 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
     QString status;
     bool fileCanOpen;
 
+    // for merge type
     QByteArray mergeFileContent;
     QMap<QString,QVariant> mergeValueMap;
     bool mergeConentHasError = false;
+
+    // for dir type
+    int replaceIndex;
+    int replaceLength;
+    QString fileName;
 
     qDebug()<<"rultype="<<type;
     switch(type){
@@ -139,7 +149,31 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
                                .arg("text/javascript") // TODO reuse contentTypeMapping above
                                .arg(count));
             break;
-
+        case RuleType_LocalContentDirReplace:
+            replaceIndex = connectionData->fullUrl.indexOf(replace);
+            replaceLength = replace.length();
+            fileName = connectionData->fullUrl.mid(replaceIndex+replaceLength);
+            if(fileName.indexOf("?")!=-1){
+                fileName = fileName.left(fileName.indexOf("?"));
+            }
+            if(fileName.indexOf("#")!=-1){
+                fileName = fileName.left(fileName.indexOf("#"));
+            }
+            f.setFileName(fileName);
+            fileCanOpen = f.open(QFile::ReadOnly | QIODevice::Text);
+            if(fileCanOpen){
+                body = f.readAll();
+                f.close();
+            }else{
+                status = "404 Not Found";
+                body.append(QString("file:%1 not found").arg(replace));
+            }
+            count = body.size();
+            header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+                               .arg(status)
+                               .arg("text/html") // TODO reuse contentTypeMapping above
+                               .arg(count));
+            break;
         case QiRuleManager::RuleType_RemoteContentReplace:
             QNetworkAccessManager networkManager;
             reply = networkManager.get(QNetworkRequest(QUrl(replace)));
@@ -158,6 +192,7 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
                     .arg(reply->header(QNetworkRequest::ContentLengthHeader).toString()));
             body = reply->readAll();
             break;
+
 
     }
 
