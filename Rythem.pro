@@ -73,13 +73,11 @@ OTHER_FILES += \
     wsAPI/index.css \
     wsAPI/index.html \
     wsAPI/index.js \
-    index.html \
-    test.js
-
-CONFIG(debug){
-    DEFINES -= DEBUGTOFILE
+    index.html
+CONFIG(release){
+    DEFINES += DEBUGTOFILE
     message("debug")
 }else{
-    DEFINES += DEBUGTOFILE
+    DEFINES -= DEBUGTOFILE
     message("release")
 }

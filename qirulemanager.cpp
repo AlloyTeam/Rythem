@@ -98,38 +98,45 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
             break;
         case QiRuleManager::RuleType_LocalContentMergeReplace:
             f.setFileName(replace);
-            fileCanOpen = f.open(QFile::ReadOnly);
+            fileCanOpen = f.open(QFile::ReadOnly| QIODevice::Text);
+
             if(fileCanOpen){
                 QScriptEngine engine;
                 mergeFileContent = f.readAll();
                 mergeValueMap = engine.evaluate(mergeFileContent.prepend("(").append(")")).toVariant().toMap();
+                qDebug()<<mergeValueMap;
+                qDebug()<<mergeFileContent;
                 mergeValueMap = mergeValueMap["projects"].toList().first().toMap();
                 if(engine.hasUncaughtException() || mergeValueMap.isEmpty()){//wrong content
-                    qDebug()<<"wrong qzmin format:"<<mergeFileContent;
+                    qDebug()<<"wrong qzmin format:"<<replace<<mergeFileContent;
                     mergeConentHasError = true;
                 }
-                f.close();
             }else{
+                qDebug()<<"file cannot open";
                 mergeConentHasError = true;
             }
+            f.close();
             if(mergeConentHasError){
                 status = "404 NOT FOUND";
-                body.append(QString("merge file with wrong format:").append(mergeFileContent));
+                body.append(QString("merge file with wrong format:").append(replace).append(mergeFileContent));
             }else{
-                foreach(QVariant item,mergeValueMap["includes"].toList()){
+                status = "200 OK";
+                foreach(QVariant item,mergeValueMap["include"].toList()){
+                    qDebug()<<item.toString();
                     f.setFileName(item.toString());
                     fileCanOpen = f.open(QFile::ReadOnly);
                     if(fileCanOpen){
                         body.append(f.readAll());
                     }else{
-                        body.append(QString("/*file:%1 not found\r\n*/").arg(item.toString()));
+                        body.append(QString("/*file:【%1】 not found*/").arg(item.toString()));
                     }
+                    f.close();
                 }
             }
             count = body.size();
             header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
                                .arg(status)
-                               .arg("x-application/javascript") // TODO reuse contentTypeMapping above
+                               .arg("text/javascript") // TODO reuse contentTypeMapping above
                                .arg(count));
             break;
 
