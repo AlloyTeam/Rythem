@@ -170,7 +170,7 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
                 body = f.readAll();
             }else{
                 status = "404 Not Found";
-                body.append(QString("file:%1 not found").arg(replace));
+                body.append(QString("file:%1 not found").arg(fileName));
             }
             f.close();
             count = body.size();
