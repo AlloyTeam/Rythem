@@ -224,7 +224,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         qDebug()<<"got rule";
         int type = rule[ QiRuleManager::ConfigKey_RuleType].toInt();
         if(QiRuleManager::isRuleNeedBlockOrientResponse(type)){
-            QPair<QByteArray,QByteArray> headerAndBody = QiRuleManager::getReplaceContent(rule);
+            QPair<QByteArray,QByteArray> headerAndBody = QiRuleManager::getReplaceContent(rule,receivingResponseConnectinoData);
             QByteArray header = headerAndBody.first;
             QByteArray body = headerAndBody.second;
             receivingResponseConnectinoData->setResponseHeader(header);

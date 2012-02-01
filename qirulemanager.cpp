@@ -21,7 +21,7 @@ QMap<QiRuleManager::ConfigKey,QVariant> QiRuleManager::getRule(ConnectionData_pt
             QiRuleConent_type rule = qVariantValue<QiRuleConent_type> (ruleVariant);
             if( isRuleMatch(rule,connectionData) ){
                 *isMatch = true;
-                qDebug()<<"rule MATCHED..........----------";
+                //qDebug()<<"rule MATCHED..........----------";
                 return rule;
             }
         }
@@ -34,26 +34,27 @@ bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_pt
     //TODO
     QString entry = rule[ConfigKey_RulePattern].toString();
     QString replace = rule[ConfigKey_RuleReplace].toString();
-    qDebug()<<type<<entry<<replace;
+    //qDebug()<<type<<entry<<replace;
 
     QRegExp rx(entry, Qt::CaseInsensitive, QRegExp::Wildcard);
     if( type == RuleType_SimpleAddressReplace){
-        qDebug()<<"--- host="<<connectionData->host<<entry;
+        //qDebug()<<"--- host="<<connectionData->host<<entry;
         if (entry == connectionData->host){
             return true;
         }
     }else if(type == RuleType_ComplexAddressReplace){
-        qDebug()<<"fullUrl="<<connectionData->fullUrl;
+        //qDebug()<<"RuleType_ComplexAddressReplace fullUrl="<<connectionData->fullUrl;
         return (entry.indexOf(connectionData->fullUrl) != -1);// TODO
     }else if(type == RuleType_LocalContentSingleReplace){
-        qDebug()<<"fullUrl="<<connectionData->fullUrl;
+        //qDebug()<<"RuleType_LocalContentSingleReplace fullUrl="<<connectionData->fullUrl;
         return rx.exactMatch(connectionData->fullUrl);
     }else if(type == RuleType_RemoteContentReplace){
         return rx.exactMatch(connectionData->fullUrl);
     }else if(type == RuleType_LocalContentMergeReplace){
         return rx.exactMatch(connectionData->fullUrl);
     }else if(type == RuleType_LocalContentDirReplace){
-        return (entry.indexOf(connectionData->fullUrl)!=-1);
+        //qDebug()<<"RuleType_LocalContentDirReplace"<<entry<<connectionData->fullUrl;
+        return (connectionData->fullUrl.indexOf(entry)!=-1);
     }
 
     return false;
@@ -68,7 +69,6 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
 
     int type = rule[ QiRuleManager::ConfigKey_RuleType].toInt();
     QString pattern = rule[QiRuleManager::ConfigKey_RulePattern].toString();
-    Q_UNUSED(pattern)
     QString replace = rule[QiRuleManager::ConfigKey_RuleReplace].toString();
     int count;
     QEventLoop theLoop;
@@ -83,8 +83,8 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
     bool mergeConentHasError = false;
 
     // for dir type
-    int replaceIndex;
-    int replaceLength;
+    int patternIndex;
+    int patternLength;
     QString fileName;
 
     qDebug()<<"rultype="<<type;
@@ -95,11 +95,11 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
             status = "200 OK";
             if(fileCanOpen){
                 body = f.readAll();
-                f.close();
             }else{
                 status = "404 Not Found";
                 body.append(QString("file:%1 not found").arg(replace));
             }
+            f.close();
             count = body.size();
             header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
                                .arg(status)
@@ -114,8 +114,8 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
                 QScriptEngine engine;
                 mergeFileContent = f.readAll();
                 mergeValueMap = engine.evaluate(mergeFileContent.prepend("(").append(")")).toVariant().toMap();
-                qDebug()<<mergeValueMap;
-                qDebug()<<mergeFileContent;
+                //qDebug()<<mergeValueMap;
+                //qDebug()<<mergeFileContent;
                 mergeValueMap = mergeValueMap["projects"].toList().first().toMap();
                 if(engine.hasUncaughtException() || mergeValueMap.isEmpty()){//wrong content
                     qDebug()<<"wrong qzmin format:"<<replace<<mergeFileContent;
@@ -132,7 +132,7 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
             }else{
                 status = "200 OK";
                 foreach(QVariant item,mergeValueMap["include"].toList()){
-                    qDebug()<<item.toString();
+                    //qDebug()<<item.toString();
                     f.setFileName(item.toString());
                     fileCanOpen = f.open(QFile::ReadOnly);
                     if(fileCanOpen){
@@ -150,24 +150,29 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
                                .arg(count));
             break;
         case RuleType_LocalContentDirReplace:
-            replaceIndex = connectionData->fullUrl.indexOf(replace);
-            replaceLength = replace.length();
-            fileName = connectionData->fullUrl.mid(replaceIndex+replaceLength);
+            patternIndex = connectionData->fullUrl.indexOf(pattern);
+            patternLength = pattern.length();
+            fileName = connectionData->fullUrl.mid(patternIndex+patternLength);
+            //qDebug()<<fileName;
             if(fileName.indexOf("?")!=-1){
                 fileName = fileName.left(fileName.indexOf("?"));
+                //qDebug()<<fileName;
             }
             if(fileName.indexOf("#")!=-1){
                 fileName = fileName.left(fileName.indexOf("#"));
+                //qDebug()<<fileName;
             }
+            fileName.prepend(replace);
+            //qDebug()<<fileName;
             f.setFileName(fileName);
             fileCanOpen = f.open(QFile::ReadOnly | QIODevice::Text);
             if(fileCanOpen){
                 body = f.readAll();
-                f.close();
             }else{
                 status = "404 Not Found";
                 body.append(QString("file:%1 not found").arg(replace));
             }
+            f.close();
             count = body.size();
             header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
                                .arg(status)
