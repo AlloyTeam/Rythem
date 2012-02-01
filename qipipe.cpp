@@ -223,86 +223,31 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
     if(gotRule){
         qDebug()<<"got rule";
         int type = rule[ QiRuleManager::ConfigKey_RuleType].toInt();
-        QString pattern = rule[QiRuleManager::ConfigKey_RulePattern].toString();
-        QString replace = rule[QiRuleManager::ConfigKey_RuleReplace].toString();
-        QByteArray byteToWrite;
-        int count;
-        QByteArray body;
-        QEventLoop theLoop;
-        QNetworkReply* reply;
-        QFile f;
-        QString status;
-        bool fileCanOpen;
-        qDebug()<<"rultype="<<type;
-        switch(type){
-            case QiRuleManager::RuleType_DomainReplace:
-                //receivingResponseConnectinoData->setHost(replace);
-                //qDebug()<<receivingResponseConnectinoData->host;
-                break;
-            case QiRuleManager::RuleType_SimpleAddressReplace:
-                serverIp = replace;
-                receivingResponseConnectinoData->serverIP = serverIp;
-                break;
-             case QiRuleManager::RuleType_LocalContentReplace:
-                f.setFileName(replace);
-                fileCanOpen = f.open(QFile::ReadOnly);
-
-                status = "200 OK";
-
-                if(fileCanOpen){
-                    body = f.readAll();
-                    f.close();
-                }else{
-                    status = "404 Not Found";
-                    body.append(QString("file:%1 not found").arg(replace));
-                }
-                count = body.size();
-                byteToWrite.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
-                                   .arg(status)
-                                   .arg("text/html") // TODO reuse contentTypeMapping above
-                                   .arg(count));
-                receivingResponseConnectinoData->setResponseHeader(byteToWrite);
-                qDebug()<<"body="<<body;
-                byteToWrite.append(body);
-                receivingResponseConnectinoData->appendResponseBody(body);
-                requestSocket->write(byteToWrite);
-                requestSocket->flush();
-                emit finishSuccess(receivingResponseConnectinoData);
-                break;
-            case QiRuleManager::RuleType_ComplexAddressReplace:
-                break;
-
-            case QiRuleManager::RuleType_RemoteContentReplace:
-                reply = networkManager.get(QNetworkRequest(QUrl(replace)));
-                connect(&networkManager,SIGNAL(finished(QNetworkReply*)),&theLoop,SLOT(quit()));
-                theLoop.exec();
-                bool isStatusOk;
-                int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(&isStatusOk);
-                if(!isStatusOk){
-                    status = 2000;
-                }
-                QByteArray resone = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toByteArray();
-                byteToWrite.append(QString("HTTP/1.1 %1 %2 \r\nServer: Qiddler \r\nContent-Type: %3 \r\nContent-Length: %4 \r\n\r\n")
-                        .arg(status)
-                        .arg(QString(resone))
-                        .arg(reply->header(QNetworkRequest::ContentTypeHeader).toString())
-                        .arg(reply->header(QNetworkRequest::ContentLengthHeader).toString()));
-                receivingResponseConnectinoData->setResponseHeader(byteToWrite);
-                body = reply->readAll();
-                byteToWrite.append(body);
-                receivingResponseConnectinoData->appendResponseBody(body);
-                requestSocket->write(byteToWrite);
-                requestSocket->flush();
-                requestSocket->close();
-                qDebug()<<body;
-                break;
-
-        }
-
         if(QiRuleManager::isRuleNeedBlockOrientResponse(type)){
+            QPair<QByteArray,QByteArray> headerAndBody = QiRuleManager::getReplaceContent(rule);
+            QByteArray header = headerAndBody.first;
+            QByteArray body = headerAndBody.second;
+            receivingResponseConnectinoData->setResponseHeader(header);
+            receivingResponseConnectinoData->appendResponseBody(body);
+            requestSocket->write(header);
+            requestSocket->write(body);
+            requestSocket->flush();
+            emit finishSuccess(receivingResponseConnectinoData);
             qDebug()<<"discard this request";
             receivingResponseConnectinoData.clear();
             return;
+        }else{
+            QString replace = rule[QiRuleManager::ConfigKey_RuleReplace].toString();
+            switch(type){
+                case QiRuleManager::RuleType_DomainReplace:
+                    //receivingResponseConnectinoData->setHost(replace);
+                    //qDebug()<<receivingResponseConnectinoData->host;
+                    break;
+                case QiRuleManager::RuleType_SimpleAddressReplace:
+                    serverIp = replace;
+                    receivingResponseConnectinoData->serverIP = serverIp;
+                    break;
+            }
         }
     }
 

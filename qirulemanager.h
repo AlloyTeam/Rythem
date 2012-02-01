@@ -6,6 +6,7 @@
 #include <QMap>
 #include <qiconnectiondata.h>
 #include <QApplication>
+#include <QScriptEngine>
 
 
 
@@ -31,18 +32,21 @@ public:
             ConfigKey_RulePattern,
             ConfigKey_RuleReplace
         };
+
+        // 为配置文件兼容，以下enum的值只能添加，不能修改！！！
         enum RuleType{
-            RuleType_LocalContentReplace = 0,    // 替换本地内容
-            RuleType_RemoteContentReplace,   // 替换远程内容   （本地预读取还是远程获取？本地预读需处理“更新”逻辑)
-            RuleType_SimpleAddressReplace ,   // 替换远程ip地址 一个域名对应一个host
-            RuleType_ComplexAddressReplace,  // 替换远程ip地址一个域名对应多个host
+            RuleType_LocalContentSingleReplace  = 0,  // 替换本地内容
+            RuleType_LocalContentMergeReplace   = 6,  // 合并替换本地内容，格式兼容qzmin
+            RuleType_RemoteContentReplace       = 1,  // 替换远程内容   （本地预读取还是远程获取？本地预读需处理“更新”逻辑)
+            RuleType_SimpleAddressReplace       = 2,  // 替换远程ip地址 一个域名对应一个host
+            RuleType_ComplexAddressReplace      = 3,  // 替换远程ip地址一个域名对应多个host
             // TODO
-            RuleType_PathReplace,            // 路径重定向(仅保留域名) 如 http://qplus.com/cgi_developing_or_has_error 重定向至 http://qplus.com/cgi_ok_but_will_discard
-            RuleType_DomainReplace           // 域名重定向(仅替换域名) 如 http://domain.NOT.deploy.com/cgi 重定向至 http://domain.deploy.com/
+            RuleType_PathReplace                = 4,            // 路径重定向(仅保留域名) 如 http://qplus.com/cgi_developing_or_has_error 重定向至 http://qplus.com/cgi_ok_but_will_discard
+            RuleType_DomainReplace              = 5 // 域名重定向(仅替换域名) 如 http://domain.NOT.deploy.com/cgi 重定向至 http://domain.deploy.com/
         };
         enum ContentReplaceRuleType{
             ContentReplaceRuleType_SingleReplace = 0,          //单个文件替换
-            ContentReplaceRuleType_MutiReplace             //多文件合并替换
+            ContentReplaceRuleType_MutiReplace   = 1         //多文件合并替换
         };
     //typedef QVector< QMap<QiRuleManager::ConfigKey,QVariant> > QiRulesVector_type;
     //typedef QList< QMap<ConfigKey,QVariant> > QiRulesList_type;
@@ -56,6 +60,8 @@ public:
         QString configFilePath = QApplication::instance()->applicationDirPath()+"/config.txt";
         qDebug()<<configFilePath;
         QFile configFile(configFilePath);
+
+
         if(configFile.exists() && configFile.open(QFile::ReadOnly)){
             qDebug()<<"config file exists";
             configGroup[ConfigKey_Author] = "ippan";
@@ -79,6 +85,14 @@ public:
             }
             configGroup[ConfigKey_Rules] = qVariantFromValue(theRules);
         }else{
+
+            QStringList configForDebug;
+            configForDebug<<"0"<<"http://www.itisme.com"<<"./config.txt";
+            configForDebug<<"0"<<"http://iptton.sinaapp.com/a0.js"<<"./a.js";
+            configForDebug<<"1"<<"http://www.qq.com"<<"http://w.qq.com/js/main.js";
+            configForDebug<<"6"<<"http://rythem.com/"<<"./rythem.merge.qzmin";
+            configForDebug.join("\r\n");
+
             configGroup[ConfigKey_Author] = "ippan";
             configGroup[ConfigKey_RemoteHost] = "ippan.web.qq.com";
             configGroup[ConfigKey_RemoteAddress] = "113.108.4.143";
@@ -97,9 +111,14 @@ public:
 
             //http://iptton.sinaapp.com/a0.js
             QiRuleConent_type rule3;
-            rule3[ConfigKey_RuleType] = RuleType_LocalContentReplace;
+            rule3[ConfigKey_RuleType] = RuleType_LocalContentSingleReplace;
             rule3[ConfigKey_RulePattern] = QString("http://iptton.sinaapp.com/a0.js");
             rule3[ConfigKey_RuleReplace] = QString("/Users/emrelax/a.js");
+
+            QiRuleConent_type rule4;
+            rule4[ConfigKey_RuleType] = RuleType_LocalContentMergeReplace;
+            rule4[ConfigKey_RulePattern] = QString("http://www.rythem.com/merge");
+            rule4[ConfigKey_RuleReplace] = QString("./test.js");
 
 
             theRules.append(qVariantFromValue(rule1));
@@ -131,6 +150,8 @@ public:
                 return true;
         }
     }
+
+    static QPair<QByteArray,QByteArray> getReplaceContent(QMap<ConfigKey,QVariant> rule);
 
 private:
 
@@ -164,6 +185,7 @@ signals:
 public slots:
     
 };
+
 
 Q_DECLARE_METATYPE(QiRuleManager::QiRuleConent_type)
 Q_DECLARE_METATYPE(QiRuleManager::RuleType)
