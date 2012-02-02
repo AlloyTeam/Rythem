@@ -75,9 +75,9 @@ OTHER_FILES += \
     wsAPI/index.js \
     index.html
 CONFIG(release){
-    DEFINES += DEBUGTOFILE
-    message("debug")
+    #DEFINES += DEBUGTOFILE
+    #message("debug")
 }else{
-    DEFINES -= DEBUGTOFILE
-    message("release")
+    #DEFINES -= DEBUGTOFILE
+    #message("release")
 }

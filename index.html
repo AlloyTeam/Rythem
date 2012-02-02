@@ -27,6 +27,9 @@
         <button onclick="addRule(event)">add rule</button>
     </div>
 </div>
+<div id="debug">
+    debug area<br/>
+</div>
 <script>
     function $(id){return document.getElementById(id);}
     function init(){
@@ -40,9 +43,11 @@
                 },
                 'getDir':function(){
                     return "C:\\fake";
-                }
+                },
+                'updateRule':{'connect':function(){}}
             };
         }
+        App.ruleChanged.connect(updateRule);
         $('ruleType').onchange=function(){
             if(this.value == 3){
                 $('selectDir').style["display"]="none";
@@ -61,11 +66,20 @@
         $('selectDir').onclick=function(){
             $('replace').value = App.getDir();
         }
+        updateRule( App.getRules() );
     }
     function addRule(){
         var spliter = "\x01";
         var msg = [$('ruleType').value,$('pattern').value,$('replace').value].join(spliter);
         window.App.doAction("addRule",msg);
+    }
+    function updateRule(ruleGroup){
+        var k=[];
+        for(var b in ruleGroup){
+            k.push("---");
+            k.push([b,ruleGroup[b]]);
+        }
+        $('debug').innerHTML+="ruleChanged:"+k.join("|")+"<br/>";
     }
     window.onload = init;
 </script>
