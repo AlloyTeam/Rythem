@@ -65,6 +65,7 @@ void WebSocketClient::processReceivedData(){
     */
 	if(handshaked){
 		//process data frame
+		//TODO 這裡要根據不同websocket協議版本,用不同方式讀取內容
 		if(buffer->size() >= 2){
 			//TODO what if FIN(the first bit) is 1? we need to merge multiple package!
 			//get opcode, mask, and payload length
@@ -136,7 +137,7 @@ void WebSocketClient::processReceivedData(){
 	else{
 		//process handshake header
 
-        // 新版websocket
+		// 舊版websocket協議
         QString randomStr;
 
 		if(buffer->indexOf("\r\n\r\n") != -1){
