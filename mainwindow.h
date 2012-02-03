@@ -27,6 +27,11 @@ class QiJsBridge:public QObject{
         QString getDir(){
             return QFileDialog::getExistingDirectory();
         }
+        QString getRules(){
+            return "";
+        }
+   signals:
+        void ruleChanged();
 };
 
 class MainWindow : public QMainWindow

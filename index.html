@@ -230,11 +230,14 @@ details ul{padding-top:12px;}
 </div>
 <script>
     function $(id){return document.getElementById(id);}
+	window.onerror=function(a,b,c){alert('error'+a+b+c);}
     function init(){
         if(!!!window.App){
             window.App = {
                 'doAction':function(type,msg){
-                    console.info("call App's doAction with args:",arguments);
+					if(window.console){
+						console.info("call App's doAction with args:",arguments);
+					}
                 },
                 'getFile':function(){
                     return "C:\\fake\\file.html";
@@ -246,7 +249,7 @@ details ul{padding-top:12px;}
                 'ruleChanged':{'connect':function(){}}
             };
         }
-        App.ruleChanged.connect(updateRule);
+		App.ruleChanged.connect(updateRule);
         $('ruleType').onchange=function(){
             if(this.value == 3){
                 $('selectDir').style["display"]="none";
@@ -268,12 +271,14 @@ details ul{padding-top:12px;}
         updateRule( App.getRules() );
 		$('ruleGroups').addEventListener("keydown",function(e){
 			if(e.keyCode==13){
+				e.target.blur();
 				if(e.target.getAttribute("ori-content") != e.target.innerHTML){
 					onValueChange(e.target);
 				}
 				e.preventDefault();
 			}
 		},true);
+		alert(4);
 		$('ruleGroups').addEventListener("mousedown",function(e){
 			if(e.target.hasAttribute('contenteditable')){
 				e.target.setAttribute("ori-content",e.target.innerHTML);
@@ -282,8 +287,9 @@ details ul{padding-top:12px;}
 		
     }
 	function onValueChange(el){
-		el.blur();
-		console.info(el.innerHTML);
+		if(window.console){
+			console.info(el.innerHTML);
+		}
 	}
     function addRule(){
         var spliter = "\x01";
@@ -291,11 +297,13 @@ details ul{padding-top:12px;}
         window.App.doAction("addRule",msg);
     }
     function updateRule(ruleGroup){
-        var k=[];
-        for(var b in ruleGroup){
-            k.push("---");
-            k.push([b,ruleGroup[b]]);
-        }
+		var k=[];
+		if(ruleGroup){
+			for(var b in ruleGroup){
+				k.push("---");
+				k.push([b,ruleGroup[b]]);
+			}
+		}
         $('debug').innerHTML+="ruleChanged:"+k.join("|")+"<br/>";
     }
 	
@@ -361,7 +369,7 @@ details ul{padding-top:12px;}
 			var group = document.createElement('li');
 			group.id = group.groupId;
 			
-			group.innerHTML = 
+			group.innerHTML = "";
 			
 			$('ruleGroups').appendChild(group);
 		}
