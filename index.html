@@ -22,6 +22,11 @@ summary::-webkit-details-marker{display: none}
 summary:before{border-radius: 5px; content: "+"; color: #363636; display: block; float: left; font-size: 1.5em; font-weight: bold; margin: -2px 10px 0 10px; padding: 0; text-align: center; width: 20px;}
 details[open] summary:before{content: "-"; margin-top: -4px;}
 .rule-list{padding-top:12px;}
+details ul{padding-top:12px;}
+:indeterminate{
+	background:rgba(23,44,55,.3);
+	content:"0";
+}
 
     </style>
 </head>
@@ -49,7 +54,7 @@ details[open] summary:before{content: "-"; margin-top: -4px;}
 				<ul class="rule-list">
 					<li class="rule">
 						<input type="checkbox" class="enabaled" />
-						<select class="rule-type" value="host">
+						<select class="rule-type" value="2">
 							<option value="1">simple host</option>
 							<option value="2" title="可以cgi路径为同一domain设置host">complex host</option>
 							<option value="3">local content replace(file)</option>
@@ -116,15 +121,25 @@ details[open] summary:before{content: "-"; margin-top: -4px;}
 					</li>
 					<li class="rule">
 						<input type="checkbox" class="enabaled" />
-						<select class="rule-type" value="host">
+						<select class="rule-type" value="2">
 							<option value="1">simple host</option>
 							<option value="2" title="可以cgi路径为同一domain设置host">complex host</option>
 							<option value="3">local content replace(file)</option>
 							<option value="4">local content replace(dir)</option>
 							<option value="5">remote content repalce</option>
 						</select>
-						<span contenteditable=true class="pattern">cgi.qplus.com</span>
-						<span contenteditable=true class="replace">172.34.35.220</span>
+						<details>
+						<summary>cgi.qplus.com</summary>
+						<ul>
+							<li>
+								<span contenteditable=true class="pattern">cgi/mycenter</span>
+								<span contenteditable=true class="replace">172.34.35.220</span>
+							</li>
+							<li>
+								<span contenteditable=true class="pattern">cgi/mycenter</span>
+								<span contenteditable=true class="replace">172.34.35.220</span>
+							</li>
+						</ul>
 					</li>
 					<li class="rule">
 						<input type="checkbox" class="enabaled" />
