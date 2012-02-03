@@ -1,5 +1,21 @@
 #include "qirule2.h"
 
+QiRule2::QiRule2() :QObject(){
+
+}
+
+QiRule2::QiRule2(const QiRule2 &rule) :
+	QObject(),
+	_name(rule.name()),
+	_type(rule.type()),
+	_pattern(rule.pattern()),
+	_replacement(rule.replacement()),
+	_isEnable(rule.isEnable()),
+	_isRemote(rule.isRemoteRule())
+{
+
+}
+
 QiRule2::QiRule2(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
 	QObject(),
 	_name(name),
@@ -11,37 +27,9 @@ QiRule2::QiRule2(QString name, int type, QString pattern, QString replacement, b
 {
 }
 
-bool QiRule2::match(QString path){
-	//TODO check the path with this rule
-	return false;
-}
-
-QString QiRule2::toJSON(){
-	return QString("{\"name\":\"%1\", \"type\":%2, \"enable\":%3, \"pattern\":\"%4\", \"replace\"\"%5\"}")
-			.arg(_name)
-			.arg(_type)
-			.arg(_isEnable)
-			.arg(_pattern)
-			.arg(_replacement);
-}
-
-bool QiRule2::isRemoteRule(){
-	return _isRemote;
-}
-bool QiRule2::isEnable(){
-	return _isEnable;
-}
-QString QiRule2::name(){
-	return _name;
-}
-int QiRule2::type(){
-	return _type;
-}
-QString QiRule2::pattern(){
-	return _pattern;
-}
-QString QiRule2::replacement(){
-	return _replacement;
+QiRule2 QiRule2::operator =(const QiRule2 &rule){
+	this->update(rule.name(), rule.type(), rule.pattern(), rule.replacement(), rule.isEnable(), rule.isRemoteRule());
+	return *this;
 }
 
 void QiRule2::update(QString name, int type, QString pattern, QString replacement, bool enable, bool remote){
@@ -56,39 +44,38 @@ void QiRule2::update(QString name, int type, QString pattern, QString replacemen
 	}
 }
 
-void QiRule2::setIsRemoteRule(bool value){
-	if(!_isRemote){
-		_isRemote = value;
-		emit changed();
-	}
+bool QiRule2::match(const QString path) const{
+	//TODO check the path with this rule
+	return false;
 }
-void QiRule2::setEnable(bool value){
-	if(!_isRemote){
-		_isEnable = value;
-		emit changed();
-	}
+
+QString QiRule2::toJSON() const{
+	return QString("{\"name\":\"%1\", \"type\":%2, \"enable\":%3, \"pattern\":\"%4\", \"replace\"\"%5\"}")
+			.arg(_name)
+			.arg(_type)
+			.arg(_isEnable)
+			.arg(_pattern)
+			.arg(_replacement);
 }
-void QiRule2::setName(QString value){
-	if(!_isRemote){
-		_name = value;
-		emit changed();
-	}
+
+bool QiRule2::isNull() const{
+	return (!_pattern.length() && !_replacement.length());
 }
-void QiRule2::setType(int value){
-	if(!_isRemote){
-		_type = value;
-		emit changed();
-	}
+bool QiRule2::isRemoteRule() const{
+	return _isRemote;
 }
-void QiRule2::setPattern(QString value){
-	if(!_isRemote){
-		_pattern = value;
-		emit changed();
-	}
+bool QiRule2::isEnable() const{
+	return _isEnable;
 }
-void QiRule2::setReplacement(QString value){
-	if(!_isRemote){
-		_replacement = value;
-		emit changed();
-	}
+QString QiRule2::name() const{
+	return _name;
+}
+int QiRule2::type() const{
+	return _type;
+}
+QString QiRule2::pattern() const{
+	return _pattern;
+}
+QString QiRule2::replacement() const{
+	return _replacement;
 }

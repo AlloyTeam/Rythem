@@ -16,33 +16,31 @@ class QiRule2 : public QObject
 {
 	Q_OBJECT
 public:
-	QiRule2(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
-	bool match(QString path);
-	QString toJSON();
-
-	bool isRemoteRule();
-	bool isEnable();
-	QString name();
-	int type();
-	QString pattern();
-	QString replacement();
+	QiRule2();
+	QiRule2(const QiRule2 &rule);
+	explicit QiRule2(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
+	QiRule2 operator =(const QiRule2 &rule);
 
 	void update(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
-	void setIsRemoteRule(bool value);
-	void setEnable(bool value);
-	void setName(QString value);
-	void setType(int value);
-	void setPattern(QString value);
-	void setReplacement(QString value);
+	bool match(const QString path) const;
+	QString toJSON() const;
+
+	bool isNull() const;
+	bool isRemoteRule() const;
+	bool isEnable() const;
+	QString name() const;
+	int type() const;
+	QString pattern() const;
+	QString replacement() const;
 
 signals:
 	void changed();
 
 private:
 	QString _name;
+	int _type;
 	QString _pattern;
 	QString _replacement;
-	int _type;
 	bool _isEnable;
 	bool _isRemote;
 };

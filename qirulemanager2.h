@@ -2,6 +2,8 @@
 #define QIRULEMANAGER2_H
 
 #include <QtCore>
+#include "qirule2.h"
+#include "qirulegroup2.h"
 
 class QiRuleManager2 : public QObject
 {
@@ -19,8 +21,8 @@ signals:
 public slots:
 
 private:
-	QList localGroups;
-	QList remoteGroups;
+	QList<QiRuleGroup2> localGroups;
+	QList<QiRuleGroup2> remoteGroups;
 	
 };
 
