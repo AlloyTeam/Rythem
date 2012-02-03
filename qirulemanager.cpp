@@ -86,6 +86,7 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
     int patternIndex;
     int patternLength;
     QString fileName;
+    QString encode="utf-8";
 
     qDebug()<<"rultype="<<type;
     switch(type){
@@ -114,6 +115,9 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
                 QScriptEngine engine;
                 mergeFileContent = f.readAll();
                 mergeValueMap = engine.evaluate(mergeFileContent.prepend("(").append(")")).toVariant().toMap();
+                if(mergeValueMap.contains("encode")){
+                    encode = mergeValueMap["encode"].toString();
+                }
                 //qDebug()<<mergeValueMap;
                 //qDebug()<<mergeFileContent;
                 mergeValueMap = mergeValueMap["projects"].toList().first().toMap();
@@ -144,9 +148,10 @@ QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVa
                 }
             }
             count = body.size();
-            header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+            header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
                                .arg(status)
                                .arg("text/javascript") // TODO reuse contentTypeMapping above
+                               .arg(encode)
                                .arg(count));
             break;
         case RuleType_LocalContentDirReplace:
