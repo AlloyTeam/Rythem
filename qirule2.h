@@ -19,9 +19,12 @@ public:
 	QiRule2();
 	QiRule2(const QiRule2 &rule);
 	explicit QiRule2(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
+
 	QiRule2 operator =(const QiRule2 &rule);
+	bool operator ==(const QiRule2 &rule) const;
 
 	void update(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
+	void update(const QiRule2 &rule);
 	bool match(const QString path) const;
 	QString toJSON() const;
 

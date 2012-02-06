@@ -11,10 +11,14 @@ public:
 	QiRuleGroup2();
 	QiRuleGroup2(const QiRuleGroup2 &group);
 	explicit QiRuleGroup2(QString name, bool enable = true, bool remote = false);
+
 	QiRuleGroup2 operator =(const QiRuleGroup2 &group);
+	bool operator ==(const QiRuleGroup2 &group) const;
 
 	void update(QString name, bool enable = true, bool remote = false);
+	void update(const QiRuleGroup2 &group);
 	void addRule(const QiRule2 &value, int index = -1);
+	int length() const;
 	int getRuleIndex(const QString name) const;
 	QiRule2 getRule(const QString name) const;
 	QiRule2 getRuleAt(const int index) const;
@@ -25,6 +29,7 @@ public:
 	QiRule2 match(const QString path) const;
 	QString toJSON() const;
 
+	bool isNull() const;
 	bool isRemote() const;
 	bool isEnable() const;
 	QString groupName() const;

@@ -21,7 +21,7 @@ void QiRuleManager2::setRemoteConfig(QString host, QString addr, QString path, b
 	if(reload) loadRemoteConfig();
 }
 
-void parseConfigContent(QString json){
+void QiRuleManager2::parseConfigContent(QString json){
 
 }
 
@@ -42,35 +42,29 @@ void QiRuleManager2::saveLocalConfigChanges(){
 }
 
 void QiRuleManager2::addRuleGroup(const QiRuleGroup2 &value, int index){
-
+	QList<QiRuleGroup2> &list = value.isRemote() ? remoteGroups : localGroups;
+	int existGroup = list.indexOf(value);
+	if(existGroup != -1) list.removeAt(existGroup);
+	if(index == -1) list.append(value);
+	else list.insert(index, value);
 }
 
-QiRuleGroup2 QiRuleManager2::getRuleGroup(const QString &name) const{
-
-}
-
-QiRuleGroup2 QiRuleManager2::getRuleGroupAt(int index) const{
-
-}
-
-void QiRuleManager2::updateRuleGroup(const QString &name, const QiRuleGroup2 &newValue){
-
-}
-
-void QiRuleManager2::updateRuleGroupAt(int index, const QiRuleGroup2 &newValue){
-
-}
-
-void QiRuleManager2::remoteRuleGroup(const QString &name){
-
-}
-
-void QiRuleManager2::remoteRuleGroupAt(int index){
-
+QiRule2 QiRuleManager2::findMatchInGroups(const QString &path, const QString &groupName, const QList<QiRuleGroup2> &list) const{
+	int i, len = list.length();
+	for(i=0; i<len; i++){
+		QiRuleGroup2 group = list.at(i);
+		if((groupName.length() && groupName == group.groupName()) || !groupName.length()){
+			QiRule2 rule = group.match(path);
+			if(!rule.isNull()) return rule;
+		}
+	}
+	return QiRule2();
 }
 
 QiRule2 QiRuleManager2::getMatchRule(const QString &path, const QString &groupName) const{
-
+	QiRule2 localMatch = findMatchInGroups(path, groupName, localGroups);
+	if(localMatch.isNull()) return findMatchInGroups(path, groupName, remoteGroups);
+	else return localMatch;
 }
 
 void QiRuleManager2::replace(ConnectionData_ptr &connectionData) const{

@@ -32,6 +32,10 @@ QiRule2 QiRule2::operator =(const QiRule2 &rule){
 	return *this;
 }
 
+bool QiRule2::operator ==(const QiRule2 &rule) const{
+	return this->name() == rule.name();
+}
+
 void QiRule2::update(QString name, int type, QString pattern, QString replacement, bool enable, bool remote){
 	if(!_isRemote){
 		_isRemote = remote;
@@ -42,6 +46,10 @@ void QiRule2::update(QString name, int type, QString pattern, QString replacemen
 		_replacement = replacement;
 		emit changed();
 	}
+}
+
+void QiRule2::update(const QiRule2 &rule){
+	this->update(rule.name(), rule.type(), rule.pattern(), rule.replacement(), rule.isEnable(), rule.isRemoteRule());
 }
 
 bool QiRule2::match(const QString path) const{

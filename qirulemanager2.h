@@ -20,12 +20,6 @@ public:
 	void saveLocalConfigChanges();
 
 	void addRuleGroup(const QiRuleGroup2 &value, int index = -1);
-	QiRuleGroup2 getRuleGroup(const QString &name) const;
-	QiRuleGroup2 getRuleGroupAt(int index) const;
-	void updateRuleGroup(const QString &name, const QiRuleGroup2 &newValue);
-	void updateRuleGroupAt(int index, const QiRuleGroup2 &newValue);
-	void remoteRuleGroup(const QString &name);
-	void remoteRuleGroupAt(int index);
 
 	QiRule2 getMatchRule(const QString &path, const QString &groupName = "") const;
 	void replace(ConnectionData_ptr &connectionData) const;
@@ -35,14 +29,17 @@ public:
 	QString remoteHost;
 	QString remoteAddress;
 	QString remotePath;
+	QList<QiRuleGroup2> localGroups;
+	QList<QiRuleGroup2> remoteGroups;
 	
 signals:
+	void changed();
 	
 public slots:
 
 private:
-	QList<QiRuleGroup2> localGroups;
-	QList<QiRuleGroup2> remoteGroups;
+	void parseConfigContent(QString json);
+	QiRule2 findMatchInGroups(const QString &path, const QString &groupName, const QList<QiRuleGroup2> &list) const;
 	
 };
 
