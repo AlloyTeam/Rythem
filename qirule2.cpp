@@ -58,12 +58,13 @@ bool QiRule2::match(const QString path) const{
 }
 
 QString QiRule2::toJSON() const{
-	return QString("{\"name\":\"%1\", \"type\":%2, \"enable\":%3, \"pattern\":\"%4\", \"replace\"\"%5\"}")
-			.arg(_name)
-			.arg(_type)
-			.arg(_isEnable)
-			.arg(_pattern)
-			.arg(_replacement);
+	QString result;
+	QTextStream(&result) << "{\"name\":\"" << _name << "\","
+						   << "\"type\":" << _type << ","
+						   << "\"enable\":" << _isEnable << ","
+						   << "\"pattern\":\"" << _pattern << "\","
+						   << "\"replace\":\"" << _replacement << "\"}";
+	return result;
 }
 
 bool QiRule2::isNull() const{

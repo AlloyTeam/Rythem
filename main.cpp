@@ -43,13 +43,6 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	QiRule2 r1("rule1", 1, "pattern", "replacement");
-	QiRule2 r2("rule2", 2, "pattern", "replacement");
-	QiRuleGroup2 g1("group1");
-	g1.addRule(r1);
-	g1.addRule(r2);
-	qDebug() << g1.toJSON();
-
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);
 #endif

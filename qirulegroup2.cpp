@@ -118,13 +118,13 @@ QiRule2 QiRuleGroup2::match(const QString path) const{
 
 QString QiRuleGroup2::toJSON() const{
 	int i, length = _rules.length();
-	QStringList result;
+	QStringList list;
 	for(i=0; i<length; i++){
-		result << _rules.at(i).toJSON();
+		list << _rules.at(i).toJSON();
 	}
-	return QString("{\"enable\":%1, \"rules\":[%2]}")
-			.arg(this->isEnable())
-			.arg(result.join(", "));
+	QString result;
+	QTextStream(&result) << "{\"enable\":" << isEnable() << ", \"rules\":[" << list.join(", ") << "]}";
+	return result;
 }
 
 bool QiRuleGroup2::isNull() const{
