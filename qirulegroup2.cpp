@@ -1,5 +1,21 @@
 #include "qirulegroup2.h"
 
+QiRuleGroup2::QiRuleGroup2() :
+	QObject(),
+	_groupName(""),
+	_isEnable(false),
+	_isRemote(false)
+{
+}
+
+QiRuleGroup2::QiRuleGroup2(const QiRuleGroup2 &group) :
+	QObject(),
+	_groupName(group.groupName()),
+	_isEnable(group.isEnable()),
+	_isRemote(group.isRemote())
+{
+}
+
 QiRuleGroup2::QiRuleGroup2(QString name, bool enable, bool remote) :
 	QObject(),
 	_groupName(name),
@@ -15,7 +31,7 @@ void QiRuleGroup2::update(QString name, bool enable, bool remote){
 	emit changed();
 }
 
-void QiRuleGroup2::addRule(const QiRule2 value, int index){
+void QiRuleGroup2::addRule(const QiRule2 &value, int index){
 	//remove existed rule with the same name first
 	int existIndex = this->getRuleIndex(value.name());
 	if(existIndex != -1) this->removeRuleAt(existIndex);
@@ -44,7 +60,7 @@ QiRule2 QiRuleGroup2::getRuleAt(const int index) const{
 	return _rules.value(index);
 }
 
-void QiRuleGroup2::updateRule(const QString name, const QiRule2 newValue){
+void QiRuleGroup2::updateRule(const QString name, const QiRule2 &newValue){
 	int index = this->getRuleIndex(name);
 	if(index != -1){
 		this->updateRuleAt(index, newValue);
@@ -52,7 +68,7 @@ void QiRuleGroup2::updateRule(const QString name, const QiRule2 newValue){
 	}
 }
 
-void QiRuleGroup2::updateRuleAt(const int index, const QiRule2 newValue){
+void QiRuleGroup2::updateRuleAt(const int index, const QiRule2 &newValue){
 	_rules.replace(index, newValue);
 	emit changed();
 }
@@ -97,4 +113,7 @@ bool QiRuleGroup2::isEnable() const{
 }
 bool QiRuleGroup2::isRemote() const{
 	return _isRemote;
+}
+QString QiRuleGroup2::groupName() const{
+	return _groupName;
 }
