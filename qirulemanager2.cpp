@@ -162,7 +162,7 @@ void QiRuleManager2::replace(ConnectionData_ptr connectionData) const{
 
 void QiRuleManager2::replace(ConnectionData_ptr connectionData, const QiRule2 &rule) const{
 	if(!rule.isNull()){
-		//TODO replace connectionData content with specify rule
+		rule.replace(connectionData);
 	}
 }
 

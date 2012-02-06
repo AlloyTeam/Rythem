@@ -53,8 +53,31 @@ void QiRule2::update(const QiRule2 &rule){
 }
 
 bool QiRule2::match(ConnectionData_ptr conn) const{
-	//TODO check the path with this rule
-	return false;
+	//override this method in different type of rule
+	QRegExp rx(pattern(), Qt::CaseInsensitive, QRegExp::Wildcard);
+	switch(type()){
+	case COMPLEX_ADDRESS_REPLACE:
+		//ignore complex address replace first
+		return false;
+
+	case SIMPLE_ADDRESS_REPLACE:
+		return conn->host == pattern();
+
+	case REMOTE_CONTENT_REPLACE:
+	case LOCAL_FILE_REPLACE:
+	case LOCAL_FILES_REPLACE:
+		return rx.exactMatch(conn->fullUrl);
+
+	case LOCAL_DIR_REPLACE:
+		return (conn->fullUrl.indexOf(pattern()) != -1);
+
+	default:
+		return false;
+	}
+}
+
+void QiRule2::replace(ConnectionData_ptr conn) const{
+	//override this method in different type of rule
 }
 
 QString QiRule2::toJSON() const{

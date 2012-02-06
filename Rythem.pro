@@ -34,7 +34,13 @@ SOURCES += main.cpp\
     qirulemanager2.cpp \
     json.cpp \
     qirulegroup2.cpp \
-    qirule2.cpp
+    qirule2.cpp \
+    qirulecomplexaddress.cpp \
+    qirulesimpleaddress.cpp \
+    qiruleremotecontent.cpp \
+    qirulelocalfile.cpp \
+    qirulelocalfiles.cpp \
+    qirulelocaldir.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -60,7 +66,13 @@ HEADERS  += mainwindow.h \
     qirulemanager2.h \
     json.h \
     qirulegroup2.h \
-    qirule2.h
+    qirule2.h \
+    qirulecomplexaddress.h \
+    qirulesimpleaddress.h \
+    qiruleremotecontent.h \
+    qirulelocalfile.h \
+    qirulelocalfiles.h \
+    qirulelocaldir.h
 
 mac:HEADERS -= qiwinhttp.h
 
