@@ -26,8 +26,8 @@ public:
 
 	void update(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
 	void update(const QiRule2 &rule);
-	bool match(ConnectionData_ptr conn) const;
-	void replace(ConnectionData_ptr conn) const;
+	virtual bool match(const QString &url) const;
+	virtual void replace(ConnectionData_ptr conn) const;
 	QString toJSON() const;
 
 	bool isNull() const;

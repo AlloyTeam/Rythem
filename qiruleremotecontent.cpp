@@ -6,11 +6,11 @@ QiRuleRemoteContent::QiRuleRemoteContent(QString name, int type, QString pattern
 
 }
 
-bool QiRuleRemoteContent::match(ConnectionData_ptr conn) const{
+bool QiRuleRemoteContent::match(const QString &url) const{
 	QRegExp rx(pattern(), Qt::CaseInsensitive, QRegExp::Wildcard);
-	return rx.exactMatch(conn->fullUrl);
+	return rx.exactMatch(url);
 }
 
 void QiRuleRemoteContent::replace(ConnectionData_ptr conn) const{
-
+	qDebug() << "checking remote content rule" << pattern();
 }

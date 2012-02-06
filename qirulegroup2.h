@@ -4,6 +4,7 @@
 #include <QtCore>
 #include "qirule2.h"
 #include "qiconnectiondata.h"
+#include "qirulesimpleaddress.h"
 
 class QiRuleGroup2: public QObject
 {
@@ -18,16 +19,16 @@ public:
 
 	void update(QString name, bool enable = true, bool remote = false);
 	void update(const QiRuleGroup2 &group);
-	void addRule(const QiRule2 &value, int index = -1);
+	void addRule(QiRule2 *value, int index = -1);
 	int length() const;
 	int getRuleIndex(const QString name) const;
-	QiRule2 getRule(const QString name) const;
-	QiRule2 getRuleAt(const int index) const;
+	QiRule2 *getRule(const QString name) const;
+	QiRule2 *getRuleAt(const int index) const;
 	void updateRule(const QString name, const QiRule2 &newValue);
 	void updateRuleAt(const int index, const QiRule2 &newValue);
 	void removeRule(const QString name);
 	void removeRuleAt(const int index);
-	QiRule2 match(ConnectionData_ptr conn) const;
+	QiRule2 *match(const QString &url) const;
 	QString toJSON() const;
 
 	bool isNull() const;
@@ -42,7 +43,7 @@ private:
 	QString _groupName;
 	bool _isEnable;
 	bool _isRemote;
-	QList<QiRule2> _rules;
+	QList<QiRule2 *> _rules;
 };
 
 #endif // QIRULEGROUP2_H

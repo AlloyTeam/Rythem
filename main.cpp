@@ -9,10 +9,10 @@
 #include <QtCore>
 
 #include "qirulemanager.h"
-
 #include "qirulemanager2.h"
 #include "qirulegroup2.h"
 #include "qirule2.h"
+#include "QUrl"
 
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -49,6 +49,11 @@ int main(int argc, char *argv[])
 
 	QiRuleManager2 manager("/Users/moscartong/Desktop/config.txt");
 	manager.loadConfig();
+	QiRule2 *rule = manager.getMatchRule("http://abc.com/1.html");
+	if(rule && !rule->isNull()){
+		qDebug() << "match result:" << rule->toJSON();
+	}
+	else qDebug() << "NO MATCH";
 
     QiRuleManager::instance();
 

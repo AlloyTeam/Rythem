@@ -10,7 +10,7 @@ class QiRuleLocalFiles : public QiRule2
 	Q_OBJECT
 public:
 	explicit QiRuleLocalFiles(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
-	bool match(ConnectionData_ptr conn) const;
+	bool match(const QString &url) const;
 	void replace(ConnectionData_ptr conn) const;
 	
 signals:

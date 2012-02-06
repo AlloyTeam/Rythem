@@ -6,10 +6,10 @@ QiRuleLocalDir::QiRuleLocalDir(QString name, int type, QString pattern, QString 
 
 }
 
-bool QiRuleLocalDir::match(ConnectionData_ptr conn) const{
-	return (conn->fullUrl.indexOf(pattern()) != -1);
+bool QiRuleLocalDir::match(const QString &url) const{
+	return (url.indexOf(pattern()) != -1);
 }
 
 void QiRuleLocalDir::replace(ConnectionData_ptr conn) const{
-
+	qDebug() << "checking local dir rule" << pattern();
 }

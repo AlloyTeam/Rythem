@@ -4,6 +4,12 @@
 #include <QtCore>
 #include <QHttp>
 #include "qirule2.h"
+#include "qirulecomplexaddress.h"
+#include "qirulesimpleaddress.h"
+#include "qiruleremotecontent.h"
+#include "qirulelocalfile.h"
+#include "qirulelocalfiles.h"
+#include "qirulelocaldir.h"
 #include "qirulegroup2.h"
 #include "qipipe.h"
 #include "qiconnectiondata.h"
@@ -22,18 +28,18 @@ public:
 	void loadConfig();
 	void saveLocalConfigChanges() const;
 
-	void addRuleGroup(const QiRuleGroup2 &value, int index = -1);
+	void addRuleGroup(QiRuleGroup2 *value, int index = -1);
 
-	QiRule2 getMatchRule(ConnectionData_ptr connectionData, const QString &groupName = "") const;
+	QiRule2 *getMatchRule(const QString &url, const QString &groupName = "") const;
 	void replace(ConnectionData_ptr connectionData) const;
-	void replace(ConnectionData_ptr connectionData, const QiRule2 &rule) const;
+	void replace(ConnectionData_ptr connectionData, const QiRule2 *rule) const;
 
 	QString localConfigFile;
 	QString remoteHost;
 	QString remoteAddress;
 	QString remotePath;
-	QList<QiRuleGroup2> localGroups;
-	QList<QiRuleGroup2> remoteGroups;
+	QList<QiRuleGroup2 *> localGroups;
+	QList<QiRuleGroup2 *> remoteGroups;
 	
 signals:
 	void localConfigLoaded();
@@ -44,8 +50,8 @@ public slots:
 
 private:
 	QHttp remoteConfigLoader;
-	QList<QiRuleGroup2> parseConfigContent(QString json, bool remote = false);
-	QiRule2 findMatchInGroups(ConnectionData_ptr connectionData, const QString &groupName, const QList<QiRuleGroup2> &list) const;
+	QList<QiRuleGroup2 *> *parseConfigContent(QString json, bool remote = false);
+	QiRule2 *findMatchInGroups(const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const;
 	
 };
 

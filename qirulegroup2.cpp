@@ -10,10 +10,16 @@ QiRuleGroup2::QiRuleGroup2() :
 
 QiRuleGroup2::QiRuleGroup2(const QiRuleGroup2 &group) :
 	QObject(),
+	//copy group info
 	_groupName(group.groupName()),
 	_isEnable(group.isEnable()),
 	_isRemote(group.isRemote())
 {
+	//copy rules
+	int i, len = group.length();
+	for(i=0; i<len; i++){
+		addRule(group.getRuleAt(i));
+	}
 }
 
 QiRuleGroup2::QiRuleGroup2(QString name, bool enable, bool remote) :
@@ -46,7 +52,7 @@ void QiRuleGroup2::update(const QiRuleGroup2 &group){
 	update(group.groupName(), group.isEnable(), group.isRemote());
 }
 
-void QiRuleGroup2::addRule(const QiRule2 &value, int index){
+void QiRuleGroup2::addRule(QiRule2 *value, int index){
 	//remove existed rule with the same name first
 	int existIndex = _rules.indexOf(value);
 	if(existIndex != -1) this->removeRuleAt(existIndex);
@@ -63,20 +69,20 @@ int QiRuleGroup2::length() const{
 int QiRuleGroup2::getRuleIndex(const QString name) const{
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
-		if(_rules.at(i).name() == name){
+		if(_rules.at(i)->name() == name){
 			return i;
 		}
 	}
 	return -1;
 }
 
-QiRule2 QiRuleGroup2::getRule(const QString name) const{
+QiRule2 *QiRuleGroup2::getRule(const QString name) const{
 	int index = this->getRuleIndex(name);
 	return _rules.value(index);
 }
 
-QiRule2 QiRuleGroup2::getRuleAt(const int index) const{
-	return _rules.value(index);
+QiRule2 *QiRuleGroup2::getRuleAt(const int index) const{
+	return _rules.at(index);
 }
 
 void QiRuleGroup2::updateRule(const QString name, const QiRule2 &newValue){
@@ -87,8 +93,8 @@ void QiRuleGroup2::updateRule(const QString name, const QiRule2 &newValue){
 }
 
 void QiRuleGroup2::updateRuleAt(const int index, const QiRule2 &newValue){
-	QiRule2 rule = _rules.at(index);
-	rule.update(newValue);
+	QiRule2 *rule = _rules.at(index);
+	rule->update(newValue);
 	emit changed();
 }
 
@@ -106,21 +112,22 @@ void QiRuleGroup2::removeRuleAt(const int index){
 }
 
 //判斷一下返回結果的isNull()
-QiRule2 QiRuleGroup2::match(ConnectionData_ptr conn) const{
+QiRule2 *QiRuleGroup2::match(const QString &url) const{
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
-		if(_rules.at(i).match(conn)){
-			return _rules.at(i);
+		QiRule2 *rule = _rules.at(i);
+		if(rule->match(url)){
+			return rule;
 		}
 	}
-	return QiRule2();
+	return 0;
 }
 
 QString QiRuleGroup2::toJSON() const{
 	QStringList list;
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
-		list << _rules.at(i).toJSON();
+		list << _rules.at(i)->toJSON();
 	}
 	QString result;
 	QTextStream(&result) << "{\"enable\":" << isEnable() << ", \"rules\":[" << list.join(", ") << "]}";

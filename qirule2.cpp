@@ -52,42 +52,27 @@ void QiRule2::update(const QiRule2 &rule){
 	this->update(rule.name(), rule.type(), rule.pattern(), rule.replacement(), rule.isEnable(), rule.isRemoteRule());
 }
 
-bool QiRule2::match(ConnectionData_ptr conn) const{
+bool QiRule2::match(const QString &) const{
 	//override this method in different type of rule
-	QRegExp rx(pattern(), Qt::CaseInsensitive, QRegExp::Wildcard);
-	switch(type()){
-	case COMPLEX_ADDRESS_REPLACE:
-		//ignore complex address replace first
-		return false;
-
-	case SIMPLE_ADDRESS_REPLACE:
-		return conn->host == pattern();
-
-	case REMOTE_CONTENT_REPLACE:
-	case LOCAL_FILE_REPLACE:
-	case LOCAL_FILES_REPLACE:
-		return rx.exactMatch(conn->fullUrl);
-
-	case LOCAL_DIR_REPLACE:
-		return (conn->fullUrl.indexOf(pattern()) != -1);
-
-	default:
-		return false;
-	}
+	qDebug() << "i am called >__<";
+	return false;
 }
 
-void QiRule2::replace(ConnectionData_ptr conn) const{
+void QiRule2::replace(ConnectionData_ptr) const{
 	//override this method in different type of rule
 }
 
 QString QiRule2::toJSON() const{
-	QString result;
-	QTextStream(&result) << "{\"name\":\"" << _name << "\","
-						   << "\"type\":" << _type << ","
-						   << "\"enable\":" << _isEnable << ","
-						   << "\"pattern\":\"" << _pattern << "\","
-						   << "\"replace\":\"" << _replacement << "\"}";
-	return result;
+	if(!isNull()){
+		QString result;
+		QTextStream(&result) << "{\"name\":\"" << _name << "\","
+							   << "\"type\":" << _type << ","
+							   << "\"enable\":" << _isEnable << ","
+							   << "\"pattern\":\"" << _pattern << "\","
+							   << "\"replace\":\"" << _replacement << "\"}";
+		return result;
+	}
+	else return "{}";
 }
 
 bool QiRule2::isNull() const{

@@ -6,11 +6,11 @@ QiRuleLocalFile::QiRuleLocalFile(QString name, int type, QString pattern, QStrin
 
 }
 
-bool QiRuleLocalFile::match(ConnectionData_ptr conn) const{
+bool QiRuleLocalFile::match(const QString &url) const{
 	QRegExp rx(pattern(), Qt::CaseInsensitive, QRegExp::Wildcard);
-	return rx.exactMatch(conn->fullUrl);
+	return rx.exactMatch(url);
 }
 
 void QiRuleLocalFile::replace(ConnectionData_ptr conn) const{
-
+	qDebug() << "checking local file rule" << pattern();
 }
