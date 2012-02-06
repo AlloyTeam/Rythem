@@ -117,8 +117,8 @@ QiRule2 QiRuleGroup2::match(const QString path) const{
 }
 
 QString QiRuleGroup2::toJSON() const{
-	int i, length = _rules.length();
 	QStringList list;
+	int i, length = _rules.length();
 	for(i=0; i<length; i++){
 		list << _rules.at(i).toJSON();
 	}

@@ -2,6 +2,7 @@
 #define QIRULEMANAGER2_H
 
 #include <QtCore>
+#include <QHttp>
 #include "qirule2.h"
 #include "qirulegroup2.h"
 #include "qipipe.h"
@@ -13,11 +14,12 @@ public:
 	explicit QiRuleManager2(QString localFile = "", QString host = "", QString address = "", QString path = "");
 	void setLocalConfig(QString localFile, bool reload = false);
 	void setRemoteConfig(QString host, QString addr, QString path, bool reload = false);
+	QString remoteConfigURL();
 
 	void loadLocalConfig();
 	void loadRemoteConfig();
 	void loadConfig();
-	void saveLocalConfigChanges();
+	void saveLocalConfigChanges() const;
 
 	void addRuleGroup(const QiRuleGroup2 &value, int index = -1);
 
@@ -36,9 +38,11 @@ signals:
 	void changed();
 	
 public slots:
+	void remoteConfigLoaded(int id, bool error);
 
 private:
-	void parseConfigContent(QString json);
+	QHttp remoteConfigLoader;
+	QList<QiRuleGroup2> parseConfigContent(QString json, bool remote = false);
 	QiRule2 findMatchInGroups(const QString &path, const QString &groupName, const QList<QiRuleGroup2> &list) const;
 	
 };

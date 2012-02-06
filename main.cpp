@@ -46,6 +46,10 @@ int main(int argc, char *argv[])
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);
 #endif
+
+	QiRuleManager2 manager("/Users/moscartong/Desktop/config.txt");
+	manager.loadConfig();
+
     QiRuleManager::instance();
 
     // register metatypes
