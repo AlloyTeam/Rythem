@@ -73,6 +73,7 @@ QiPipe_Private::QiPipe_Private(int descriptor):requestSocket(NULL),responseSocke
         qWarning()<<"invalid socket descriptor!!";
         return;
     }
+    qDebug()<<descriptor<<"socketState="<<requestSocket->state();
 }
 QiPipe_Private::~QiPipe_Private(){
     //qDebug()<<"~QiPipe_Private";
@@ -90,12 +91,20 @@ void QiPipe_Private::onRequestReadReady(){
         //qDebug()<<"onRequestReady:"<<"\n"<<newReqData;
     //}
     //update request buffer
+    //qDebug()<<requestSocket->socketDescriptor()<<" readReady\n"<<newReqData;
     requestBuffer.append(newReqData);
-    parseRequest(newReqData);
+    while(!requestBuffer.isEmpty()){
+        parseRequest(requestBuffer);
+        if(!requestBuffer.isEmpty()){
+            qDebug()<<"more than one request in requestReadReady"<<requestBuffer;
+        }
+    }
 }
 
 // 检查请求数据中是否有header，如果有header则检查请求包是否完整，并重置requestBuffer
 void QiPipe_Private::parseRequest(const QByteArray &newContent){
+
+    ConnectionData_ptr tmp;
 
     //qDebug()<<"requesting"<< requestSocket->socketDescriptor()<<newContent;
 
@@ -120,6 +129,7 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         //TODO connectionData 入栈与requestState相关联，需要setRequestState方法统一
         requestState = PackageFound;
         bufferConnectionArray.push_back(gettingRequestConnectionData);
+        tmp = gettingRequestConnectionData;
         gettingRequestConnectionData.clear();
 
 
@@ -128,15 +138,18 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         //qDebug()<<"req content-length="<<requestContentLength<<" remain="<<requestBodyRemain;
         int bufferBodyLength = requestBuffer.length();
         //qDebug()<<bufferBodyLength;
-        requestBodyRemain = requestBodyRemain - bufferBodyLength;
         //qDebug()<<"req content-length="<<requestContentLength<<" remain="<<requestBodyRemain;
         if(gettingRequestConnectionData->appendRequestBody(requestBuffer)){
             //TODO connectionData 入栈与requestState相关联，需要setRequestState方法统一
             requestState = PackageFound;
             bufferConnectionArray.push_back(gettingRequestConnectionData);
+            tmp = gettingRequestConnectionData;
             gettingRequestConnectionData.clear();
+            requestBuffer.remove(0,requestBodyRemain);
+        }else{
+            requestBuffer.clear();
         }
-        requestBuffer.clear();
+        requestBodyRemain = requestBodyRemain - bufferBodyLength;
         //TODO?
     }
     if(requestState != PackageFound){
@@ -258,7 +271,12 @@ void QiPipe_Private::parseRequest(const QByteArray &newContent){
         //所以这里可以简单处理
 
         //2012.1.19 ippan:需先判断是否需替换内容
-        responseSocket->write(newContent);
+        //if(receivingResponseConnectinoData->host == "zc.qq.com"){
+        //    qDebug()<<"zc.qq.com"<<newContent;
+        //}
+        qDebug()<<tmp->requestRawDataToSend;
+        int i = responseSocket->write(tmp->requestRawDataToSend);
+        Q_ASSERT(i==tmp->requestRawDataToSend.size());
         responseSocket->flush();
 
     }else if(responseState == Initial){
@@ -349,18 +367,21 @@ void QiPipe_Private::onResponseConnected(){
         serverIp = responseSocket->peerAddress().toString();
         receivingResponseConnectinoData->serverIP = serverIp;
     }
-    qDebug()<<responseSocket->peerName()<<serverIp;
+    //qDebug()<<responseSocket->peerName()<<serverIp;
     responseState = Connected;
     if(receivingResponseConnectinoData.isNull()){
         receivingResponseConnectinoData = nextConnectionData();
+        if(receivingResponseConnectinoData.isNull()){
+            return;
+        }
     }
     // emit connect signal
     //if(receivingResponseConnectinoData->getRequestHeader("Host") == "support.qq.com"){
     //    qDebug()<<"send this:\n"<<responseSocket->peerName()<<responseSocket->peerPort()<<receivingResponseConnectinoData->requestRawDataToSend;
     //}
     while(receivingResponseConnectinoData->requestRawDataToSend.size()>0){
-        if(receivingResponseConnectinoData->host == "id.qq.com"){
-            qDebug()<<"id.qq.com"<<receivingResponseConnectinoData->requestRawDataToSend;
+        if(receivingResponseConnectinoData->host == "zc.qq.com"){
+            qDebug()<<"zc.qq.com"<<receivingResponseConnectinoData->requestRawDataToSend;
         }
         qint64 n = responseSocket->write(receivingResponseConnectinoData->requestRawDataToSend);
         responseSocket->flush();
@@ -368,6 +389,7 @@ void QiPipe_Private::onResponseConnected(){
             qDebug()<<"write error !!!!!";
             break;
         }
+        Q_ASSERT(n == receivingResponseConnectinoData->requestRawDataToSend.size());
         receivingResponseConnectinoData->requestRawDataToSend.remove(0,n);
     }
 }
@@ -410,6 +432,7 @@ void QiPipe_Private::onResponseReadReady(){
         */
         // reset receivingResponseConnection
         receivingResponseConnectinoData.clear();
+        receivingResponseConnectinoData = nextConnectionData();
     }
 }
 
@@ -450,7 +473,7 @@ bool QiPipe_Private::parseResponse(const QByteArray newContent){
     }
 
     if(receivingResponseConnectinoData->returnCode == 400){
-        qDebug()<<"response 400\n"<<receivingResponseConnectinoData->requestHeaderRawData;
+        qDebug()<<"response 400\n"<<receivingResponseConnectinoData->requestRawDataToSend<<responseSocket->peerName();
     }
 
     if(responseState != HeaderFound){//check if got end
@@ -511,13 +534,17 @@ void QiPipe_Private::tearDown(){
     //QMutexLocker locker(&mutex);
     //Q_UNUSED(locker);
     if(requestSocket){
+        qDebug()<<"tearDown"<<requestSocket->socketDescriptor();
         requestSocket->blockSignals(true);
         requestSocket->disconnect(this);
         if(requestSocket->isOpen()){
             requestSocket->abort();
         }
         requestSocket->deleteLater();
+        //delete requestSocket;
         requestSocket = NULL;
+    }else{
+        qDebug()<<"tearDown without socketdescriptor?";
     }
     if(responseSocket){
         responseSocket->blockSignals(true);
@@ -525,6 +552,7 @@ void QiPipe_Private::tearDown(){
         if(responseSocket->isOpen()){
             responseSocket->abort();
         }
+        //delete responseSocket;
         responseSocket->deleteLater();
         responseSocket = NULL;
     }
@@ -534,6 +562,7 @@ void QiPipe_Private::tearDown(){
         }
         emit finishedWithError(bufferConnectionArray.at(i));
     }
+    bufferConnectionArray.clear();
     if(receivingResponseConnectinoData){
         if(receivingResponseConnectinoData->returnCode == -1){
             receivingResponseConnectinoData->returnCode = 500;
@@ -541,6 +570,7 @@ void QiPipe_Private::tearDown(){
         emit finishedWithError(receivingResponseConnectinoData);
     }
     emit pipeFinished();
+    qDebug()<<"close all bufferConnection?";
 }
 
 void QiPipe_Private::finishConnectionSuccess(){
@@ -555,7 +585,7 @@ ConnectionData_ptr QiPipe_Private::nextConnectionData(){
     // TODO use single function do this
     if(bufferConnectionArray.size()==0){//是否会出现请求未发送完成就开始返回内容的情况？
         qDebug()<<"gettingRequestConnectionData isNull?"<<gettingRequestConnectionData.isNull();
-        qDebug()<<"ERROR!!! connect response socket without any request!是否会出现请求未发送完成就开始返回内容的情况?";
+        qDebug()<<"ERROR!!! connect response socket without any request!";
         ConnectionData_ptr empty;
         return empty;
     }

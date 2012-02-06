@@ -14,6 +14,7 @@ QiProxyServer::QiProxyServer(QObject *parent) :
 void QiProxyServer::incomingConnection(int socketId){
     QMutexLocker locker(&mutex);
     Q_UNUSED(locker);
+    qDebug()<<"incomingConnection socketId="<<socketId;
     if(pushSocket(socketId) == socketId){
         addPipe(socketId);
     }
