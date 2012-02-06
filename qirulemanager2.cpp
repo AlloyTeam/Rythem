@@ -8,7 +8,7 @@ QiRuleManager2::QiRuleManager2(QString localFile, QString host, QString address,
 	remoteAddress(address),
 	remotePath(path)
 {
-	connect(&remoteConfigLoader, SIGNAL(requestFinished(int,bool)), this, SLOT(remoteConfigLoaded(int,bool)));
+	connect(&remoteConfigLoader, SIGNAL(requestFinished(int,bool)), this, SLOT(onRemoteConfigLoaded(int,bool)));
 }
 
 void QiRuleManager2::setLocalConfig(QString localFile, bool reload){
@@ -77,6 +77,7 @@ void QiRuleManager2::loadLocalConfig(){
 				QList<QiRuleGroup2> groups = parseConfigContent(content, false);
 				localGroups.append(groups);
 				file.close();
+				emit localConfigLoaded();
 			}
 			else{
 				qWarning() << "[RuleManager] local config file open fail (read only)";
@@ -136,36 +137,40 @@ void QiRuleManager2::addRuleGroup(const QiRuleGroup2 &value, int index){
 	else list.insert(index, value);
 }
 
-QiRule2 QiRuleManager2::findMatchInGroups(const QString &path, const QString &groupName, const QList<QiRuleGroup2> &list) const{
+QiRule2 QiRuleManager2::findMatchInGroups(ConnectionData_ptr connectionData, const QString &groupName, const QList<QiRuleGroup2> &list) const{
 	int i, len = list.length();
 	for(i=0; i<len; i++){
 		QiRuleGroup2 group = list.at(i);
 		if((groupName.length() && groupName == group.groupName()) || !groupName.length()){
-			QiRule2 rule = group.match(path);
+			QiRule2 rule = group.match(connectionData);
 			if(!rule.isNull()) return rule;
 		}
 	}
 	return QiRule2();
 }
 
-QiRule2 QiRuleManager2::getMatchRule(const QString &path, const QString &groupName) const{
-	QiRule2 localMatch = findMatchInGroups(path, groupName, localGroups);
-	if(localMatch.isNull()) return findMatchInGroups(path, groupName, remoteGroups);
+QiRule2 QiRuleManager2::getMatchRule(ConnectionData_ptr connectionData, const QString &groupName) const{
+	QiRule2 localMatch = findMatchInGroups(connectionData, groupName, localGroups);
+	if(localMatch.isNull()) return findMatchInGroups(connectionData, groupName, remoteGroups);
 	else return localMatch;
 }
 
-void QiRuleManager2::replace(ConnectionData_ptr &connectionData) const{
-
+void QiRuleManager2::replace(ConnectionData_ptr connectionData) const{
+	QiRule2 rule = getMatchRule(connectionData);
+	replace(connectionData, rule);
 }
 
-void QiRuleManager2::replace(ConnectionData_ptr &connectionData, const QiRule2 &rule) const{
-
+void QiRuleManager2::replace(ConnectionData_ptr connectionData, const QiRule2 &rule) const{
+	if(!rule.isNull()){
+		//TODO replace connectionData content with specify rule
+	}
 }
 
-void QiRuleManager2::remoteConfigLoaded(int id, bool error){
+void QiRuleManager2::onRemoteConfigLoaded(int id, bool error){
 	qDebug() << "[RuleManager] remote config loaded" << id << error;
 	if(!error){
 		QString content = remoteConfigLoader.readAll();
 		remoteGroups.append(parseConfigContent(content, true));
+		emit remoteConfigLoaded();
 	}
 }

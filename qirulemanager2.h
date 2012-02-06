@@ -6,6 +6,7 @@
 #include "qirule2.h"
 #include "qirulegroup2.h"
 #include "qipipe.h"
+#include "qiconnectiondata.h"
 
 class QiRuleManager2 : public QObject
 {
@@ -23,9 +24,9 @@ public:
 
 	void addRuleGroup(const QiRuleGroup2 &value, int index = -1);
 
-	QiRule2 getMatchRule(const QString &path, const QString &groupName = "") const;
-	void replace(ConnectionData_ptr &connectionData) const;
-	void replace(ConnectionData_ptr &connectionData, const QiRule2 &rule) const;
+	QiRule2 getMatchRule(ConnectionData_ptr connectionData, const QString &groupName = "") const;
+	void replace(ConnectionData_ptr connectionData) const;
+	void replace(ConnectionData_ptr connectionData, const QiRule2 &rule) const;
 
 	QString localConfigFile;
 	QString remoteHost;
@@ -35,15 +36,16 @@ public:
 	QList<QiRuleGroup2> remoteGroups;
 	
 signals:
-	void changed();
+	void localConfigLoaded();
+	void remoteConfigLoaded();
 	
 public slots:
-	void remoteConfigLoaded(int id, bool error);
+	void onRemoteConfigLoaded(int id, bool error);
 
 private:
 	QHttp remoteConfigLoader;
 	QList<QiRuleGroup2> parseConfigContent(QString json, bool remote = false);
-	QiRule2 findMatchInGroups(const QString &path, const QString &groupName, const QList<QiRuleGroup2> &list) const;
+	QiRule2 findMatchInGroups(ConnectionData_ptr connectionData, const QString &groupName, const QList<QiRuleGroup2> &list) const;
 	
 };
 

@@ -106,10 +106,10 @@ void QiRuleGroup2::removeRuleAt(const int index){
 }
 
 //判斷一下返回結果的isNull()
-QiRule2 QiRuleGroup2::match(const QString path) const{
+QiRule2 QiRuleGroup2::match(ConnectionData_ptr conn) const{
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
-		if(_rules.at(i).match(path)){
+		if(_rules.at(i).match(conn)){
 			return _rules.at(i);
 		}
 	}

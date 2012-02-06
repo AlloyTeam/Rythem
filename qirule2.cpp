@@ -52,7 +52,7 @@ void QiRule2::update(const QiRule2 &rule){
 	this->update(rule.name(), rule.type(), rule.pattern(), rule.replacement(), rule.isEnable(), rule.isRemoteRule());
 }
 
-bool QiRule2::match(const QString path) const{
+bool QiRule2::match(ConnectionData_ptr conn) const{
 	//TODO check the path with this rule
 	return false;
 }

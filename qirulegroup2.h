@@ -3,6 +3,7 @@
 
 #include <QtCore>
 #include "qirule2.h"
+#include "qiconnectiondata.h"
 
 class QiRuleGroup2: public QObject
 {
@@ -26,7 +27,7 @@ public:
 	void updateRuleAt(const int index, const QiRule2 &newValue);
 	void removeRule(const QString name);
 	void removeRuleAt(const int index);
-	QiRule2 match(const QString path) const;
+	QiRule2 match(ConnectionData_ptr conn) const;
 	QString toJSON() const;
 
 	bool isNull() const;
