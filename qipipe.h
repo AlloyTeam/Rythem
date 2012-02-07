@@ -70,6 +70,7 @@ public slots:
         void onRequestReadReady();
         void onRequestError();
         void onRequestClose();
+
         void onResponseConnected();
         void onResponseReadReady();
         void onResponseError(QAbstractSocket::SocketError);
@@ -137,6 +138,8 @@ private:
         };
         State requestState;
         State responseState;
+
+        QString host;
 };
 
 #endif // QPIPE_H

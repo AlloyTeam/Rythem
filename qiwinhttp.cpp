@@ -246,6 +246,7 @@ QWindowsSystemProxy::QWindowsSystemProxy()
     : initialized(false), functional(false), isAutoConfig(false)
 {
     defaultResult << QNetworkProxy::NoProxy;
+    hHttpSession = NULL;
 }
 
 QWindowsSystemProxy::~QWindowsSystemProxy()

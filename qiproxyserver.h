@@ -49,6 +49,7 @@ class QiProxyServer : public QTcpServer{
             return connectionId;
         }
         
+        QList<int> tmp;
 };
 
 #endif // QPROXYSERVER_H

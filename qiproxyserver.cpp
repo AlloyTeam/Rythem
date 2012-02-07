@@ -120,6 +120,10 @@ int QiProxyServer::fetchPendingSocket(){
 
 //如果需要等待，返回-1，否则返回handle
 int QiProxyServer::pushSocket(int handle){
+    if(tmp.contains(handle)){
+        qDebug()<<"handler exists!!!!!!";
+    }
+    tmp.push_back(handle);
     if(pipes.size() >= MAXSOCKET){
         qDebug()<<"socket length more than "<<MAXSOCKET;
         pendingSocketHanles.append(handle);
