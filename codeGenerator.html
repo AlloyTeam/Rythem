@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="generator" content="iptton#gmail.com"/>
+	<title>c++ .h define to declare</title>
+</head>
+<body>
+<textarea id="defines" style="width:300px;height:200px">
+public:
+	void    
+	a();
+	void *b()const;
+	const a* b():const;
+	const a& c():const;
+signals:
+	void k();
+private:
+	void d(d& c,C c=3):const;
+	
+signals:
+	void k();
+</textarea>
+<textArea id="output" style="width:300px;height:200px">
+	
+</textArea><br/>
+<label for="className">class name</label><input type="text" id="className" /> <br/>
+<label for="useSpace">use space instead of tab</label><input type="checkBox" checked /><br/>
+<label for="tabWidth">tab width</label><input type="text" value="4" id="tabWidth"/>
+<button id="go">go</button>
+<script>
+function $(id){return document.getElementById(id);}
+$('go').onclick=function(){
+	s = $('defines').value;
+	s=s.replace(/[\n]/g,"");
+	s=s.replace(/[\t]/g,"");
+	//console.info(s);
+	s = s.trim();
+	s = s.replace(/[\s]{2,}/g," ");
+	//console.info(s);
+	s=s.replace(/signals\:.*(?:((private|public|protected)))/g,"");//replace all signals
+	s=s.replace(/signals\:.*$/g,"");//replace all signals
+	s=s.replace(/((public)|(private)|(protected))\:/g,"");
+	fs = s.split(";");
+	
+	var className=$('className').value;
+	var outputStr=[];
+	for(var i=0;i<fs.length;++i){
+		var f = fs[i];
+		f=f.trim();
+		if(!f)continue;
+		//console.info(f);
+		var j = f.search(/[^\s]+\(/); // bala bala fName(argType arg1,argType2 arg2...):const;
+		if(j==-1){
+			outputStr.push("/*invalid function:",f,"*/");
+			continue;
+		}
+		var type=f.substr(0,j);
+		var fnameAndArg=f.substr(j,f.length-1-j);
+		outputStr.push([type,className,"::",fnameAndArg,"{\\TODO auto generator by ippan\r\n\r\n}"].join(""));
+	}
+	$('output').value=outputStr.join("\r\n");
+	$('output').select();
+}
+</script>
+</body>
+</html>
