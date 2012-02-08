@@ -54,7 +54,6 @@ void QiRule2::update(const QiRule2 &rule){
 
 bool QiRule2::match(const QString &) const{
 	//override this method in different type of rule
-	qDebug() << "i am called >__<";
 	return false;
 }
 
@@ -62,14 +61,17 @@ void QiRule2::replace(ConnectionData_ptr) const{
 	//override this method in different type of rule
 }
 
-QString QiRule2::toJSON() const{
+QString QiRule2::toJSON(int tabCount) const{
+	QString tabs = QString("\t").repeated(tabCount);
 	if(!isNull()){
 		QString result;
-		QTextStream(&result) << "{\"name\":\"" << _name << "\","
-							   << "\"type\":" << _type << ","
-							   << "\"enable\":" << _isEnable << ","
-							   << "\"pattern\":\"" << _pattern << "\","
-							   << "\"replace\":\"" << _replacement << "\"}";
+		QTextStream(&result) << tabs << "{\n"
+							 << tabs << "\t\"name\":\"" << _name << "\",\n"
+							 << tabs << "\t\"type\":" << _type << ",\n"
+							 << tabs << "\t\"enable\":" << _isEnable << ",\n"
+							 << tabs << "\t\"pattern\":\"" << _pattern << "\",\n"
+							 << tabs << "\t\"replace\":\"" << _replacement << "\"\n"
+							 << tabs << "}";
 		return result;
 	}
 	else return "{}";
@@ -95,4 +97,9 @@ QString QiRule2::pattern() const{
 }
 QString QiRule2::replacement() const{
 	return _replacement;
+}
+
+QDebug operator <<(QDebug dbg, const QiRule2 &rule){
+	dbg.nospace() << "(pattern=" << rule.pattern() << ", replace=" << rule.replacement() << ")";
+	return dbg.space();
 }

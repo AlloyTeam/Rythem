@@ -47,13 +47,13 @@ int main(int argc, char *argv[])
     qInstallMsgHandler(myMessageHandler);
 #endif
 
+	//new rule manager test----------------------------------------------------
 	QiRuleManager2 manager("/Users/moscartong/Desktop/config.txt");
 	manager.loadConfig();
-	QiRule2 *rule = manager.getMatchRule("http://abc.com/1.html");
-	if(rule && !rule->isNull()){
-		qDebug() << "match result:" << rule->toJSON();
-	}
-	else qDebug() << "NO MATCH";
+	QList<QiRule2 *> matchResult;
+	manager.getMatchRules(&matchResult, "http://abc.com/a.html");
+	qDebug() << matchResult;
+	//-------------------------------------------------------------------------
 
     QiRuleManager::instance();
 

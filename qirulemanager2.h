@@ -29,10 +29,11 @@ public:
 	void saveLocalConfigChanges() const;
 
 	void addRuleGroup(QiRuleGroup2 *value, int index = -1);
+	QString configusToJSON(int tabCount = 0, bool localOnly = false) const;
 
-	QiRule2 *getMatchRule(const QString &url, const QString &groupName = "") const;
+	void getMatchRules(QList<QiRule2 *> *result, const QString &url, const QString &groupName = "") const;
 	void replace(ConnectionData_ptr connectionData) const;
-	void replace(ConnectionData_ptr connectionData, const QiRule2 *rule) const;
+	void replace(ConnectionData_ptr connectionData, const QList<QiRule2 *> *rules) const;
 
 	QString localConfigFile;
 	QString remoteHost;
@@ -50,8 +51,8 @@ public slots:
 
 private:
 	QHttp remoteConfigLoader;
-	QList<QiRuleGroup2 *> *parseConfigContent(QString json, bool remote = false);
-	QiRule2 *findMatchInGroups(const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const;
+	void parseConfigContent(QList<QiRuleGroup2 *> *result, QString json, bool remote = false);
+	void findMatchInGroups(QList<QiRule2 *> *result, const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const;
 	
 };
 
