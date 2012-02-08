@@ -40,8 +40,7 @@ SOURCES += main.cpp\
     qiruleremotecontent.cpp \
     qirulelocalfile.cpp \
     qirulelocalfiles.cpp \
-    qirulelocaldir.cpp \
-    rypiperesponse.cpp
+	qirulelocaldir.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -73,8 +72,7 @@ HEADERS  += mainwindow.h \
     qiruleremotecontent.h \
     qirulelocalfile.h \
     qirulelocalfiles.h \
-    qirulelocaldir.h \
-    rypiperesponse.h
+	qirulelocaldir.h
 
 mac:HEADERS -= qiwinhttp.h
 
