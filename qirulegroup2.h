@@ -28,8 +28,8 @@ public:
 	void updateRuleAt(const int index, const QiRule2 &newValue);
 	void removeRule(const QString name);
 	void removeRuleAt(const int index);
-	QiRule2 *match(const QString &url) const;
-	QString toJSON() const;
+	void match(QList<QiRule2 *> *result, const QString &url) const;
+	QString toJSON(int tabCount = 0, bool withName = false) const;
 
 	bool isNull() const;
 	bool isRemote() const;

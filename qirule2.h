@@ -28,7 +28,7 @@ public:
 	void update(const QiRule2 &rule);
 	virtual bool match(const QString &url) const;
 	virtual void replace(ConnectionData_ptr conn) const;
-	QString toJSON() const;
+	QString toJSON(int tabCount = 0) const;
 
 	bool isNull() const;
 	bool isRemoteRule() const;
@@ -49,5 +49,7 @@ private:
 	bool _isEnable;
 	bool _isRemote;
 };
+
+QDebug operator <<(QDebug dbg, const QiRule2 &rule);
 
 #endif // QIRULE2_H

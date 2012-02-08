@@ -28,9 +28,8 @@ QString QiRuleManager2::remoteConfigURL(){
 	return "http://" + host + remotePath;
 }
 
-QList<QiRuleGroup2 *> *QiRuleManager2::parseConfigContent(QString json, bool remote){
+void QiRuleManager2::parseConfigContent(QList<QiRuleGroup2 *> *result, QString json, bool remote){
 	qDebug() << "[RuleManager] parsing config content";
-	QList<QiRuleGroup2 *> *groups = new QList<QiRuleGroup2 *>();
 	QScriptEngine engine;
 	QScriptValue value = engine.evaluate("(" + json + ")");
 	QScriptValueIterator groupsIt(value);
@@ -73,9 +72,8 @@ QList<QiRuleGroup2 *> *QiRuleManager2::parseConfigContent(QString json, bool rem
 				group->addRule(rule);
 			}
 		}
-		groups->append(group);
+		result->append(group);
 	}
-	return groups;
 }
 
 void QiRuleManager2::loadLocalConfig(){
@@ -86,8 +84,9 @@ void QiRuleManager2::loadLocalConfig(){
 			if(file.open(QIODevice::ReadOnly)){
 				QTextStream stream(&file);
 				QString content = stream.readAll();
-				QList<QiRuleGroup2 *> *groups = parseConfigContent(content, false);
-				localGroups.append(*groups);
+				QList<QiRuleGroup2 *> groups;
+				parseConfigContent(&groups, content, false);
+				localGroups.append(groups);
 				file.close();
 				emit localConfigLoaded();
 			}
@@ -118,27 +117,44 @@ void QiRuleManager2::saveLocalConfigChanges() const{
 	if(localConfigFile.length()){
 		QFile file(localConfigFile);
 		QFileInfo fileInfo(file);
-		if(file.open(QIODevice::WriteOnly)){
-			QStringList groups;
-			int i, length = localGroups.length();
-			for(i=0; i<length; i++){
-				groups << ("\"" + localGroups.at(i)->groupName() + "\":" + localGroups.at(i)->toJSON());
-			}
-
-			QTextStream stream(&file);
-			stream << "{" << groups.join(", ") << "}";
-			if(file.flush()){
-				qDebug() << "[RuleManager] write local config done to" << localConfigFile;
+		if(!fileInfo.isDir()){
+			if(file.open(QIODevice::WriteOnly)){
+				QTextStream stream(&file);
+				stream << this->configusToJSON(0, true);
+				if(file.flush()){
+					qDebug() << "[RuleManager] write local config done to" << localConfigFile;
+				}
+				else{
+					qWarning() << "[RuleManager] writing local config fail";
+				}
+				file.close();
 			}
 			else{
-				qWarning() << "[RuleManager] writing local config fail";
+				qWarning() << "[RuleManager] local config file open fail (write only)";
 			}
-			file.close();
 		}
-		else{
-			qWarning() << "[RuleManager] local config file open fail (write only)";
+		qWarning() << "[RuleManager] you can't save config to a directory";
+	}
+}
+
+QString QiRuleManager2::configusToJSON(int tabCount, bool localOnly) const{
+	QString tabs = QString("\t").repeated(tabCount);
+	QStringList groups;
+	int i, length = localGroups.length();
+	for(i=0; i<length; i++){
+		groups << localGroups.at(i)->toJSON(tabCount + 1, true);
+	}
+	if(!localOnly){
+		length = remoteGroups.length();
+		for(i=0; i<length; i++){
+			groups << remoteGroups.at(i)->toJSON(tabCount + 1, true);
 		}
 	}
+	QString result;
+	QTextStream(&result) << tabs << "{\n"
+						 << tabs << groups.join(",\n") << "\n"
+						 << tabs << "}";
+	return result;
 }
 
 void QiRuleManager2::addRuleGroup(QiRuleGroup2 *value, int index){
@@ -149,33 +165,40 @@ void QiRuleManager2::addRuleGroup(QiRuleGroup2 *value, int index){
 	else list.insert(index, value);
 }
 
-QiRule2 *QiRuleManager2::findMatchInGroups(const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const{
+void QiRuleManager2::findMatchInGroups(QList<QiRule2 *> *result, const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const{
 	int i, len = list.length();
 	for(i=0; i<len; i++){
 		QiRuleGroup2 *group = list.at(i);
 		if((groupName.length() && groupName == group->groupName()) || !groupName.length()){
-			QiRule2 *rule = group->match(url);
-			if(rule && !rule->isNull()) return rule;
+			QList<QiRule2 *> groupMatch;
+			group->match(&groupMatch, url);
+			if(groupMatch.length()){
+				result->append(groupMatch);
+			}
 		}
 	}
-	return 0;
 }
 
-QiRule2 *QiRuleManager2::getMatchRule(const QString &url, const QString &groupName) const{
+void QiRuleManager2::getMatchRules(QList<QiRule2 *> *result, const QString &url, const QString &groupName) const{
 	qDebug() << "[RuleManager] finding match rule ...";
-	QiRule2 *localMatch = findMatchInGroups(url, groupName, localGroups);
-	if(!localMatch) return findMatchInGroups(url, groupName, remoteGroups);
-	else return localMatch;
+	findMatchInGroups(result, url, groupName, localGroups);
+	if(!result->length()){
+		findMatchInGroups(result, url, groupName, remoteGroups);
+	}
 }
 
 void QiRuleManager2::replace(ConnectionData_ptr connectionData) const{
-	QiRule2 *rule = getMatchRule(connectionData->fullUrl);
-	replace(connectionData, rule);
+	QList<QiRule2 *> rules;
+	getMatchRules(&rules, connectionData->fullUrl);
+	replace(connectionData, &rules);
 }
 
-void QiRuleManager2::replace(ConnectionData_ptr connectionData, const QiRule2 *rule) const{
-	if(!rule->isNull()){
-		rule->replace(connectionData);
+void QiRuleManager2::replace(ConnectionData_ptr connectionData, const QList<QiRule2 *> *rules) const{
+	int length = rules->length();
+	if(length){
+		for(int i=0; i<length; i++){
+			rules->at(i)->replace(connectionData);
+		}
 	}
 }
 
@@ -183,7 +206,9 @@ void QiRuleManager2::onRemoteConfigLoaded(int id, bool error){
 	qDebug() << "[RuleManager] remote config loaded" << id << error;
 	if(!error){
 		QString content = remoteConfigLoader.readAll();
-		remoteGroups.append(*parseConfigContent(content, true));
+		QList<QiRuleGroup2 *> groups;
+		parseConfigContent(&groups, content, true);
+		remoteGroups.append(groups);
 		emit remoteConfigLoaded();
 	}
 }

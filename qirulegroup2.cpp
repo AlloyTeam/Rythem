@@ -112,25 +112,31 @@ void QiRuleGroup2::removeRuleAt(const int index){
 }
 
 //判斷一下返回結果的isNull()
-QiRule2 *QiRuleGroup2::match(const QString &url) const{
+void QiRuleGroup2::match(QList<QiRule2 *> *result, const QString &url) const{
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
 		QiRule2 *rule = _rules.at(i);
+		qDebug() << "matching" << rule->pattern() << "with" << url;
 		if(rule->match(url)){
-			return rule;
+			result->append(rule);
 		}
 	}
-	return 0;
 }
 
-QString QiRuleGroup2::toJSON() const{
+QString QiRuleGroup2::toJSON(int tabCount, bool withName) const{
+	QString tabs = QString("\t").repeated(tabCount);
 	QStringList list;
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
-		list << _rules.at(i)->toJSON();
+		list << _rules.at(i)->toJSON(tabCount + 2);
 	}
 	QString result;
-	QTextStream(&result) << "{\"enable\":" << isEnable() << ", \"rules\":[" << list.join(", ") << "]}";
+	QString name = withName ? ("\"" + groupName() + "\": ") : "";
+	QTextStream(&result) << tabs << name << "{\n"
+						 << tabs << "\t\"enable\":" << isEnable() << ",\n"
+						 << tabs << "\t\"rules\":[\n" << list.join(",\n") << "\n"
+						 << tabs << "\t]\n"
+						 << tabs << "}";
 	return result;
 }
 
