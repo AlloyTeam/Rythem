@@ -8,8 +8,8 @@ class JSON
 {
 public:
 	JSON();
-	static QScriptValue parse(const QString raw);
-	static QString toString();
+	static QScriptValue parse(const QString &raw);
+	static QString toString(const QScriptValue &value);
 };
 
 #endif // JSON_H
