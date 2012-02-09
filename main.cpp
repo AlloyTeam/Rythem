@@ -7,12 +7,12 @@
 #include "connectionmonitorwsserver.h"
 #include <QDateTime>
 #include <QtCore>
+#include <QUrl>
 
 #include "qirulemanager.h"
 #include "qirulemanager2.h"
 #include "qirulegroup2.h"
 #include "qirule2.h"
-#include "QUrl"
 
 void myMessageHandler(QtMsgType type, const char *msg)
 {

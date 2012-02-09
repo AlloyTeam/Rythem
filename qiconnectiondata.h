@@ -46,6 +46,7 @@ public:
     QString protocol;
     QString serverIP;
     QString host;
+	QString replacedHost;
     QString path;
     QString fullUrl;
     int port;

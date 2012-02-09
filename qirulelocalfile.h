@@ -16,7 +16,10 @@ public:
 signals:
 	
 public slots:
-	
+
+private:
+	static QMap<QString, QString> mimeMap;
+	static QMap<QString, QString> initMimeMap();
 };
 
 #endif // QIRULELOCALFILE_H

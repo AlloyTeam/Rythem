@@ -2,6 +2,7 @@
 #define QIRULESIMPLEADDRESS_H
 
 #include <QtCore>
+#include <QUrl>
 #include "qirule2.h"
 #include "qiconnectiondata.h"
 
@@ -16,6 +17,10 @@ public:
 signals:
 	
 public slots:
+
+private:
+	QString patternHost;
+	QString replacementHost;
 	
 };
 

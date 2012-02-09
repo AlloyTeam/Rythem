@@ -183,7 +183,6 @@ void QiRuleManager2::getMatchRules(QList<QiRule2 *> *result, const QString &url,
 	qDebug() << "[RuleManager] finding match rule ...";
 	findMatchInGroups(result, url, groupName, localGroups);
 	findMatchInGroups(result, url, groupName, remoteGroups);
-	qSort(result->begin(), result->end());
 }
 
 void QiRuleManager2::replace(ConnectionData_ptr connectionData) const{
@@ -195,8 +194,25 @@ void QiRuleManager2::replace(ConnectionData_ptr connectionData) const{
 void QiRuleManager2::replace(ConnectionData_ptr connectionData, const QList<QiRule2 *> *rules) const{
 	int length = rules->length();
 	if(length){
+		bool hostReplaced, otherReplaced;
 		for(int i=0; i<length; i++){
-			rules->at(i)->replace(connectionData);
+			//get the next rule and its type
+			QiRule2 *rule = rules->at(i);
+			bool isHostReplaceRule = (rule->type() == SIMPLE_ADDRESS_REPLACE || rule->type() == COMPLEX_ADDRESS_REPLACE);
+
+			//replace host
+			if(isHostReplaceRule && !hostReplaced){
+				rule->replace(connectionData);
+				hostReplaced = true;
+			}
+			//replace content
+			else if(!isHostReplaceRule && !otherReplaced){
+				rule->replace(connectionData);
+				otherReplaced = true;
+			}
+
+			//host and content needs only to replace once
+			if(hostReplaced && otherReplaced) return;
 		}
 	}
 }
