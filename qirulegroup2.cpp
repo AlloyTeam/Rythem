@@ -116,7 +116,6 @@ void QiRuleGroup2::match(QList<QiRule2 *> *result, const QString &url) const{
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
 		QiRule2 *rule = _rules.at(i);
-		qDebug() << "matching" << rule->pattern() << "with" << url;
 		if(rule->match(url)){
 			result->append(rule);
 		}

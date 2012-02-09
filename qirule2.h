@@ -23,11 +23,12 @@ public:
 
 	QiRule2 operator =(const QiRule2 &rule);
 	bool operator ==(const QiRule2 &rule) const;
+	bool operator <(const QiRule2 &rule) const;
 
 	void update(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
 	void update(const QiRule2 &rule);
 	virtual bool match(const QString &url) const;
-	virtual void replace(ConnectionData_ptr conn) const;
+	virtual QPair<QByteArray, QByteArray> replace(ConnectionData_ptr conn) const;
 	QString toJSON(int tabCount = 0) const;
 
 	bool isNull() const;

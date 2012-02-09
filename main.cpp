@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
 
 	//new rule manager test----------------------------------------------------
 	QiRuleManager2 manager("/Users/moscartong/Desktop/config.txt");
-	manager.loadConfig();
+	manager.loadConfig(); //2ms
 	QList<QiRule2 *> matchResult;
-	manager.getMatchRules(&matchResult, "http://abc.com/a.html");
+	manager.getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms
 	qDebug() << matchResult;
 	//-------------------------------------------------------------------------
 

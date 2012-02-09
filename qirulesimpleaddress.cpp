@@ -12,6 +12,7 @@ bool QiRuleSimpleAddress::match(const QString &url) const{
 	return fullUrl.host() == patternUrl.host();
 }
 
-void QiRuleSimpleAddress::replace(ConnectionData_ptr conn) const{
-	qDebug() << "checking simple address rule" << pattern();
+QPair<QByteArray, QByteArray> QiRuleSimpleAddress::replace(ConnectionData_ptr) const{
+	//this is just a host replace
+	return QPair<QByteArray, QByteArray>();
 }

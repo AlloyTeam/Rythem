@@ -11,7 +11,7 @@ class QiRuleSimpleAddress : public QiRule2
 public:
 	explicit QiRuleSimpleAddress(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
 	bool match(const QString &url) const;
-	void replace(ConnectionData_ptr conn) const;
+	QPair<QByteArray, QByteArray> replace(ConnectionData_ptr conn) const;
 	
 signals:
 	

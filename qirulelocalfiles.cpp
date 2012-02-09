@@ -11,6 +11,7 @@ bool QiRuleLocalFiles::match(const QString &url) const{
 	return rx.exactMatch(url);
 }
 
-void QiRuleLocalFiles::replace(ConnectionData_ptr conn) const{
-	qDebug() << "checking local files rule" << pattern();
+QPair<QByteArray, QByteArray> QiRuleLocalFiles::replace(ConnectionData_ptr) const{
+	QPair<QByteArray, QByteArray> result;
+	return result;
 }

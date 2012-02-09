@@ -182,9 +182,8 @@ void QiRuleManager2::findMatchInGroups(QList<QiRule2 *> *result, const QString &
 void QiRuleManager2::getMatchRules(QList<QiRule2 *> *result, const QString &url, const QString &groupName) const{
 	qDebug() << "[RuleManager] finding match rule ...";
 	findMatchInGroups(result, url, groupName, localGroups);
-	if(!result->length()){
-		findMatchInGroups(result, url, groupName, remoteGroups);
-	}
+	findMatchInGroups(result, url, groupName, remoteGroups);
+	qSort(result->begin(), result->end());
 }
 
 void QiRuleManager2::replace(ConnectionData_ptr connectionData) const{

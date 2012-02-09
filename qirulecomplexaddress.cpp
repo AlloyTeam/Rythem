@@ -11,6 +11,6 @@ bool QiRuleComplexAddress::match(const QString &) const{
 	return false;
 }
 
-void QiRuleComplexAddress::replace(ConnectionData_ptr) const{
-
+QPair<QByteArray, QByteArray> QiRuleComplexAddress::replace(ConnectionData_ptr) const{
+	return QPair<QByteArray, QByteArray>();
 }

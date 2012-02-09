@@ -11,6 +11,6 @@ bool QiRuleRemoteContent::match(const QString &url) const{
 	return rx.exactMatch(url);
 }
 
-void QiRuleRemoteContent::replace(ConnectionData_ptr conn) const{
-	qDebug() << "checking remote content rule" << pattern();
+QPair<QByteArray, QByteArray> QiRuleRemoteContent::replace(ConnectionData_ptr) const{
+	return QPair<QByteArray, QByteArray>();
 }

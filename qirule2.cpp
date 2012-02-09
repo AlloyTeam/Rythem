@@ -36,6 +36,10 @@ bool QiRule2::operator ==(const QiRule2 &rule) const{
 	return this->name() == rule.name();
 }
 
+bool QiRule2::operator <(const QiRule2 &rule) const{
+	return this->type() < rule.type();
+}
+
 void QiRule2::update(QString name, int type, QString pattern, QString replacement, bool enable, bool remote){
 	if(!_isRemote){
 		_isRemote = remote;
@@ -57,8 +61,9 @@ bool QiRule2::match(const QString &) const{
 	return false;
 }
 
-void QiRule2::replace(ConnectionData_ptr) const{
+QPair<QByteArray, QByteArray> QiRule2::replace(ConnectionData_ptr) const{
 	//override this method in different type of rule
+	return QPair<QByteArray, QByteArray>();
 }
 
 QString QiRule2::toJSON(int tabCount) const{
