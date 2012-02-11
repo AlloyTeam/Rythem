@@ -40,7 +40,10 @@ SOURCES += main.cpp\
     qiruleremotecontent.cpp \
     qirulelocalfile.cpp \
     qirulelocalfiles.cpp \
-	qirulelocaldir.cpp
+	qirulelocaldir.cpp \
+    ryproxyserver.cpp \
+    rypipedata.cpp \
+    ryconnection.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -72,7 +75,10 @@ HEADERS  += mainwindow.h \
     qiruleremotecontent.h \
     qirulelocalfile.h \
     qirulelocalfiles.h \
-	qirulelocaldir.h
+	qirulelocaldir.h \
+    ryproxyserver.h \
+    rypipedata.h \
+    ryconnection.h
 
 mac:HEADERS -= qiwinhttp.h
 
