@@ -23,7 +23,7 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
     if(role == Qt::DisplayRole || role == Qt::ToolTipRole){
         int row = index.row();
         int column = index.column();
-        ConnectionData_ptr p;
+        RyPipeData_ptr p;
         if(pipesVector.count()>row){
             p = pipesVector.at(row);
         }else{
@@ -38,13 +38,13 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
             case 0:
                 return QString("%1").arg(row/*p->number*/);
             case 1:
-                return ((p->returnCode==-1)?QString("-"):QString("%1").arg(p->returnCode));
+                return ((p->responseStatus.isEmpty())?QString("-"):p->responseStatus);
             case 2:
-                return p->protocol;
+                return p->httpVersion;
             case 3:
                 return p->host;
             case 4:
-                return p->serverIP;
+                return p->serverIp;
             case 5:
                 return p->path;
             default:
@@ -78,20 +78,20 @@ Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
     return QAbstractTableModel::flags(index);
 }
 
-ConnectionData_ptr QiddlerPipeTableModel::getItem(int row){
+RyPipeData_ptr QiddlerPipeTableModel::getItem(int row){
     //qDebug()<<pipesVector.size()<<row;
     if(pipesVector.size() >= row){
         return pipesVector.at(row);
     }
     //qDebug()<<row<<" ---";
-    return ConnectionData_ptr(new QiConnectionData());
+    return RyPipeData_ptr(new RyPipeData());
 }
 
-void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
+void QiddlerPipeTableModel::updateItem(RyPipeData_ptr p){
     int i = pipesMap.keys().indexOf(p->id);
     if(i!=-1){
         /*
-        ConnectionData_ptr ori = pipesMap[p->id];
+        RyPipeData_ptr ori = pipesMap[p->id];
         pipesMap[p->id] = p;
         int j = pipesVector.indexOf(ori);
         if(j!=-1){
@@ -103,9 +103,9 @@ void QiddlerPipeTableModel::updateItem(ConnectionData_ptr p){
     }
 }
 
-void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
+void QiddlerPipeTableModel::addItem(RyPipeData_ptr p){
     //qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
-    ConnectionData_ptr p1 = p;
+    RyPipeData_ptr p1 = p;
     ++pipeNumber;
     p1->number=pipeNumber;
 
@@ -124,7 +124,7 @@ void QiddlerPipeTableModel::addItem(ConnectionData_ptr p){
 }
 
 void QiddlerPipeTableModel::removeAllItem(){
-    int l = pipesVector.size();
+    //int l = pipesVector.size();
     pipesMap.clear();
     pipesVector.clear();
     qDebug()<<"length="<<pipesVector.count();

@@ -87,12 +87,12 @@ void MainWindow::showSettingsDialog(){
 
 }
 
-void MainWindow::onPipeUpdate(ConnectionData_ptr pipeData){
+void MainWindow::onPipeUpdate(RyPipeData_ptr pipeData){
     //qDebug()<<"connected";
     pipeTableModel.updateItem(pipeData);
 }
 
-void MainWindow::onNewPipe(ConnectionData_ptr pipeData){
+void MainWindow::onNewPipe(RyPipeData_ptr pipeData){
     //pipeTableModel
     pipeTableModel.addItem(pipeData);
 }
@@ -100,12 +100,33 @@ void MainWindow::onNewPipe(ConnectionData_ptr pipeData){
 void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight){
     //qDebug()<<"onSelectionChange";
     int row = topLeft.row();
-    ConnectionData_ptr data = pipeTableModel.getItem(row);
-    ui->requestTextEdit->setPlainText(data->requestHeaderRawData +"\r\n\r\n"+data->requestBody );
-    ui->responseTextEdit->setPlainText(QString::fromUtf8(
-                                           (data->responseHeaderRawData+"\r\n\r\n"
-                                            + (data->unChunkResponse.isEmpty()?data->responseBody:data->unChunkResponse)).data())
-                                       );
+    RyPipeData_ptr data = pipeTableModel.getItem(row);
+    ui->requestTextEdit->setPlainText(data->requestHeaderRawData() +"\r\n\r\n"+data->requestBodyRawData() );
+
+    QString encoding="UTF-8";
+    QString contentType = data->getResponseHeader("Content-Type");
+    int encodingIndex = contentType.indexOf("charset=");
+    if(encodingIndex!=-1){
+        encoding = contentType.mid(encodingIndex + 8);
+    }
+    if(encoding.toUpper() == "UTF-8"){
+        ui->responseTextEdit->setPlainText(QString::fromUtf8(
+                                               (data->responseHeaderRawData()+"\r\n\r\n"
+                                                + (data->isResponseChunked()?
+                                                       data->responseBodyRawDataUnChunked()
+                                                       :data->responseBodyRawData())).data())
+                                           );
+    }else{
+        ui->responseTextEdit->setPlainText(QString::fromAscii(
+                                               (data->responseHeaderRawData()+"\r\n\r\n"
+                                                + (data->isResponseChunked()?
+                                                       data->responseBodyRawDataUnChunked()
+                                                       :data->responseBodyRawData())).data())
+                                           );
+    }
+
+
+
     data.clear();
 }
 

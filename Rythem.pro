@@ -43,7 +43,8 @@ SOURCES += main.cpp\
 	qirulelocaldir.cpp \
     ryproxyserver.cpp \
     rypipedata.cpp \
-    ryconnection.cpp
+    ryconnection.cpp \
+    composer.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -78,18 +79,20 @@ HEADERS  += mainwindow.h \
 	qirulelocaldir.h \
     ryproxyserver.h \
     rypipedata.h \
-    ryconnection.h
+    ryconnection.h \
+    composer.h
 
 mac:HEADERS -= qiwinhttp.h
 
 FORMS    += mainwindow.ui \
-    rule_config.ui
+    rule_config.ui \
+    composer.ui
 
 mac:CONFIG += app_bundle
 
 
 
-win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
+win32:LIBS += G:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation
 
 RESOURCES += \

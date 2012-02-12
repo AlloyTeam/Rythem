@@ -3,10 +3,11 @@
 
 #include <QMainWindow>
 #include "qiddlerpipetablemodel.h"
-#include "qiconnectiondata.h"
+#include "rypipedata.h"
 #include <QSettings>
 #include <QWebFrame>
 #include <QFileDialog>
+#include <QDebug>
 
 namespace Ui {
     class MainWindow;
@@ -46,8 +47,8 @@ public:
     explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
 public slots:
-        void onNewPipe(ConnectionData_ptr);
-        void onPipeUpdate(ConnectionData_ptr);
+        void onNewPipe(RyPipeData_ptr);
+        void onPipeUpdate(RyPipeData_ptr);
 
         void toggleProxy();
 

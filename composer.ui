@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Composer</class>
+ <widget class="Composer" name="Composer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>643</width>
+    <height>507</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Sender</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>3</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>3</number>
+   </property>
+   <property name="spacing">
+    <number>-1</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLineEdit" name="server">
+     <property name="text">
+      <string>w.l.qq.com</string>
+     </property>
+     <property name="placeholderText">
+      <string>server</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="port">
+     <property name="text">
+      <string>80</string>
+     </property>
+     <property name="placeholderText">
+      <string>port</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QPushButton" name="connectbtn">
+     <property name="text">
+      <string>connect</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QPushButton" name="disconnectbtn">
+     <property name="text">
+      <string>disconnect</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <widget class="QPushButton" name="sendbtn">
+     <property name="text">
+      <string>send</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="6">
+    <widget class="QPlainTextEdit" name="request">
+     <property name="toolTip">
+      <string>request</string>
+     </property>
+     <property name="statusTip">
+      <string>request</string>
+     </property>
+     <property name="plainText">
+      <string>GET /lview?type=text&amp;callback=auto_gen_1&amp;loc=QQ_FC_RX_text1,QQ_FC_RX_text2,QQ_FC_RX_text3,QQ_FC_RX_text4,QQ_FC_RX_text5,QQ_FC_DZ_text1,QQ_FC_DZ_text2,QQ_FC_DZ_text3,QQ_FC_DZ_text4,QQ_FC_DZ_text5,QQ_FC_XP_text1,QQ_FC_XP_text2,QQ_FC_XP_text3,QQ_FC_XP_text4,QQ_FC_XP_text5,QQ_FC_ESF_text1,QQ_FC_ESF_text2,QQ_FC_ESF_text3,QQ_FC_ESF_text4,QQ_FC_ESF_text5,QQ_SX_ZS_Test1,QQ_SX_ZS_Test2,QQ_SX_ZS_Test3,QQ_SX_ZS_Test4,QQ_SX_ZS_Test5,QQ_SX_ZS_Test6,QQ_SX_ZS_Test7,QQ_SX_ZS_Test8,QQ_SX_ZS_Test9,QQ_SX_ZS_Test10,QQ_SX_LX_Test1,QQ_SX_LX_Test2,QQ_SX_LX_Test3,QQ_SX_LX_Test4,QQ_SX_LX_Test5,QQ_SX_LX_Test6,QQ_SX_LX_Test7,QQ_SX_LX_Test8,QQ_SX_LX_Test9,QQ_SX_LX_Test10&amp;k=&amp;t=%E8%85%BE%E8%AE%AF%E9%A6%96%E9%A1%B5&amp;r=&amp;s= HTTP/1.1
+Host: w.l.qq.com
+Connection: keep-alive
+Accept-Encoding: identity;q=1, *;q=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.46 Safari/535.11
+Accept: */*
+Referer: http://im.qq.com/macqq/index.shtml
+Accept-Language: zh-CN,zh;q=0.8
+Accept-Charset: gb18030,utf-8;q=0.7,*;q=0.3
+Cookie: pgv_r_cookie=116156043288; sd_machines=-1|-1|-1|-1; comment_uin=164473028 %u0069%u0070%u0074%u0074%u006f%u006e; comment_skey=e7eadd2dda7ad02007b2aa2da36d34a7+iptton; old_friend=true; lv_irt_id=fe103783d2a200ef99be838e606bae5d; pvid=8739289251; mbCardUserNotLoginTips=1; pt2gguin=o0164473028; ptisp=ctc; show_id=; o_cookie=164473028; verifysession=h005f594834a73e2d5de281414f85629403925acc6e89b25a779dcb0a60d2147ed189c5a866140b5cc7; pgv_pvid=o_cookie=164473028; pgv_info=ssid=s9100271653&amp;pgvReferrer=
+Range: bytes=48-6116217
+
+</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="6">
+    <widget class="QPlainTextEdit" name="response">
+     <property name="toolTip">
+      <string>response</string>
+     </property>
+     <property name="statusTip">
+      <string>response</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QComboBox" name="requestsComboBox">
+     <item>
+      <property name="text">
+       <string>long without content-lenght</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>sort withou content-legth</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>Composer</class>
+   <extends>QWidget</extends>
+   <header>composer.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

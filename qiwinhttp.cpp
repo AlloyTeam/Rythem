@@ -71,9 +71,7 @@ static PtrWinHttpGetDefaultProxyConfiguration ptrWinHttpGetDefaultProxyConfigura
 static PtrWinHttpGetIEProxyConfigForCurrentUser ptrWinHttpGetIEProxyConfigForCurrentUser = 0;
 static PtrWinHttpCloseHandle ptrWinHttpCloseHandle = 0;
 static PtrWinHttpSetDefaultProxyConfiguration ptrWinHttpSetDefaultProxyConfiguration = 0;
-static bool isInited=false;
 static QMutex mutex;
-static WINHTTP_AUTOPROXY_OPTIONS autoProxyOptions;
 
 
 
@@ -208,7 +206,6 @@ static QList<QNetworkProxy> parseServerList(const QNetworkProxyQuery &query, con
 
 
 
-static HINTERNET  sesstion;
 QiWinHttp::QiWinHttp(QObject *parent) :
     QObject(parent){
 }

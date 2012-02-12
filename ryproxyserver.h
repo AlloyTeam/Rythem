@@ -14,6 +14,9 @@ class RyProxyServer : public QTcpServer,public QRunnable
         ~RyProxyServer();
         void run();
         void close();
+
+        quint64 nextPipeId();
+
     signals:
         void pipeBegin(RyPipeData_ptr);
         void pipeComplete(RyPipeData_ptr);
@@ -41,6 +44,8 @@ class RyProxyServer : public QTcpServer,public QRunnable
         QMap<RyConnection*,QThread*> _threads;
 
         RyConnection *_getConnection(int handle);
+
+        quint64 _lastPipeId;
 
     private slots:
         void onConnectionIdleTimeout();

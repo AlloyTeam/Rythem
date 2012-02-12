@@ -8,12 +8,13 @@ RyProxyServer* RyProxyServer::instance(){
 RyProxyServer::RyProxyServer(QObject *parent) :
     QTcpServer(parent){
     //qDebug()<<"server initialing";
+    _lastPipeId = 0;
 
 }
 RyProxyServer::~RyProxyServer(){
-    qDebug()<<"~RyProxyServer begin";
+    //qDebug()<<"~RyProxyServer begin";
     close();
-    qDebug()<<"~RyProxyServer done";
+    //qDebug()<<"~RyProxyServer done";
 }
 
 void RyProxyServer::close(){
@@ -34,6 +35,10 @@ void RyProxyServer::close(){
     }
 }
 
+quint64 RyProxyServer::nextPipeId(){
+    return _lastPipeId++;
+}
+
 void RyProxyServer::run(){
 
 }
@@ -42,38 +47,44 @@ void RyProxyServer::run(){
 void RyProxyServer::cacheSocket(QString address,quint16 port,QTcpSocket* socket){
     qDebug()<<"CACHE SOCKET cacheSocket"<<address<<port;
     // TODO the key QString("%1:%2").arg(address.toLower()).arg(port) should be a function or macro
+    socket->moveToThread(this->thread());
+    QString key = QString("%1:%2").arg(address.toLower()).arg(port);
     QMutexLocker locker(&_socketsOpMutex);
     Q_UNUSED(locker)
-    socket->moveToThread(this->thread());
-    if(_cachedSockets.values().contains(socket)){
-        qDebug()<<"already cache this!";
-    }else{
-        _cachedSockets.insert(QString("%1:%2").arg(address.toLower()).arg(port) ,socket);
-    }
+    //if(_cachedSockets.values().contains(socket)){
+    // 效率优化，不做这个不大需要的检查
+    //    qDebug()<<"already cache this!";
+    //}else{
+        _cachedSockets.insert(key ,socket);
+    //}
 }
 QTcpSocket* RyProxyServer::getSocket(QString address,quint16 port,bool* isFromCache,QThread* _desThread){
-    qDebug()<<"getSocket";
+
+    QDateTime time = QDateTime::currentDateTime();
+    //qDebug()<<"getSocket "<<time.toMSecsSinceEpoch();
     if(isFromCache) *isFromCache = false;
-    QMutexLocker locker(&_socketsOpMutex);
-    Q_UNUSED(locker)
     QTcpSocket *theSocket = NULL;
     QString theKey = QString("%1:%2").arg(address.toLower()).arg(port);
-    if(_cachedSockets.contains( theKey )){
-        if(isFromCache) *isFromCache = true;
 
-        QList<QTcpSocket*> sockets = _cachedSockets.values(theKey);
-        theSocket = sockets.at(0);
-        qDebug()<<"return cached socket";
-        int n = _cachedSockets.remove(theKey,theSocket);
-        if(n!=1){
-            qDebug()<<"!!!!!DELETE FAILED!!!";
-        }
+
+    QMutexLocker locker(&_socketsOpMutex);
+    if(false && _cachedSockets.contains( theKey )){
+
+        //QList<QTcpSocket*> sockets = _cachedSockets.values(theKey);
+        theSocket = _cachedSockets.take(theKey);
+        locker.unlock();
+        if(isFromCache) *isFromCache = true;
+        //qDebug()<<"return cached socket";
+        //int n = _cachedSockets.remove(theKey,theSocket);
 
     }else{
-        qDebug()<<"new response socket";
+        locker.unlock();
+        //qDebug()<<"new response socket";
         theSocket = new QTcpSocket();
     }
     theSocket->moveToThread(_desThread);
+    //qint64 getSocketDatTime = time.msecsTo(QDateTime::currentDateTime());
+    //qDebug()<<"== get socket time(ms)"<<getSocketDatTime<<" "<<time.toMSecsSinceEpoch();
     return theSocket;
 }
 
@@ -89,9 +100,11 @@ void RyProxyServer::incomingConnection(int handle){
 }
 // private functions
 RyConnection * RyProxyServer::_getConnection(int handle){
-    QMutexLocker locker(&connectionOpMutex);
-    Q_UNUSED(locker)
-    //qDebug()<<"getConnection"<<handle;
+    //QMutexLocker locker(&connectionOpMutex);
+    //Q_UNUSED(locker)
+    //QDateTime time = QDateTime::currentDateTime();
+    //qDebug()<<"getConnection:"
+    //          <<time.toMSecsSinceEpoch();
     //if(!_cacheConnections.contains(handle)){
         QThread *newThread = new QThread();
 
@@ -123,6 +136,11 @@ RyConnection * RyProxyServer::_getConnection(int handle){
         connect(newThread,SIGNAL(started()),connection,SLOT(run()));
         //connect(newThread,SIGNAL(destroyed()),SLOT(onThreadTerminated()));
         newThread->start();
+        /*
+        qDebug()<<"=== create connection cost:"
+               <<time.msecsTo(QDateTime::currentDateTime())
+               <<time.toMSecsSinceEpoch();
+        */
         return connection;
 }
 

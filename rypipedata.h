@@ -40,6 +40,9 @@ class RyPipeData : public QObject
         QString path;
         QString httpVersion;
         QString fullUrl;
+        QString serverIp;
+        quint64 id;
+        quint64 number;// for view only
 
         QString responseStatus;
         QString responseResone;
@@ -72,7 +75,7 @@ class RyPipeData : public QObject
 
 
     signals:
-        
+
     public slots:
 
     private:
@@ -101,7 +104,7 @@ class RyPipeData : public QObject
 
         void parseHeaders(const QList<QByteArray>& headers,QMap<QString,QString>*);
 
-        
+
 };
 typedef QSharedPointer<RyPipeData> RyPipeData_ptr;
 

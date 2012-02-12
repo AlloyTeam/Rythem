@@ -2,8 +2,7 @@
 #include <QtGui/QStatusBar>
 #include "mainwindow.h"
 #include <QDebug>
-#include "qiconnectiondata.h"
-#include "qiproxyserver.h"
+
 #include "connectionmonitorwsserver.h"
 #include <QDateTime>
 #include <QtCore>
@@ -13,6 +12,9 @@
 #include "qirulemanager2.h"
 #include "qirulegroup2.h"
 #include "qirule2.h"
+
+#include "ryproxyserver.h"
+#include "rypipedata.h"
 
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -58,20 +60,21 @@ int main(int argc, char *argv[])
     QiRuleManager::instance();
 
     // register metatypes
-    qRegisterMetaType<ConnectionData_const_ptr>("ConnectionData_const_ptr");
-    qRegisterMetaType<ConnectionData_ptr>("ConnectionData_ptr");
+    qRegisterMetaType<RyPipeData_ptr>("RyPipeData_ptr");
 
     //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF8"));
     //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF8"));
 
     MainWindow w;
 
-    QiProxyServer server;
-    // TODO listne should be a slot
-    server.listen(QHostAddress("127.0.0.1"),8889);
-    server.connect(&server,SIGNAL(newPipe(ConnectionData_ptr)),&w,SLOT(onNewPipe(ConnectionData_ptr)));
-    server.connect(&server,SIGNAL(pipeUpdate(ConnectionData_ptr)),&w,SLOT(onPipeUpdate(ConnectionData_ptr)));
+    RyProxyServer* server = RyProxyServer::instance();
+    server->connect(server,SIGNAL(pipeBegin(RyPipeData_ptr)),&w,SLOT(onNewPipe(RyPipeData_ptr)));
+    server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
+    server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
+    server->listen(QHostAddress("127.0.0.1"),8889);
+
     w.show();
+
 
 	ConnectionMonitorWSServer wsServer;
 	wsServer.start();
@@ -80,9 +83,9 @@ int main(int argc, char *argv[])
 	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionUpdate(ConnectionData_ptr)));
 	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionRemove(ConnectionData_ptr)));
 
-	QString status;
-        status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
-	w.statusBar()->showMessage(status);
+    //QString status;
+    //    status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
+    //w.statusBar()->showMessage(status);
 
     return a.exec();
 }

@@ -117,32 +117,31 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
     }
     path = "/";
     port = 80;//TODO
-    int n;
-    //qDebug()<<"fullUrl="<<fullUrl;
-    if(fullUrl.indexOf("://")!=-1){
-        int tmp = fullUrl.indexOf("://")+3;
-        n = fullUrl.mid(tmp).indexOf("/");
-        if(n!=-1 && n<fullUrl.length()-1){
-            path = fullUrl.mid(tmp).mid(n);
+
+    QString withouProtocol = fullUrl;
+    int indexOfHost = fullUrl.indexOf("://");
+    if(indexOfHost!=-1){
+        withouProtocol = fullUrl.mid(indexOfHost+3);
+    }
+
+    if(indexOfHost==-1 && method!= "CONNECT"){
+        // request after CONNECT tunnel
+        path = fullUrl;
+    }else{
+        QString hostAndPort = withouProtocol;
+        int indexOfPath = withouProtocol.indexOf("/");
+        if(indexOfPath!=-1){
+            hostAndPort = withouProtocol.left(indexOfPath);
+            path = withouProtocol.mid(indexOfPath);
         }
-    }else{//CONNECT method?
-        //TODO
-        if(method == "CONNECT"){
-            qDebug()<<"TODO deal with CONNECT method"
-                <<firstLine;
-            n = fullUrl.indexOf("/");
-            if(n!=-1 && n<fullUrl.length()-1){
-                path = fullUrl.mid(n);
-            }else{
-                int tmp = fullUrl.indexOf(":");
-                //qDebug()<<"???"<<fullUrl<<tmp;
-                host = fullUrl.left(tmp);
-                port = fullUrl.mid(tmp+1).toInt();
-            }
-        }else{// request after CONNECT tunnel
-            path = fullUrl;
+        int indexOfPort = hostAndPort.indexOf(":");
+        host = hostAndPort;
+        if(indexOfPort!=-1){
+            host = hostAndPort.left(indexOfPort);
+            port = hostAndPort.mid(indexOfPort+1).toInt();
         }
     }
+
     //qDebug()<<"host="<<host<<port;
     QString sigsToSend = method+" "+path+" "+httpVersion+"\r\n";
     _dataToSend.append(sigsToSend);
@@ -154,7 +153,14 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
         }
 
         if(headerName == "Host"){
-            host = value;
+            int d = value.indexOf(":");
+            if(d!=-1){
+                host = value.left(d);
+                port = value.mid(d+1).trimmed().toInt();
+            }else{
+                host = value;
+                port = 80;
+            }
         }
 
         _dataToSend.append(headerName);
@@ -203,6 +209,7 @@ bool RyPipeData::parseResponseHeader(const QByteArray& headers){
     if(_responseHeaders.keys().contains("Transfer-Encoding")){
         if(_responseHeaders.value("Transfer-Encoding","other")=="chunked"){
             _isResponseChunked = true;
+            _isContentLenthUnLimit = false;
             _lastChunkSize = -1;
         }
     }
