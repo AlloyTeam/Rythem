@@ -15,6 +15,9 @@ class RyProxyServer : public QTcpServer,public QRunnable
         void run();
         void close();
 
+        int maxOfSocket();
+        void setMaxSocket(int max);
+
         quint64 nextPipeId();
 
     signals:
@@ -32,6 +35,8 @@ class RyProxyServer : public QTcpServer,public QRunnable
     private:
         QMutex connectionOpMutex;
         QMutex _socketsOpMutex;
+
+        int _maxOfSocket;
         //sockets
         // cache for reuse
         QMultiMap<QString,QTcpSocket*> _cachedSockets;

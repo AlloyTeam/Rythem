@@ -20,10 +20,9 @@ class Composer : public QWidget
     private:
         Ui::Composer *ui;
         QTcpSocket *socket;
-        int _test;
 
         QString _proxyHost;
-        qint16 _proxyPort;
+        quint16 _proxyPort;
 
         QList<QStringList> _requests;
 

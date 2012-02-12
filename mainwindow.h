@@ -67,10 +67,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QVector<QiPipe*> *pipes;
     QiJsBridge *jsBridge;
     void createMenus();
     QiProxyServer *server;
-	QVector<QiPipe*> *pipes;
 
     bool isUsingCapture;
     ProxyInfo previousProxyInfo;

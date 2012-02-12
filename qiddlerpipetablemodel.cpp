@@ -47,8 +47,10 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
                 return p->serverIp;
             case 5:
                 return p->path;
+            case 6:
+                return p->responseBodyRawData().size();
             default:
-                return QString("Unknow %1").arg(index.column());
+                return p->getResponseHeader("Cache-Control");
         }
 
     }else{

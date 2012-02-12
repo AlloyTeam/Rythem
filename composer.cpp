@@ -6,6 +6,7 @@ Composer::Composer(QWidget *parent) :
     ui(new Ui::Composer){
     ui->setupUi(this);
     socket = new QTcpSocket();
+    //socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8999));
     connect(socket,SIGNAL(connected()),SLOT(onConnected()));
     connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onError(QAbstractSocket::SocketError)));
     connect(socket,SIGNAL(aboutToClose()),SLOT(onClose()));
@@ -71,6 +72,21 @@ Composer::Composer(QWidget *parent) :
     ui->requestsComboBox->addItem(requestStr.at(0));
     requestStr.clear();
 
+    requestStr<<"qt.gtimg.cn"<<"80"<<
+                "GET /0.7963608948048204&q=s_sh000001 HTTP/1.1"
+                "\nHost: qt.gtimg.cn"
+                "\nProxy-Connection: keep-alive"
+                "\nUser-Agent: Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7"
+                "\nAccept: */*"
+                "\nReferer: http://www.qq.com/"
+                "\nAccept-Encoding: gzip,deflate,sdch"
+                "\nAccept-Language: zh-CN,zh;q=0.8"
+                "\nAccept-Charset: gb18030,utf-8;q=0.7,*;q=0.3"
+                "\n\n";
+    _requests.append(requestStr);
+    ui->requestsComboBox->addItem(requestStr.at(0));
+    requestStr.clear();
+
 
     requestStr<<"bbs.anjiala.com"<<"80"<<
                 "GET /member.php?mod=loginstatus HTTP/1.1"
@@ -98,19 +114,12 @@ Composer::Composer(QWidget *parent) :
     ui->sendbtn->setDisabled(true);
     ui->disconnectbtn->setDisabled(true);
 
-    connectToHost();
+    //connectToHost();
 }
 
 Composer::~Composer()
 {
     delete ui;
-}
-
-void Composer::setupProxy(QString host,qint16 port){
-    _proxyHost = host;
-    _proxyPort = port;
-    socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,host,port));
-
 }
 
 void Composer::onConnected(){
@@ -144,6 +153,13 @@ void Composer::onClose(){
     ui->disconnectbtn->setDisabled(true);
 }
 
+void Composer::setupProxy(QString host,qint16 port){
+    _proxyHost = host;
+    _proxyPort = port;
+    qDebug()<<host<<port;
+    //socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,host,port));
+
+}
 
 void Composer::onConnectBtnClick(){
     ui->response->setPlainText("");
@@ -188,7 +204,7 @@ void Composer::sendData(const QByteArray &ba){
     ba2.replace("\n","\r\n");
     //qDebug()<<"sending:"<<QString(ba2).replace("\r","\\r").replace("\n","\\n");
 
-    socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8999));
+    socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,_proxyHost,_proxyPort));
     if(socket->isOpen()){
         socket->write(ba2);
         socket->flush();

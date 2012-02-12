@@ -2,6 +2,9 @@
 #include "ryproxyserver.h"
 
 #include <QApplication>
+#ifdef WIN32
+#include "qiwinhttp.h"
+#endif
 
 RyConnection::RyConnection(int socketHandle,QObject* parent)
     :QObject(parent),
@@ -107,8 +110,8 @@ void RyConnection::onRequestReadyRead(){
 }
 void RyConnection::onRequestClose(){
     qDebug()<<"request close"<<handle();
-    //QMutexLocker locker(&pipeDataMutex);
-    //Q_UNUSED(locker)
+    QMutexLocker locker(&pipeDataMutex);
+    Q_UNUSED(locker)
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
@@ -125,9 +128,9 @@ void RyConnection::onRequestClose(){
     closed = true;
 }
 void RyConnection::onRequestError(QAbstractSocket::SocketError){
-    //QMutexLocker locker(&pipeDataMutex);
-    //Q_UNUSED(locker)
-    qDebug()<<"request error";
+    QMutexLocker locker(&pipeDataMutex);
+    Q_UNUSED(locker)
+    //qDebug()<<"request error";
 
     if(_responseSocket){
         _responseSocket->blockSignals(true);
@@ -164,9 +167,9 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError){
 void RyConnection::onResponseConnected(){
     QMutexLocker locker(&pipeDataMutex);
     Q_UNUSED(locker)
-    qDebug()<<_responseSocket->state() ;
+    //qDebug()<<_responseSocket->state() ;
     _connectionNotOkTime = 0;
-    qDebug()<<"---onResponseConnected";
+    //qDebug()<<"---onResponseConnected";
     //because the socket will be reuse. so remove unnecessary signal/slot connections
     disconnect(_responseSocket,SIGNAL(connected()),this,SLOT(onResponseConnected()));
 
@@ -183,7 +186,7 @@ void RyConnection::onResponseConnected(){
         parseResponse();
         return;
     }else{
-        qDebug()<<"to write:\n"<<_sendingPipeData->dataToSend();
+        //qDebug()<<"to write:\n"<<_sendingPipeData->dataToSend();
         _responseSocket->write(_sendingPipeData->dataToSend());
         _responseSocket->flush();
     }
@@ -204,8 +207,8 @@ void RyConnection::onResponseReadyRead(){
         qDebug()<<"empty response";
         return;
     }
-    qDebug()<<"response ready read\n"
-            <<newContent;
+    //qDebug()<<"response ready read\n"
+    //        <<newContent;
     _requestSocket->write(newContent);
     _requestSocket->flush();
     _responseBuffer.append(newContent);
@@ -217,7 +220,7 @@ void RyConnection::onResponseClose(){
     qDebug()<<"response close";
     closed = true;
 }
-void RyConnection::onResponseError(QAbstractSocket::SocketError err){
+void RyConnection::onResponseError(QAbstractSocket::SocketError){
     //QMutexLocker locker(&pipeDataMutex);
     //Q_UNUSED(locker)
     //qDebug()<<"response error "<<err;
@@ -270,6 +273,7 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError err){
 }
 
 void RyConnection::onRequestHeaderFound(){
+    /*
     if(_isConnectTunnel){
         _receivingPipeData->path = _receivingPipeData->fullUrl;
         _receivingPipeData->fullUrl
@@ -282,6 +286,7 @@ void RyConnection::onRequestHeaderFound(){
         _receivingPipeData->host = _connectingHost;
         _receivingPipeData->port = _connectingPort;
     }
+    */
     _requestState = ConnectionStateHeadFound;
 }
 
@@ -534,8 +539,9 @@ void RyConnection::doRequestToNetwork(){
         }
     }
 */
-    qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
-    qDebug()<<"to connect:"<<host<<port;
+
+    //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
+    //qDebug()<<"to connect:"<<host<<port;
     _fullUrl = _sendingPipeData->fullUrl;
     bool isGettingSocketFromServer = true;
     if(_responseSocket){
@@ -617,7 +623,7 @@ void RyConnection::doRequestToNetwork(){
     QMutexLocker locker(&pipeDataMutex);
 
     if(isGettingSocketFromServer){
-        qDebug()<<"responseSocket from server";
+        //qDebug()<<"responseSocket from proxyserver";
         _responseSocket->blockSignals(true);
         _responseSocket->disconnectFromHost();
         _responseSocket->abort();
@@ -628,11 +634,25 @@ void RyConnection::doRequestToNetwork(){
     QAbstractSocket::SocketState responseState = _responseSocket->state();
     if(responseState == QAbstractSocket::UnconnectedState
             || responseState == QAbstractSocket::ClosingState){
-        qDebug()<<"responseSocket is not open"
-                <<"connect to "<<host<<port
-                <<responseState
-                <<_responseSocket->readAll();
+        //qDebug()<<"responseSocket is not open"
+        //        <<"connect to "<<host<<port
+        //        <<responseState
+        //        <<_responseSocket->readAll();
         _responseState = ConnectionStateConnecting;
+#ifdef Q_OS_WIN
+        // TODO add mac pac support
+        QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(_sendingPipeData->fullUrl)));
+        for(int i=0,l=proxylist.length();i<l;++i){
+            QNetworkProxy p = proxylist.at(i);
+            if(p.hostName() == RyProxyServer::instance()->serverAddress().toString()
+                    && p.port() == RyProxyServer::instance()->serverPort()){
+                qWarning()<<"warining: proxy is your self!";
+                continue;
+            }
+            _responseSocket->setProxy(p);
+            //qDebug()<<"proxy="<<p.hostName()<<p.port();
+        }
+ #endif
         _responseSocket->connectToHost(host,port);
         locker.unlock();
     }else{

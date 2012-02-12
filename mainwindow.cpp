@@ -29,13 +29,15 @@
 
 #include "qirulesettingsdialog.h"
 
+#include "ryproxyserver.h"
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    pipeTableModel(new QiddlerPipeTableModel()),
     ui(new Ui::MainWindow),
     pipes(new QVector<QiPipe*>),
-    pipeTableModel(new QiddlerPipeTableModel()),
     isUsingCapture(false)
 
 #ifdef Q_OS_WIN
@@ -52,6 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
     addJsObject();
     connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
     ui->webView->load(QUrl("http://127.0.0.1:8889/test/"));
+
+    // should use slot to do this
+    //ui->composer->setupProxy(RyProxyServer::instance()->serverAddress().toString(),
+    //                         RyProxyServer::instance()->serverPort());
+    ui->composer->setupProxy("127.0.0.1",
+                             8889);
 
 
     itemSelectModel = ui->tableView->selectionModel();
@@ -103,25 +111,27 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
     RyPipeData_ptr data = pipeTableModel.getItem(row);
     ui->requestTextEdit->setPlainText(data->requestHeaderRawData() +"\r\n\r\n"+data->requestBodyRawData() );
 
-    QString encoding="UTF-8";
+    QByteArray encoding("UTF-8");
     QString contentType = data->getResponseHeader("Content-Type");
     int encodingIndex = contentType.indexOf("charset=");
     if(encodingIndex!=-1){
-        encoding = contentType.mid(encodingIndex + 8);
+        encoding.clear();
+        encoding.append(contentType.mid(encodingIndex + 8));
     }
-    if(encoding.toUpper() == "UTF-8"){
-        ui->responseTextEdit->setPlainText(QString::fromUtf8(
+    if(encoding.toUpper() == QByteArray("UTF-8")){
+        QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
+        ui->responseTextEdit->setPlainText(QString(
                                                (data->responseHeaderRawData()+"\r\n\r\n"
                                                 + (data->isResponseChunked()?
                                                        data->responseBodyRawDataUnChunked()
                                                        :data->responseBodyRawData())).data())
                                            );
     }else{
-        ui->responseTextEdit->setPlainText(QString::fromAscii(
-                                               (data->responseHeaderRawData()+"\r\n\r\n"
+        QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
+        ui->responseTextEdit->setPlainText(QString((data->responseHeaderRawData()+"\r\n\r\n"
                                                 + (data->isResponseChunked()?
                                                        data->responseBodyRawDataUnChunked()
-                                                       :data->responseBodyRawData())).data())
+                                                       :data->responseBodyRawData())))
                                            );
     }
 
@@ -133,21 +143,21 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
 void MainWindow::toggleProxy(){
     if(isUsingCapture){
         isUsingCapture = false;
-        /*
+
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
         proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
         if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
         }
-        */
-        ///*
+
+        /*
         // hard code just for some crash issue
         proxySetting.setValue("ProxyEnable",1);
         proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
         //if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
         //}
-        //*/
+        */
     }else{
         isUsingCapture = true;
         previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();

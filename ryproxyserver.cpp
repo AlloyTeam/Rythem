@@ -9,7 +9,7 @@ RyProxyServer::RyProxyServer(QObject *parent) :
     QTcpServer(parent){
     //qDebug()<<"server initialing";
     _lastPipeId = 0;
-
+    setMaxSocket(30);
 }
 RyProxyServer::~RyProxyServer(){
     //qDebug()<<"~RyProxyServer begin";
@@ -33,6 +33,14 @@ void RyProxyServer::close(){
         QTcpSocket *socket = _cachedSockets.values().takeFirst();
         socket->deleteLater();
     }
+}
+
+int RyProxyServer::maxOfSocket(){
+    return _maxOfSocket;
+}
+
+void RyProxyServer::setMaxSocket(int max){
+    _maxOfSocket = max;
 }
 
 quint64 RyProxyServer::nextPipeId(){
@@ -68,7 +76,8 @@ QTcpSocket* RyProxyServer::getSocket(QString address,quint16 port,bool* isFromCa
 
 
     QMutexLocker locker(&_socketsOpMutex);
-    if(false && _cachedSockets.contains( theKey )){
+    if(_cachedSockets.size() >= _maxOfSocket
+            || _cachedSockets.contains( theKey )){
 
         //QList<QTcpSocket*> sockets = _cachedSockets.values(theKey);
         theSocket = _cachedSockets.take(theKey);

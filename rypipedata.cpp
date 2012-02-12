@@ -124,7 +124,7 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
         withouProtocol = fullUrl.mid(indexOfHost+3);
     }
 
-    if(indexOfHost==-1 && method!= "CONNECT"){
+    if(indexOfHost==-1){
         // request after CONNECT tunnel
         path = fullUrl;
     }else{
@@ -139,6 +139,9 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
         if(indexOfPort!=-1){
             host = hostAndPort.left(indexOfPort);
             port = hostAndPort.mid(indexOfPort+1).toInt();
+        }
+        if(method == "CONNECT"){
+            fullUrl.prepend("http://");
         }
     }
 
@@ -168,6 +171,21 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
         _dataToSend.append(value);
         _dataToSend.append("\r\n");
     }
+
+    if(path == fullUrl){
+        if(method!="CONNECT"){
+            if(port == 80){
+                fullUrl.prepend(QString("http://").append(host));
+            }else{
+                fullUrl.prepend(
+                            QString("http://")
+                            .append(host)
+                            .append(":")
+                            .append(QString("").setNum(port)));
+            }
+        }
+    }
+
     _dataToSend.append("\r\n");
     _requestBodyRemain = 0;
     if(_requestHeaders.keys().contains("Content-Length")){
@@ -441,10 +459,10 @@ QString& RyPipeData::httpVersion()const{
 */
 
 QString RyPipeData::getRequestHeader(const QString &name) const{
-    return _requestHeaders[name];
+    return _requestHeaders.value(name,"undefined");
 }
 QString RyPipeData::getResponseHeader(const QString &name) const{
-    return _responseHeaders[name];
+    return _responseHeaders.value(name,"undefined");
 }
 
 // private functions

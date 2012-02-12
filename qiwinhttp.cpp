@@ -356,7 +356,7 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
     //QMutexLocker locker(&sp->mutex);
     //Q_UNUSED(locker);
 
-    qint64 beginTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    //qint64 beginTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
 
     //sp->init();
@@ -373,7 +373,7 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
         // we'll still ask for the proxy.
         // But for a file url, we know we don't need one.
         if (url.scheme() == QLatin1String("file") || url.scheme() == QLatin1String("qrc")){
-            qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
+            //qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
             return sp->defaultResult;
         }
         if (query.queryType() != QNetworkProxyQuery::UrlRequest) {
@@ -414,10 +414,10 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
                 //GlobalFree(proxyInfo.lpszProxyBypass);
 
             if (isBypassed(query.peerHostName(), splitSpaceSemicolon(proxyBypass))){
-                qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
+                //qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
                 return sp->defaultResult;
             }
-            qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
+            //qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
             return parseServerList(query, proxyServerList);
         }
 
@@ -428,24 +428,24 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
             //Don't search for it next time again.
             sp->isAutoConfig = false;
         }
-        qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
+        //qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
         return sp->defaultResult;
     }
 
     // static configuration
     if (isBypassed(query.peerHostName(), sp->proxyBypass)){
-        qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
+        //qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
         return sp->defaultResult;
     }
 
     QList<QNetworkProxy> result = parseServerList(query, sp->proxyServerList);
     // In some cases, this was empty. See SF task 00062670
     if (result.isEmpty()){
-        qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
+        //qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
         return sp->defaultResult;
     }
 
-    qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
+    //qDebug()<<"queryProxyTime:"<<(QDateTime::currentDateTime().toMSecsSinceEpoch() - beginTime);
     return result;
 }
 
