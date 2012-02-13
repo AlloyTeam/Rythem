@@ -1,0 +1,62 @@
+.hgroup{
+	display:-webkit-box;
+	-webkit-box-orient:horizontal;
+}
+.vgroup{
+	display:-webkit-box;
+	-webkit-box-orient:vertical;
+}
+.spacer{
+	-webkit-box-flex:1;
+}
+
+/* console */
+.jo2console{
+	position:fixed;
+	bottom:0;
+	left:0;
+	right:0;
+	height:300px;
+	z-index:9999;
+	font-family:Arial;
+	font-size:12px;
+	color:#000;
+	border-top:1px solid #CCC;
+	background-color:#FFF;
+	-webkit-user-select:none;
+}
+.jo2console header{
+    background-color: #EEE;
+}
+.jo2console header .tabs li{
+	list-style:none;
+	padding:6px 10px;
+	cursor:pointer;
+	-webkit-transition:background-color 200ms linear;
+}
+.jo2console header .tab.activate{
+    font-weight: bold;
+	background-color:#9AC;
+}
+.jo2console header .tab:hover{
+	background-color:#CCC;
+}
+.jo2console .panels{
+	position:relative;
+	-webkit-box-flex:1;
+	border-top:1px solid #CCC;
+}
+.jo2console .panel{
+	position:absolute;
+	display:none;
+	left:0;
+	right:0;
+	top:0;
+}
+.jo2console .panel.activate{
+	display:inline;
+}
+.jo2console footer{
+	height:22px;
+	border-top:1px solid #CCC;
+}

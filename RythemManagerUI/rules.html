@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Rules Manager</title>
+	<link rel="stylesheet" type="text/css" href="css/rules.css">
+</head>
+<body>
+	<article class="groupsPanel full vgroup">
+		<header class="titleBar hgroup">
+			<div class="leftControls hgroup">
+			</div>
+			<div class="title expand center">Rules Manager</div>
+			<div class="rightControls hgroup">
+				<div id="addGroupBtn" class="button">+</div>
+			</div>
+		</header>
+		<div class="groups expand">
+
+		</div>
+		<footer>
+
+		</footer>
+	</article>
+	<article id="panelMask" class="full center hidden">
+		<article id="addGroupPanel" class="panel vgroup hidden">
+			<header>Add Group</header>
+			<div class="body expand">
+				<div class="label">name</div>
+				<input class="field" id="newGroupName" type="text">
+			</div>
+			<footer class="hgroup rightAlign">
+				<div class="button cancel">Cancel</div>
+				<div class="button confirm">OK</div>
+			</footer>
+		</article>
+		<article id="addRulePanel" class="panel vgroup hidden">
+			<header>Add Rule</header>
+			<div class="body expand">
+				<div class="label">type</div>
+				<select id="newRuleType">
+					<option value="1" disabled>Complex Host</option>
+					<option value="2">Simple Host</option>
+					<option value="3">Remote Content</option>
+					<option value="4" selected>Local File</option>
+					<option value="5">Local Files</option>
+					<option value="6">Local Directory</option>
+				</select>
+				<div class="label">pattern</div>
+				<input class="field" id="newRulePattern" type="text">
+				<div class="label">replacement</div>
+				<input class="field" id="newRuleReplace" type="text">
+			</div>
+			<footer class="hgroup rightAlign">
+				<div class="button cancel">Cancel</div>
+				<div class="button confirm">OK</div>
+			</footer>
+		</article>
+	</article>
+	<script src="lib/jo2/jo2.js"></script>
+	<script src="lib/jo2/jo2.dom.js"></script>
+	<script src="js/rules.js"></script>
+</body>
+</html>

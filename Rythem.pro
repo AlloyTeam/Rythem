@@ -102,7 +102,16 @@ OTHER_FILES += \
     wsAPI/index.css \
     wsAPI/index.html \
     wsAPI/index.js \
-    index.html
+    index.html \
+    RythemManagerUI/rules.html \
+    RythemManagerUI/css/rules.css \
+    RythemManagerUI/js/rules.js \
+    RythemManagerUI/lib/jo2/jo2.template.js \
+    RythemManagerUI/lib/jo2/jo2.string.js \
+    RythemManagerUI/lib/jo2/jo2.js \
+    RythemManagerUI/lib/jo2/jo2.dom.js \
+    RythemManagerUI/lib/jo2/jo2.css \
+    RythemManagerUI/lib/jo2/jo2.console.js
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

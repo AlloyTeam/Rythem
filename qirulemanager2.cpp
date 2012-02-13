@@ -32,11 +32,13 @@ void QiRuleManager2::parseConfigContent(QList<QiRuleGroup2 *> *result, QString j
 	qDebug() << "[RuleManager] parsing config content";
 	QScriptEngine engine;
 	QScriptValue value = engine.evaluate("(" + json + ")");
-	QScriptValueIterator groupsIt(value);
+	QScriptValueIterator groupsIt(value.property("groups"));
 	while(groupsIt.hasNext()){
 		groupsIt.next();
 		//constructor the rule group
-		QiRuleGroup2 *group = new QiRuleGroup2(groupsIt.name(), groupsIt.value().property("enable").toBool(), remote);
+		QString groupName = groupsIt.value().property("name").toString();
+		bool groupEnable = groupsIt.value().property("enable").toBool();
+		QiRuleGroup2 *group = new QiRuleGroup2(groupName, groupEnable, remote);
 		QScriptValueIterator rulesIt(groupsIt.value().property("rules"));
 		while(rulesIt.hasNext()){
 			rulesIt.next();
