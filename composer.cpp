@@ -191,6 +191,7 @@ void Composer::connectToHost(){
         qDebug()<<"already connected";
         socket->abort();
     }
+    socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,_proxyHost,_proxyPort));
     socket->connectToHost(ui->server->text(),ui->port->text().toInt());
 }
 
@@ -203,8 +204,6 @@ void Composer::sendData(const QByteArray &ba){
     QByteArray ba2 = ba;
     ba2.replace("\n","\r\n");
     //qDebug()<<"sending:"<<QString(ba2).replace("\r","\\r").replace("\n","\\n");
-
-    socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,_proxyHost,_proxyPort));
     if(socket->isOpen()){
         socket->write(ba2);
         socket->flush();

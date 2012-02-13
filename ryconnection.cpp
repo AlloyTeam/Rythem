@@ -19,24 +19,15 @@ RyConnection::RyConnection(int socketHandle,QObject* parent)
 }
 
 RyConnection::~RyConnection(){
-    //qDebug()<<"~RyConnection";
+    qDebug()<<"~RyConnection";
     if(_requestSocket){
+        _requestSocket->disconnect(this);
         _requestSocket->blockSignals(true);
-        if(_requestSocket->isOpen()){
-            _requestSocket->disconnectFromHost();
-        }
+        _requestSocket->abort();
         delete _requestSocket;
         _requestSocket = NULL;
     }
-    if(_responseSocket){
-        _responseSocket->blockSignals(true);
-        if(_responseSocket->isOpen()){
-            _responseSocket->abort();
-        }
-        delete _responseSocket;
-        _responseSocket = NULL;
-    }
-
+    qDebug()<<"~RyConnection end";
     //qDebug()<<"~RyConnection in main"
     //        << (QApplication::instance()->thread() == QThread::currentThread());
     //QThread::currentThread()->quit();
@@ -99,9 +90,6 @@ void RyConnection::run(){
 
 //private slots
 void RyConnection::onRequestReadyRead(){
-    //QMutexLocker locker(&pipeDataMutex);
-    //Q_UNUSED(locker)
-    //qDebug()<<"onRequestReadyRead";
     QByteArray newContent = _requestSocket->readAll();
     //qDebug()<<"requestReadyRead"<<newContent;
 
@@ -109,9 +97,6 @@ void RyConnection::onRequestReadyRead(){
     parseRequest();
 }
 void RyConnection::onRequestClose(){
-    qDebug()<<"request close"<<handle();
-    QMutexLocker locker(&pipeDataMutex);
-    Q_UNUSED(locker)
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
@@ -128,10 +113,7 @@ void RyConnection::onRequestClose(){
     closed = true;
 }
 void RyConnection::onRequestError(QAbstractSocket::SocketError){
-    QMutexLocker locker(&pipeDataMutex);
-    Q_UNUSED(locker)
     //qDebug()<<"request error";
-
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
@@ -165,11 +147,9 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError){
 }
 
 void RyConnection::onResponseConnected(){
-    QMutexLocker locker(&pipeDataMutex);
-    Q_UNUSED(locker)
     //qDebug()<<_responseSocket->state() ;
     _connectionNotOkTime = 0;
-    //qDebug()<<"---onResponseConnected";
+    //qDebug()<<"onResponseConnected begin";
     //because the socket will be reuse. so remove unnecessary signal/slot connections
     disconnect(_responseSocket,SIGNAL(connected()),this,SLOT(onResponseConnected()));
 
@@ -192,10 +172,7 @@ void RyConnection::onResponseConnected(){
     }
 }
 void RyConnection::onResponseReadyRead(){
-    //qDebug()<<_responseSocket->state();
-    //QMutexLocker locker(&pipeDataMutex);
-    //Q_UNUSED(locker)
-    //quint64 length = _responseSocket->bytesAvailable();
+    //qDebug()<<"onResponsReadyRead"<<handle();
     QByteArray newContent = _responseSocket->readAll();
 
     //qDebug()<<"response come readAll:"
@@ -214,6 +191,7 @@ void RyConnection::onResponseReadyRead(){
     _responseBuffer.append(newContent);
     //qDebug()<<_responseBuffer;
     parseResponse();
+    //qDebug()<<"onResponsReadyRead end"<<handle();
 
 }
 void RyConnection::onResponseClose(){
@@ -221,13 +199,7 @@ void RyConnection::onResponseClose(){
     closed = true;
 }
 void RyConnection::onResponseError(QAbstractSocket::SocketError){
-    //QMutexLocker locker(&pipeDataMutex);
-    //Q_UNUSED(locker)
-    //qDebug()<<"response error "<<err;
-    //if(!_sendingPipeData.isNull()){
-    //          qDebug()<<_sendingPipeData->fullUrl;
-    //}
-    //if(_responseSocket && _responseSocket->bytesAvailable()!=0){
+    //qDebug()<<"onResponseError"<<handle();
     if(_sendingPipeData){
         if(_sendingPipeData->responseHeaderRawData().isEmpty()){
 
@@ -270,6 +242,7 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
     }
     emit connectionClose();
     closed = true;
+    //qDebug()<<"onResponseError end"<<handle();
 }
 
 void RyConnection::onRequestHeaderFound(){
@@ -619,9 +592,6 @@ void RyConnection::doRequestToNetwork(){
         //qDebug()<<"after move to thread..";
     }
 
-
-    QMutexLocker locker(&pipeDataMutex);
-
     if(isGettingSocketFromServer){
         //qDebug()<<"responseSocket from proxyserver";
         _responseSocket->blockSignals(true);
@@ -654,16 +624,13 @@ void RyConnection::doRequestToNetwork(){
         }
  #endif
         _responseSocket->connectToHost(host,port);
-        locker.unlock();
     }else{
         qDebug()<<"responseSocket opened"
                 <<responseState;
         if(responseState == QAbstractSocket::ConnectedState){
-            locker.unlock();
             onResponseConnected();
         }else{
             qDebug()<<"responseSocket not open yet"<<responseState;
-            locker.unlock();
             if(isGettingSocketFromServer){
                 connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
             }
@@ -673,19 +640,12 @@ void RyConnection::doRequestToNetwork(){
 RyPipeData_ptr RyConnection::nextPipe(){
     QMutexLocker locker(&pipeDataListMutex);
     Q_UNUSED(locker)
-    //QDateTime time = QDateTime::currentDateTime();
     if(_pipeList.length()>0){
-        //qDebug()<<"next pipe";
         return _pipeList.takeAt(0);
     }
-    //qint64 nextPipeCost = time.msecsTo(QDateTime::currentDateTime());
-    //qDebug()<<"=== next pipe cost:"<<nextPipeCost;
     return RyPipeData_ptr();
 }
 void RyConnection::appendPipe(RyPipeData_ptr thePipeData){
-    //QMutexLocker locker(&pipeDataListMutex);
-    //Q_UNUSED(locker)
-    //qDebug()<<"append pipe to list";
     _pipeList.append(thePipeData);
 
 }

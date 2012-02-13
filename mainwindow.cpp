@@ -30,7 +30,59 @@
 #include "qirulesettingsdialog.h"
 
 #include "ryproxyserver.h"
+#ifdef Q_OS_WIN32
+#include "zlib/zlib.h"
+#else
+#include "zlib.h"
+#endif
+QByteArray gzipDecompress( QByteArray compressData )
+{
+    //decompress GZIP data
 
+    //strip header and trailer
+      compressData.remove(0, 10);
+      compressData.chop(12);
+
+      const int buffersize = 16384;
+      quint8 buffer[buffersize];
+
+      z_stream cmpr_stream;
+      cmpr_stream.next_in = (unsigned char *)compressData.data();
+      cmpr_stream.avail_in = compressData.size();
+      cmpr_stream.total_in = 0;
+
+      cmpr_stream.next_out = buffer;
+      cmpr_stream.avail_out = buffersize;
+      cmpr_stream.total_out = 0;
+
+      cmpr_stream.zalloc = Z_NULL;
+      cmpr_stream.zalloc = Z_NULL;
+
+      if( inflateInit2(&cmpr_stream, -8 ) != Z_OK) {
+              qDebug() << "cmpr_stream error!";
+      }
+
+        QByteArray uncompressed;
+        do {
+            int status = inflate( &cmpr_stream, Z_SYNC_FLUSH );
+
+            if(status == Z_OK || status == Z_STREAM_END) {
+                    uncompressed.append(QByteArray::fromRawData((char *)buffer, buffersize - cmpr_stream.avail_out));
+                    cmpr_stream.next_out = buffer;
+                    cmpr_stream.avail_out = buffersize;
+            } else {
+                     inflateEnd(&cmpr_stream);
+                    }
+
+            if(status == Z_STREAM_END) {
+                inflateEnd(&cmpr_stream);
+                break;
+            }
+
+        }while(cmpr_stream.avail_out == 0);
+
+        return uncompressed;
+}
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -125,7 +177,11 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
     QTextCodec* oldCodec = QTextCodec::codecForCStrings();
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
     if(isEncrypted){
-        QByteArray decrypedData("sorry I cannot uncompress data right now:encrypted in:");
+        QByteArray decrypedData =
+                (data->isResponseChunked()?
+                  data->responseBodyRawDataUnChunked()
+                  :data->responseBodyRawData());
+        decrypedData = gzipDecompress(decrypedData);
         decrypedData.append(data->getResponseHeader("Content-Encoding"));
         ui->responseTextEdit->setPlainText(QString((
                                                   data->responseHeaderRawData()

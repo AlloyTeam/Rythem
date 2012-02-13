@@ -81,6 +81,17 @@ HEADERS  += mainwindow.h \
     rypipedata.h \
     ryconnection.h \
     composer.h
+win32:HEADERS += zlib/zutil.h \
+    zlib/zlib.h \
+    zlib/zconf.h \
+    zlib/trees.h \
+    zlib/inftrees.h \
+    zlib/inflate.h \
+    zlib/inffixed.h \
+    zlib/inffast.h \
+    zlib/gzguts.h \
+    zlib/deflate.h \
+    zlib/crc32.h
 
 mac:HEADERS -= qiwinhttp.h
 
@@ -92,7 +103,7 @@ mac:CONFIG += app_bundle
 
 
 
-win32:LIBS += G:\QtSDK\mingw\lib\libwininet.a
+win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation
 
 RESOURCES += \

@@ -77,9 +77,8 @@ QTcpSocket* RyProxyServer::getSocket(QString address,quint16 port,bool* isFromCa
 
 
     QMutexLocker locker(&_socketsOpMutex);
-    if(_cachedSockets.size() >= _maxOfSocket
-            || _cachedSockets.contains( theKey )){
-
+    if(/*_cachedSockets.size() >= _maxOfSocket
+            || */_cachedSockets.contains( theKey )){
         //QList<QTcpSocket*> sockets = _cachedSockets.values(theKey);
         theSocket = _cachedSockets.take(theKey);
         locker.unlock();
@@ -144,7 +143,7 @@ RyConnection * RyProxyServer::_getConnection(int handle){
 
         connection->moveToThread(newThread);
         connect(newThread,SIGNAL(started()),connection,SLOT(run()));
-        //connect(newThread,SIGNAL(destroyed()),SLOT(onThreadTerminated()));
+        connect(newThread,SIGNAL(finished()),SLOT(onThreadTerminated()));
         newThread->start();
         /*
         qDebug()<<"=== create connection cost:"
@@ -181,6 +180,10 @@ void RyProxyServer::onPipeError(RyPipeData_ptr){
 
 void RyProxyServer::onThreadTerminated(){
     qDebug()<<"thread terminated";
+    QThread *t = (QThread*)sender();
+    if(t){
+        t->deleteLater();
+    }
 }
 
 void RyProxyServer::onConnectionClosed(){
@@ -193,5 +196,5 @@ void RyProxyServer::onConnectionClosed(){
     //_cacheConnections.remove(connection);
     QMetaObject::invokeMethod(thread,"quit");
     connection->deleteLater();
-    thread->deleteLater();
+    //thread->deleteLater();
 }
