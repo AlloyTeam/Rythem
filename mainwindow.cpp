@@ -35,55 +35,55 @@
 #else
 #include "zlib.h"
 #endif
-QByteArray gzipDecompress( QByteArray compressData )
-{
-    //decompress GZIP data
 
-    //strip header and trailer
-      compressData.remove(0, 10);
-      compressData.chop(12);
+QByteArray gzipDecompress(QByteArray data){
+    if (data.size() <= 4) {
+        qWarning("gUncompress: Input data is truncated");
+        return QByteArray();
+    }
 
-      const int buffersize = 16384;
-      quint8 buffer[buffersize];
+    QByteArray result;
 
-      z_stream cmpr_stream;
-      cmpr_stream.next_in = (unsigned char *)compressData.data();
-      cmpr_stream.avail_in = compressData.size();
-      cmpr_stream.total_in = 0;
+    int ret;
+    z_stream strm;
+    static const int CHUNK_SIZE = 1024;
+    char out[CHUNK_SIZE];
 
-      cmpr_stream.next_out = buffer;
-      cmpr_stream.avail_out = buffersize;
-      cmpr_stream.total_out = 0;
+    /* allocate inflate state */
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = data.size();
+    strm.next_in = (Bytef*)(data.data());
 
-      cmpr_stream.zalloc = Z_NULL;
-      cmpr_stream.zalloc = Z_NULL;
+    ret = inflateInit2(&strm, 15 +  32); // gzip decoding
+    if (ret != Z_OK)
+        return QByteArray();
 
-      if( inflateInit2(&cmpr_stream, -8 ) != Z_OK) {
-              qDebug() << "cmpr_stream error!";
-      }
+    // run inflate()
+    do {
+        strm.avail_out = CHUNK_SIZE;
+        strm.next_out = (Bytef*)(out);
 
-        QByteArray uncompressed;
-        do {
-            int status = inflate( &cmpr_stream, Z_SYNC_FLUSH );
+        ret = inflate(&strm, Z_NO_FLUSH);
+        Q_ASSERT(ret != Z_STREAM_ERROR);  // state not clobbered
 
-            if(status == Z_OK || status == Z_STREAM_END) {
-                    uncompressed.append(QByteArray::fromRawData((char *)buffer, buffersize - cmpr_stream.avail_out));
-                    cmpr_stream.next_out = buffer;
-                    cmpr_stream.avail_out = buffersize;
-            } else {
-                     inflateEnd(&cmpr_stream);
-                    }
+        switch (ret) {
+        case Z_NEED_DICT:
+            ret = Z_DATA_ERROR;     // and fall through
+        case Z_DATA_ERROR:
+        case Z_MEM_ERROR:
+            (void)inflateEnd(&strm);
+            return QByteArray();
+        }
 
-            if(status == Z_STREAM_END) {
-                inflateEnd(&cmpr_stream);
-                break;
-            }
+        result.append(out, CHUNK_SIZE - strm.avail_out);
+    } while (strm.avail_out == 0);
 
-        }while(cmpr_stream.avail_out == 0);
-
-        return uncompressed;
+    // clean up and return
+    inflateEnd(&strm);
+    return result;
 }
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -184,7 +184,7 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
                   data->responseBodyRawDataUnChunked()
                   :data->responseBodyRawData());
         decrypedData = gzipDecompress(decrypedData);
-        decrypedData.append(data->getResponseHeader("Content-Encoding"));
+        //decrypedData.append(data->getResponseHeader("Content-Encoding"));
         ui->responseTextEdit->setPlainText(QString((
                                                   data->responseHeaderRawData()
                                                 +"\r\n\r\n"
