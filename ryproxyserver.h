@@ -51,6 +51,7 @@ class RyProxyServer : public QTcpServer,public QRunnable
         RyConnection *_getConnection(int handle);
 
         quint64 _lastPipeId;
+        quint64 _lastConnectionId;
 
     private slots:
         void onConnectionIdleTimeout();

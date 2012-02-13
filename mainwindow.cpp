@@ -100,6 +100,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setModel(&pipeTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
+    ui->tableView->setColumnWidth(1,30);
+    ui->tableView->setSortingEnabled(true);
 
     jsBridge = new QiJsBridge();
 

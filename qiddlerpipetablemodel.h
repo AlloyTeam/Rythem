@@ -20,6 +20,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+
+    static bool itemLessThan(RyPipeData_ptr a,RyPipeData_ptr b);
 public slots:
     void addItem(RyPipeData_ptr p);
     void removeItems();
@@ -39,6 +42,7 @@ public slots:
 
 private:
     int pipeNumber;
+    int _sortingColumn;
 };
 
 #endif // QIDDLERPIPETABLEMODEL_H

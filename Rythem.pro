@@ -103,7 +103,7 @@ mac:CONFIG += app_bundle
 
 
 
-win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
+win32:LIBS += G:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation
 
 RESOURCES += \

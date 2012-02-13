@@ -19,7 +19,7 @@ class RyConnection:public QObject{
             ConnectionStatePackageFound=4
         };
         //public functions
-        explicit RyConnection(int handle,QObject *parent = 0);
+        explicit RyConnection(int handle,quint64 connectionId,QObject *parent = 0);
         ~RyConnection();
         int handle() const;
         void setHandle(int theHandle);
@@ -63,6 +63,8 @@ class RyConnection:public QObject{
         QByteArray _requestBuffer;
         QByteArray _responseBuffer;
 
+        int _pipeTotal;
+
         int _handle;
         bool closed;
 
@@ -70,6 +72,8 @@ class RyConnection:public QObject{
         quint16 _connectingPort;
         bool _isConnectTunnel;
         QString _fullUrl;
+
+        quint64 _connectionId;
 
         QTcpSocket *_requestSocket;
         ConnectionState _requestState;
@@ -91,6 +95,7 @@ class RyConnection:public QObject{
 
         RyPipeData_ptr nextPipe();
         void appendPipe(RyPipeData_ptr);
+
 
 };
 

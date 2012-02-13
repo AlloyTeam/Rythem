@@ -9,7 +9,7 @@ class RyPipeData : public QObject
 {
         Q_OBJECT
     public:
-        explicit RyPipeData(QObject *parent = 0);
+        explicit RyPipeData(quint64 socketConnectionId,QObject *parent = 0);
 
         // return byte remain (if the request/response has content-length but
         //   not complete yet
@@ -34,6 +34,7 @@ class RyPipeData : public QObject
         QString& path()const;
         QString& httpVersion()const;
         */
+        quint64 socketConnectionId;
         QString host;
         quint16 port;
         QString method;

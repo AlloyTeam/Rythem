@@ -4,9 +4,9 @@
 #include <QStringList>
 
 
-RyPipeData::RyPipeData(QObject *parent):
+RyPipeData::RyPipeData(quint64 connectionId,QObject *parent):
     QObject(parent){
-
+    socketConnectionId = connectionId;
 }
 
 

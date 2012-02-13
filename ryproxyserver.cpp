@@ -9,6 +9,7 @@ RyProxyServer::RyProxyServer(QObject *parent) :
     QTcpServer(parent){
     //qDebug()<<"server initialing";
     _lastPipeId = 0;
+    _lastConnectionId = 0;
     setMaxSocket(30);
 }
 RyProxyServer::~RyProxyServer(){
@@ -114,9 +115,11 @@ RyConnection * RyProxyServer::_getConnection(int handle){
     //qDebug()<<"getConnection:"
     //          <<time.toMSecsSinceEpoch();
     //if(!_cacheConnections.contains(handle)){
+    qDebug()<<"_lastConnectionId"<<_lastConnectionId;
+    _lastConnectionId++;
         QThread *newThread = new QThread();
 
-        RyConnection *connection = new RyConnection(handle);
+        RyConnection *connection = new RyConnection(handle,_lastConnectionId);
 
         connect(connection,SIGNAL(idleTimeout()),SLOT(onConnectionIdleTimeout()));
 

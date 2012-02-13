@@ -6,12 +6,14 @@
 #include "qiwinhttp.h"
 #endif
 
-RyConnection::RyConnection(int socketHandle,QObject* parent)
+RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent)
     :QObject(parent),
       _handle(socketHandle),
+      _connectionId(connectionId),
       _requestSocket(NULL){
 
     closed = false;
+    _pipeTotal = 0;
     _isConnectTunnel = false;
     _requestState = _responseState = ConnectionStateInit;
     //qDebug()<<"RyConnection"<<socketHandle;
@@ -19,7 +21,7 @@ RyConnection::RyConnection(int socketHandle,QObject* parent)
 }
 
 RyConnection::~RyConnection(){
-    qDebug()<<"~RyConnection";
+    qDebug()<<"~RyConnection pipeTotal:"<<_pipeTotal<<"_connection id = "<<_connectionId;
     if(_requestSocket){
         _requestSocket->disconnect(this);
         _requestSocket->blockSignals(true);
@@ -306,7 +308,8 @@ void RyConnection::parseRequest(){
         return;
     }
     if(_receivingPipeData.isNull()){
-        _receivingPipeData = RyPipeData_ptr(new RyPipeData());
+        _receivingPipeData = RyPipeData_ptr(new RyPipeData(_connectionId));
+        _pipeTotal++;
         _receivingPipeData->id = RyProxyServer::instance()->nextPipeId();
     }
     //qDebug()<<"parsing request"<<newContent;

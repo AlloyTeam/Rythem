@@ -6,31 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>507</height>
+    <width>624</width>
+    <height>385</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Sender</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>3</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>3</number>
-   </property>
-   <property name="spacing">
-    <number>-1</number>
-   </property>
    <item row="0" column="0">
     <widget class="QLineEdit" name="server">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>w.l.qq.com</string>
      </property>
@@ -41,12 +32,50 @@
    </item>
    <item row="0" column="1">
     <widget class="QLineEdit" name="port">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>30</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="text">
       <string>80</string>
      </property>
      <property name="placeholderText">
       <string>port</string>
      </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QComboBox" name="requestsComboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <item>
+      <property name="text">
+       <string>long without content-lenght</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>sort withou content-legth</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="0" column="3">
@@ -103,20 +132,6 @@ Range: bytes=48-6116217
      <property name="statusTip">
       <string>response</string>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QComboBox" name="requestsComboBox">
-     <item>
-      <property name="text">
-       <string>long without content-lenght</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>sort withou content-legth</string>
-      </property>
-     </item>
     </widget>
    </item>
   </layout>
