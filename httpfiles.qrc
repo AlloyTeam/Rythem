@@ -19,4 +19,15 @@
         <file>jo2_lib/jo2.string.js</file>
         <file>jo2_lib/jo2.template.js</file>
     </qresource>
+    <qresource prefix="/web/manager">
+        <file>RythemManagerUI/rules.html</file>
+        <file>RythemManagerUI/lib/jo2/jo2.console.js</file>
+        <file>RythemManagerUI/lib/jo2/jo2.css</file>
+        <file>RythemManagerUI/lib/jo2/jo2.dom.js</file>
+        <file>RythemManagerUI/lib/jo2/jo2.js</file>
+        <file>RythemManagerUI/lib/jo2/jo2.string.js</file>
+        <file>RythemManagerUI/lib/jo2/jo2.template.js</file>
+        <file>RythemManagerUI/js/rules.js</file>
+        <file>RythemManagerUI/css/rules.css</file>
+    </qresource>
 </RCC>
