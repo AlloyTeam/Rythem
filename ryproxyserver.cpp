@@ -28,7 +28,6 @@ void RyProxyServer::close(){
         //_cacheConnections.remove(connection);
         connection->deleteLater();
         QMetaObject::invokeMethod(thread,"quit");
-        thread->deleteLater();
     }
     for(int i=0,l=_cachedSockets.values().size();i<l;++i){
         QTcpSocket *socket = _cachedSockets.values().takeFirst();
