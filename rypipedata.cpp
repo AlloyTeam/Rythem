@@ -462,7 +462,7 @@ QString RyPipeData::getRequestHeader(const QString &name) const{
     return _requestHeaders.value(name,"undefined");
 }
 QString RyPipeData::getResponseHeader(const QString &name) const{
-    return _responseHeaders.value(name,"undefined");
+    return _responseHeaders.value(name,"");
 }
 
 // private functions

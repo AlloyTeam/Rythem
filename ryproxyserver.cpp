@@ -27,6 +27,7 @@ void RyProxyServer::close(){
         connection->disconnect(this);
         //_cacheConnections.remove(connection);
         connection->deleteLater();
+        QMetaObject::invokeMethod(thread,"quit");
         thread->deleteLater();
     }
     for(int i=0,l=_cachedSockets.values().size();i<l;++i){
@@ -129,7 +130,7 @@ RyConnection * RyProxyServer::_getConnection(int handle){
                 SLOT(onPipeError(RyPipeData_ptr)));
 
         connect(connection,SIGNAL(connectionClose()),
-                SLOT(onConnectionIdleTimeout()));
+                SLOT(onConnectionClosed()));
 
         connect(connection,SIGNAL(pipeBegin(RyPipeData_ptr)),
                 SIGNAL(pipeBegin(RyPipeData_ptr)));
@@ -186,9 +187,11 @@ void RyProxyServer::onConnectionClosed(){
     qDebug()<<"connection closed";
     RyConnection *connection = qobject_cast<RyConnection*>(sender());
 
+    _connections.removeOne(connection);
     QThread *thread = _threads.take(connection);
     connection->disconnect(this);
     //_cacheConnections.remove(connection);
+    QMetaObject::invokeMethod(thread,"quit");
     connection->deleteLater();
     thread->deleteLater();
 }

@@ -111,6 +111,7 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
     RyPipeData_ptr data = pipeTableModel.getItem(row);
     ui->requestTextEdit->setPlainText(data->requestHeaderRawData() +"\r\n\r\n"+data->requestBodyRawData() );
 
+
     QByteArray encoding("UTF-8");
     QString contentType = data->getResponseHeader("Content-Type");
     int encodingIndex = contentType.indexOf("charset=");
@@ -118,22 +119,28 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
         encoding.clear();
         encoding.append(contentType.mid(encodingIndex + 8));
     }
-    if(encoding.toUpper() == QByteArray("UTF-8")){
-        QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
-        ui->responseTextEdit->setPlainText(QString(
-                                               (data->responseHeaderRawData()+"\r\n\r\n"
-                                                + (data->isResponseChunked()?
-                                                       data->responseBodyRawDataUnChunked()
-                                                       :data->responseBodyRawData())).data())
+    bool isEncrypted = !data->getResponseHeader("Content-Encoding").isEmpty();
+
+
+    QTextCodec* oldCodec = QTextCodec::codecForCStrings();
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
+    if(isEncrypted){
+        QByteArray decrypedData("sorry I cannot uncompress data right now:encrypted in:");
+        decrypedData.append(data->getResponseHeader("Content-Encoding"));
+        ui->responseTextEdit->setPlainText(QString((
+                                                  data->responseHeaderRawData()
+                                                +"\r\n\r\n"
+                                                + decrypedData
+                                               ).data())
                                            );
     }else{
-        QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
         ui->responseTextEdit->setPlainText(QString((data->responseHeaderRawData()+"\r\n\r\n"
                                                 + (data->isResponseChunked()?
                                                        data->responseBodyRawDataUnChunked()
                                                        :data->responseBodyRawData())))
                                            );
     }
+    QTextCodec::setCodecForCStrings(oldCodec);
 
 
 
