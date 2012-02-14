@@ -6,6 +6,8 @@
 #include "rywinhttp.h"
 #endif
 
+#include "ryrulemanager.h"
+
 RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent)
     :QObject(parent),
       _handle(socketHandle),
@@ -519,18 +521,38 @@ void RyConnection::doRequestToNetwork(){
         onResponsePackageFound();
         return;
     }
-
 /*
-    if(RyRuleManager::isMathRule(_pipeData)){
-        if(isHostRule){
-            host = hostToReplace;
-        }else if(isContentRule){
-            parseResponse(contentToReplaceWithHeaderAndBody);
-            return;
+    RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
+    QList<RyRule *> matchResult;
+    manager->getMatchRules(&matchResult, _sendingPipeData->fullUrl); //2ms
+    for(int i=0,l=matchResult.size();i<l;++i){
+        RyRule *rule = matchResult.at(i);
+        qDebug()<<"rule found"<<rule->toJSON();
+        if(rule->type() == COMPLEX_ADDRESS_REPLACE ||
+                rule->type() ==SIMPLE_ADDRESS_REPLACE){
+            host = _sendingPipeData->replacedHost;
+        }else{
+            QPair<QByteArray,QByteArray> headerAndBody = rule->replace(_sendingPipeData);
+            bool isOk;
+            QByteArray ba = headerAndBody.first;
+            _sendingPipeData->parseResponse(&ba,&isOk);
+            if(isOk){
+                _requestSocket->write(headerAndBody.first);
+                _requestSocket->flush();
+                onResponseHeaderFound();
+                qDebug()<<headerAndBody.second;
+                ba = headerAndBody.second;
+                _sendingPipeData->appendResponseBody(&ba);
+                _requestSocket->write(headerAndBody.second);
+                _requestSocket->flush();
+                onResponsePackageFound();
+                return;
+            }else{
+                break;
+            }
         }
     }
 */
-
     //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
     //qDebug()<<"to connect:"<<host<<port;
     _fullUrl = _sendingPipeData->fullUrl;

@@ -44,7 +44,7 @@ html, body{
 	-webkit-box-flex: 1;
 }
 .hidden{
-	display: none;
+	display: none!important;
 }
 .button{
         cursor: pointer;

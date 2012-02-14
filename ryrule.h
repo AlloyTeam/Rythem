@@ -4,6 +4,8 @@
 #include <QtCore>
 #include "rypipedata.h"
 
+
+//TODO move this in class
 enum RuleType{
 	COMPLEX_ADDRESS_REPLACE = 1,
 	SIMPLE_ADDRESS_REPLACE = 2,

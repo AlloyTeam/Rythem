@@ -8,7 +8,12 @@ function unescapeFromHtml(html){
  var s = html.replace(/&amp;/g,"&").replace(/&nbsp;/," ").replace(/&gt;/g,">").replace(/&lt;/,"<");
  return s;
 }
-
+function updateConfigs(){
+	var s = JSON.stringify(configs);
+	s = '{"groups":'+s+'}';
+	//alert(s);
+	window.App.updateConfigs(s);
+}
     /**
      * 项目里的每条规则，支持编辑和启用/禁用，会自动同步相关的数据
      * @param {Object} ruleConfig
@@ -31,8 +36,8 @@ function unescapeFromHtml(html){
             </select>\
             <div class="pattern editable">' + escapeToHtml(ruleConfig.rule.pattern) + '</div>\
             <div class="replace editable">' + escapeToHtml(ruleConfig.rule.replace) + '</div>\
-			<div class="button selectFile">--</div>\
-			<div class="button selectDir">--</div>\
+			<div class="button selectFile hidden">-F</div>\
+			<div class="button selectDir hidden">-D</div>\
             <div class="button remove">x</div> \
         ';
 
@@ -44,6 +49,8 @@ function unescapeFromHtml(html){
         var checkbox = el.querySelector('input');
         var patternField = el.querySelector('.pattern');
         var replaceField = el.querySelector('.replace');
+		var selectFileField = el.querySelector(".selectFile");
+		var selectDirField = el.querySelector(".selectDir");
 
         this.__config = ruleConfig;
         this.__el = el;
@@ -51,6 +58,8 @@ function unescapeFromHtml(html){
         this.__checkbox = checkbox;
         this.__patternField = patternField;
         this.__replaceField = replaceField;
+		this.__selectFileField = selectFileField;
+		this.__selectDirField = selectDirField;
 
         select.addEventListener(	'change', 	function(e){ me.onTypeChange(e); });
         checkbox.addEventListener(	'change', 	function(e){ me.onCheckboxChange(e); });
@@ -130,8 +139,21 @@ function unescapeFromHtml(html){
         onTypeChange: function(e){
             var options = this.__typeSelect.options;
             var index = this.__typeSelect.selectedIndex;
-            this.__config.type = Number(options[index].value);
+			var type = Number(options[index].value);
+            this.__config.type = type;
             //TODO call client's API to update rule type
+			if(type == 4 || type == 5){
+				this.__selectFileField.classList.remove("hidden");
+				this.__selectDirField.classList.add("hidden");
+			}else if(type == 6){
+				this.__selectDirField.classList.remove("hidden");
+				this.__selectFileField.classList.add("hidden");
+			}else{
+				this.__selectFileField.classList.add("hidden");
+				this.__selectDirField.classList.add("hidden");
+			}
+			
+			updateConfigs();
         },
         /**
          * 勾选/取消勾选规则时触发
@@ -140,6 +162,8 @@ function unescapeFromHtml(html){
         onCheckboxChange: function(e){
             var enabled = this.__checkbox.checked;
             this.setEnable(enabled, true);
+			
+			updateConfigs();
         },
         /**
          * 双击匹配/替换值时编辑对应值
@@ -165,12 +189,20 @@ function unescapeFromHtml(html){
 					this.__config.rule.replace = unescapeFromHtml(e.srcElement.innerHTML);
 				}
                 //TODO call client's API to update rule
-				console.info(this.__config);
+				updateConfigs();
             }
         },
 		onSelectFile: function(e,fieldEl){
-			this.__replaceField.innerHTML = window.App.getFile();
-			this.__config.rule.replace = this.getReplace();
+			var s = window.App.getFile();
+			this.__replaceField.innerHTML = escapeToHtml(s);
+			this.__config.rule.replace = s;
+			updateConfigs();
+		},
+		onSelectDir: function(e,fieldEl){
+			var s = window.App.getDir()+"/";
+			this.__replaceField.innerHTML = escapeToHtml(s);
+			this.__config.rule.replace = s;
+			updateConfigs();
 		}
     };
 
@@ -543,9 +575,6 @@ function unescapeFromHtml(html){
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    function ruleChanged(s){
-        alert(s);
-    }
 
     function init(){
 
@@ -593,11 +622,10 @@ function unescapeFromHtml(html){
 
 		if(window.App){
 			var config = window.App.getConfigs();
-			alert(config);
 			config = config.replace(/&quot;/g,"\'");
 			eval(config);
 		}
-        createGroups(configs);
+        createGroups(configs.groups);
     }
 
     window.refreshRulesCallback = function(groupsConfigs){

@@ -43,7 +43,6 @@ class RyJsBridge:public QObject{
         }
         QString getConfigs(){
             RyRuleManager *manager = RyRuleManager::instance();
-            QScriptEngine engine;
             QString s = manager->configusToJSON();
             s.prepend("configs =  ");
             s.remove("\r");
@@ -52,6 +51,12 @@ class RyJsBridge:public QObject{
             s.append(";");
             return s;
         }
+        bool updateConfigs(QString json){
+            RyRuleManager *manager = RyRuleManager::instance();
+            qDebug()<<json;
+            manager->setLocalConfigContent(json);
+        }
+
    signals:
         void ruleChanged(QString json);
 };

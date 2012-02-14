@@ -24,7 +24,7 @@ public:
 	void setRemoteConfig(QString host, QString addr, QString path, bool reload = false);
 	QString remoteConfigURL();
 
-        bool setLocalConfigContent(QString content);
+        bool setLocalConfigContent(QString content,bool dontSave=false);
 
 	void loadLocalConfig();
 	void loadRemoteConfig();

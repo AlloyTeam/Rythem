@@ -47,6 +47,17 @@ void RyRuleManager::parseConfigContent(QList<QiRuleGroup2 *> *result, QString js
 		QiRuleGroup2 *group = new QiRuleGroup2(groupName, groupEnable, remote);
 		QScriptValueIterator rulesIt(groupsIt.value().property("rules"));
 		while(rulesIt.hasNext()){
+                        /*
+                {
+                        "name":"complex address example",
+                        "type":1,
+                        "enable":true,
+                        "rule":[
+                                {"pattern":"http://abc.com/a","replace":"123.com"},
+                                {"pattern":"http://abc.com/b","replace":"456.com"}
+                        ]
+                }
+                        */
 			rulesIt.next();
 			//constructor the rule
 			RyRule *rule = 0;
@@ -54,8 +65,16 @@ void RyRuleManager::parseConfigContent(QList<QiRuleGroup2 *> *result, QString js
 			QString rName = r.property("name").toString();
 			bool rEnable = r.property("enable").toBool();
 			int rType = r.property("type").toInt32();
-			QString rPattern = r.property("rule").property("pattern").toString();
-			QString rReplace = r.property("rule").property("replace").toString();
+
+                        QScriptValueIterator rulesIt2(r.property("rule"));
+                        QString rPattern;
+                        QString rReplace;
+                        while(rulesIt2.hasNext()){
+                            rulesIt2.next();
+                            if(!rPattern.isEmpty())break;
+                            rPattern = rulesIt2.value().property("pattern").toString();
+                            rReplace = rulesIt2.value().property("replace").toString();
+                        }
 			switch(rType){
 			case COMPLEX_ADDRESS_REPLACE:
 				//ignore complex address replace rule
@@ -93,7 +112,7 @@ void RyRuleManager::loadLocalConfig(){
                                 QTextStream stream(&file);
                                 QString content = stream.readAll();
                                 file.close();
-                                bool isSuccess = setLocalConfigContent(content);
+                                bool isSuccess = setLocalConfigContent(content,true);
                                 if(isSuccess){
                                     emit localConfigLoaded();
                                 }
@@ -108,10 +127,16 @@ void RyRuleManager::loadLocalConfig(){
 	}
 }
 
-bool RyRuleManager::setLocalConfigContent(QString content){
+bool RyRuleManager::setLocalConfigContent(QString content,bool dontSave){
+    //qDebug()<<"set local config content"<<content;
+    localGroups.clear();
     QList<QiRuleGroup2 *> groups;
     parseConfigContent(&groups, content, false);
     localGroups.append(groups);
+    if(!dontSave){
+        //qDebug()<<"toSave";
+        saveLocalConfigChanges();
+    }
     return true;
 }
 
@@ -147,8 +172,9 @@ void RyRuleManager::saveLocalConfigChanges() const{
 			else{
 				qWarning() << "[RuleManager] local config file open fail (write only)";
 			}
-		}
-		qWarning() << "[RuleManager] you can't save config to a directory";
+                }else{
+                    qWarning() << "[RuleManager] you can't save config to a directory";
+                }
 	}
 }
 
@@ -166,9 +192,9 @@ QString RyRuleManager::configusToJSON(int tabCount, bool localOnly) const{
 		}
 	}
 	QString result;
-        QTextStream(&result) << tabs << "[\n"
-						 << tabs << groups.join(",\n") << "\n"
-                                                 << tabs << "]";
+        QTextStream(&result) << tabs << "{\"groups\":[\r\n"
+                                                 << tabs << groups.join(",\r\n") << "\r\n"
+                                                 << tabs << "]}";
         qDebug()<<result;
 	return result;
 }
