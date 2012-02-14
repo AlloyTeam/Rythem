@@ -35,6 +35,7 @@
 #include <zlib.h>
 #endif
 
+#include <QMovie>
 #include <QPixmap>
 
 QByteArray gzipDecompress(QByteArray data){
@@ -192,11 +193,25 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
         decrypedData = gzipDecompress(decrypedData);
     }
 
+    //TODO..
+    QMovie *movie = ui->label->movie();
+    if(movie){
+        delete movie;
+    }
     if(data->getResponseHeader("Content-Type").toLower().indexOf("image")!=-1){
         ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorImageView);
-        QPixmap pixmap;
-        pixmap.loadFromData(decrypedData);
-        ui->label->setPixmap(pixmap);
+        if(!decrypedData.isEmpty()){
+            if(data->getResponseHeader("Content-Type").toLower().indexOf("gif")!=-1){
+                QBuffer *data = new QBuffer(&decrypedData);
+                QMovie *movie = new QMovie(data);
+                ui->label->setMovie(movie);
+                //TODO start and delete movie..
+            }else{
+                QPixmap pixmap;
+                pixmap.loadFromData(decrypedData);
+                ui->label->setPixmap(pixmap);
+            }
+        }
     }else{
         ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorTextView);
     }
