@@ -15,7 +15,7 @@
 
 #ifdef Q_WS_WIN32
 #include "wininet.h"
-#include "qiwinhttp.h"
+#include "rywinhttp.h"
 #include "winnetwk.h"
 #endif
 #ifdef Q_WS_MAC
@@ -213,6 +213,7 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
             }
         }
     }else{
+        ui->label->clear();
         ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorTextView);
     }
 
@@ -315,7 +316,7 @@ void MainWindow::toggleProxy(){
 void MainWindow::toggleCapture(){
     captureAct->setChecked(!isUsingCapture);
 #ifdef Q_WS_WIN32
-    QiWinHttp::init();
+    RyWinHttp::init();
     QtConcurrent::run(this,&MainWindow::toggleProxy);
     //qDebug()<<previousProxyInfo.isUsingPac;
 #endif

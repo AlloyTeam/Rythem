@@ -9,6 +9,8 @@
 #include <QFileDialog>
 #include <QDebug>
 
+#include <QScriptEngine>
+#include <QScriptValue>
 
 #include "ryrulemanager.h"
 #include "ryproxyserver.h"
@@ -22,8 +24,8 @@ class RyJsBridge:public QObject{
         Q_OBJECT
     public:
         RyJsBridge():QObject(){
-            //RyRuleManager *manager = RyRuleManager::instance();
-            //connect(manager,SIGNAL(localConfigLoaded()),SLOT)
+
+
         }
 
     public slots:
@@ -38,6 +40,17 @@ class RyJsBridge:public QObject{
         }
         QString getRules(){
             return "";
+        }
+        QString getConfigs(){
+            RyRuleManager *manager = RyRuleManager::instance();
+            QScriptEngine engine;
+            QString s = manager->configusToJSON();
+            s.prepend("configs =  ");
+            s.remove("\r");
+            s.remove("\n");
+            s.remove("\t");
+            s.append(";");
+            return s;
         }
    signals:
         void ruleChanged(QString json);

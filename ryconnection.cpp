@@ -3,7 +3,7 @@
 
 #include <QApplication>
 #ifdef WIN32
-#include "qiwinhttp.h"
+#include "rywinhttp.h"
 #endif
 
 RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent)
@@ -629,7 +629,7 @@ void RyConnection::doRequestToNetwork(){
         _responseState = ConnectionStateConnecting;
 #ifdef Q_OS_WIN
         // TODO add mac pac support
-        QList<QNetworkProxy> proxylist = QiWinHttp::queryProxy(QNetworkProxyQuery(QUrl(_sendingPipeData->fullUrl)));
+        QList<QNetworkProxy> proxylist = RyWinHttp::queryProxy(QNetworkProxyQuery(QUrl(_sendingPipeData->fullUrl)));
         for(int i=0,l=proxylist.length();i<l;++i){
             QNetworkProxy p = proxylist.at(i);
             if(p.hostName() == RyProxyServer::instance()->serverAddress().toString()

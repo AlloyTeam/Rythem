@@ -130,12 +130,13 @@ QString QiRuleGroup2::toJSON(int tabCount, bool withName) const{
 		list << _rules.at(i)->toJSON(tabCount + 2);
 	}
 	QString result;
-	QString name = withName ? ("\"" + groupName() + "\": ") : "";
+        QString name = withName ? ("\"" + groupName() + "\": ") : "";
 	QTextStream(&result) << tabs << name << "{\n"
-						 << tabs << "\t\"enable\":" << isEnable() << ",\n"
-						 << tabs << "\t\"rules\":[\n" << list.join(",\n") << "\n"
-						 << tabs << "\t]\n"
-						 << tabs << "}";
+                             << tabs << "\t\"name\":"<<"\""<<groupName()<<"\","
+                             << tabs << "\t\"enable\":" << isEnable() << ",\n"
+                             << tabs << "\t\"rules\":[\n" << list.join(",\n") << "\n"
+                             << tabs << "\t]\n"
+                             << tabs << "}";
 	return result;
 }
 

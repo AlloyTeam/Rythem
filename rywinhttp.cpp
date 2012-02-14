@@ -1,4 +1,3 @@
-#ifdef Q_OS_WIN
 #ifndef RYWINHTTP
 #define RYWINHTTP
 #include "rywinhttp.h"
@@ -486,4 +485,3 @@ void RyWinHttp::init(){
 }
 #endif
 
-#endif

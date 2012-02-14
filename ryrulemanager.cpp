@@ -90,13 +90,13 @@ void RyRuleManager::loadLocalConfig(){
 		QFileInfo fileInfo(file);
 		if(fileInfo.exists() && fileInfo.isFile()){
 			if(file.open(QIODevice::ReadOnly)){
-				QTextStream stream(&file);
-				QString content = stream.readAll();
-				QList<QiRuleGroup2 *> groups;
-				parseConfigContent(&groups, content, false);
-				localGroups.append(groups);
-				file.close();
-				emit localConfigLoaded();
+                                QTextStream stream(&file);
+                                QString content = stream.readAll();
+                                file.close();
+                                bool isSuccess = setLocalConfigContent(content);
+                                if(isSuccess){
+                                    emit localConfigLoaded();
+                                }
 			}
 			else{
 				qWarning() << "[RuleManager] local config file open fail (read only)";
@@ -106,6 +106,13 @@ void RyRuleManager::loadLocalConfig(){
 			qWarning() << "[RuleManager] local config file does not exist or is not a file";
 		}
 	}
+}
+
+bool RyRuleManager::setLocalConfigContent(QString content){
+    QList<QiRuleGroup2 *> groups;
+    parseConfigContent(&groups, content, false);
+    localGroups.append(groups);
+    return true;
 }
 
 void RyRuleManager::loadRemoteConfig(){
@@ -150,18 +157,19 @@ QString RyRuleManager::configusToJSON(int tabCount, bool localOnly) const{
 	QStringList groups;
 	int i, length = localGroups.length();
 	for(i=0; i<length; i++){
-		groups << localGroups.at(i)->toJSON(tabCount + 1, true);
+                groups << localGroups.at(i)->toJSON(tabCount + 1, false);
 	}
 	if(!localOnly){
 		length = remoteGroups.length();
 		for(i=0; i<length; i++){
-			groups << remoteGroups.at(i)->toJSON(tabCount + 1, true);
+                        groups << remoteGroups.at(i)->toJSON(tabCount + 1, false);
 		}
 	}
 	QString result;
-	QTextStream(&result) << tabs << "{\n"
+        QTextStream(&result) << tabs << "[\n"
 						 << tabs << groups.join(",\n") << "\n"
-						 << tabs << "}";
+                                                 << tabs << "]";
+        qDebug()<<result;
 	return result;
 }
 

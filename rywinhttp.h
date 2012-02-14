@@ -1,4 +1,3 @@
-#ifdef Q_OS_WIN
 #ifndef RYWINHTTP_H
 #define RYWINHTTP_H
 
@@ -31,4 +30,4 @@ public:
 };
 
 #endif // RYWINHTTP_H
-#endif // Q_OS_WIN
+

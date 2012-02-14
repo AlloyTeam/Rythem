@@ -1,5 +1,14 @@
 ;(function(){
 
+
+function escapeToHtml(str){
+	return str.replace(/&/g,"&amp;").replace(/s/g,"&nbsp;").replace(/\>/g,"&gt;").replace(/</g,"/&lt;");
+}
+function unescapeFromHtml(html){
+ var s = html.replace(/&amp;/g,"&").replace(/&nbsp;/," ").replace(/&gt;/g,">").replace(/&lt;/,"<");
+ return s;
+}
+
     /**
      * 项目里的每条规则，支持编辑和启用/禁用，会自动同步相关的数据
      * @param {Object} ruleConfig
@@ -20,8 +29,10 @@
                 <option value="5">Local Files(.qzmin)</option>\
                 <option value="6">Local Directory</option>\
             </select>\
-            <div class="pattern editable">' + ruleConfig.rule.pattern + '</div>\
-            <div class="replace editable">' + ruleConfig.rule.replace + '</div>\
+            <div class="pattern editable">' + escapeToHtml(ruleConfig.rule.pattern) + '</div>\
+            <div class="replace editable">' + escapeToHtml(ruleConfig.rule.replace) + '</div>\
+			<div class="button selectFile">--</div>\
+			<div class="button selectDir">--</div>\
             <div class="button remove">x</div> \
         ';
 
@@ -45,6 +56,8 @@
         checkbox.addEventListener(	'change', 	function(e){ me.onCheckboxChange(e); });
         el.delegate('.editable', 	'dblclick', function(e, el){ me.onFieldsDoubleClick(e, el); });
         el.delegate('.editable', 	'keydown', 	function(e, el){ me.onFieldsEditing(e, el); });
+        el.delegate('.selectFile', 	'click', 	function(e, el){ me.onSelectFile(e, el);});
+        el.delegate('.selectDir', 	'click', 	function(e, el){ me.onSelectDir(e, el);});
 
         this.setEnable(ruleConfig.enable);
     }
@@ -146,11 +159,19 @@
                 //prevent browser create the <br> tag and stop editing
                 e.preventDefault();
                 stopEdit(fieldEl);
-                this.__config.rule.pattern = this.getPattern();
-                this.__config.rule.replace = this.getReplace();
+				if(this.__patternField == e.srcElement){
+					this.__config.rule.pattern = unescapeFromHtml(e.srcElement.innerHTML);
+				}else if(this.__replaceField == e.srcElement){
+					this.__config.rule.replace = unescapeFromHtml(e.srcElement.innerHTML);
+				}
                 //TODO call client's API to update rule
+				console.info(this.__config);
             }
-        }
+        },
+		onSelectFile: function(e,fieldEl){
+			this.__replaceField.innerHTML = window.App.getFile();
+			this.__config.rule.replace = this.getReplace();
+		}
     };
 
     /**
@@ -381,7 +402,7 @@
                 "type": 6,
                 "enable": true,
                 "rule": {
-                    "pattern": "http://abc.com/mydir/",
+                    "pattern": "http://abc.com/mydir/&amp;&quot;",
                     "replace": "C:/replacement/"
                 }
             }]
@@ -522,7 +543,12 @@
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    function ruleChanged(s){
+        alert(s);
+    }
+
     function init(){
+
         //get ui components
         addGroupBtn 	= document.getElementById('addGroupBtn');
         panelMask 		= document.getElementById('panelMask');
@@ -565,6 +591,12 @@
             hidePanel(addRulePanel);
         });
 
+		if(window.App){
+			var config = window.App.getConfigs();
+			alert(config);
+			config = config.replace(/&quot;/g,"\'");
+			eval(config);
+		}
         createGroups(configs);
     }
 

@@ -74,8 +74,8 @@ QString RyRule::toJSON(int tabCount) const{
 							 << tabs << "\t\"name\":\"" << _name << "\",\n"
 							 << tabs << "\t\"type\":" << _type << ",\n"
 							 << tabs << "\t\"enable\":" << _isEnable << ",\n"
-							 << tabs << "\t\"pattern\":\"" << _pattern << "\",\n"
-							 << tabs << "\t\"replace\":\"" << _replacement << "\"\n"
+                                                         << tabs << "\t\"rule\":{\"pattern\":\"" << _pattern << "\",\n"
+                                                         << tabs << "\t\"replace\":\"" << _replacement << "\"}\n"
 							 << tabs << "}";
 		return result;
 	}
