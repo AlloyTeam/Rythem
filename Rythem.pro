@@ -15,74 +15,59 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     qiddlerpipetablemodel.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
-    qiproxyserver.cpp \
-    qipipe.cpp \
-    qiresponse.cpp \
-    qiwinhttp.cpp \
-    qiconnectiondata.cpp \
+    rywinhttp.cpp \
     qirulemanager.cpp \
     bytearray.cpp \
     websocketserver.cpp \
     websocketclient.cpp \
     connectionmonitorwsserver.cpp \
-    qirulesettingsdialog.cpp \
-    qiresponsefactory.cpp \
-    qiremoteresponseworker.cpp \
-    iqiresponseworker.cpp \
-    qilocalfileresponseworker.cpp \
+    qirulesettingsdialog.cpp\
     httpdecoder.cpp \
-    qirulemanager2.cpp \
     json.cpp \
-    qirulegroup2.cpp \
-    qirule2.cpp \
-    qirulecomplexaddress.cpp \
-    qirulesimpleaddress.cpp \
-    qiruleremotecontent.cpp \
-    qirulelocalfile.cpp \
-    qirulelocalfiles.cpp \
-	qirulelocaldir.cpp \
+    ryrulecomplexaddress.cpp \
     ryproxyserver.cpp \
     rypipedata.cpp \
     ryconnection.cpp \
     composer.cpp \
-    rypipetableview.cpp
+    rypipetableview.cpp \
+    ryrulegroup.cpp \
+    ryrule.cpp \
+    ryrulemanager.cpp \
+    ryrulelocalfiles.cpp \
+    ryrulesimpleaddress.cpp \
+    ryruleremotecontent.cpp \
+    ryrulelocalfile.cpp \
+    ryrulelocaldir.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
     qnetworkproxyfactoryexendforpac.h \
-    qiproxyserver.h \
-    qipipe.h \
-    qiresponse.h \
-    qiwinhttp.h \
-    qiconnectiondata.h \
+    rywinhttp.h \
+    rypipedata.h \
     qirulemanager.h \
     bytearray.h \
     websocketserver.h \
     websocketclient.h \
     connectionmonitorwsserver.h \
     qirulesettingsdialog.h \
-    qiresponsefactory.h \
-    iqiresponseworker.h \
-    qiremoteresponseworker.h \
-    qilocalfileresponseworker.h \
     httpdecoder.h \
-    qirulemanager2.h \
     json.h \
-    qirulegroup2.h \
-    qirule2.h \
-    qirulecomplexaddress.h \
-    qirulesimpleaddress.h \
-    qiruleremotecontent.h \
-    qirulelocalfile.h \
-    qirulelocalfiles.h \
-	qirulelocaldir.h \
     ryproxyserver.h \
     rypipedata.h \
     ryconnection.h \
     composer.h \
-    rypipetableview.h
+    rypipetableview.h \
+    ryrulemanager.h \
+    ryrulegroup.h \
+    ryrulelocaldir.h \
+    ryrule.h \
+    ryrulesimpleaddress.h \
+    ryruleremotecontent.h \
+    ryrulelocalfiles.h \
+    ryrulelocalfile.h \
+    ryrulecomplexaddress.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \

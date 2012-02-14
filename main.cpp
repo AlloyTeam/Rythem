@@ -8,10 +8,9 @@
 #include <QtCore>
 #include <QUrl>
 
-#include "qirulemanager.h"
-#include "qirulemanager2.h"
-#include "qirulegroup2.h"
-#include "qirule2.h"
+#include "ryrulemanager.h"
+#include "ryrulegroup.h"
+#include "ryrule.h"
 
 #include "ryproxyserver.h"
 #include "rypipedata.h"
@@ -50,14 +49,14 @@ int main(int argc, char *argv[])
 #endif
 
 	//new rule manager test----------------------------------------------------
-	QiRuleManager2 manager("/Users/moscartong/Desktop/config.txt");
+        RyRuleManager manager("/Users/moscartong/Desktop/config.txt");
 	manager.loadConfig(); //2ms
-	QList<QiRule2 *> matchResult;
+        QList<RyRule *> matchResult;
 	manager.getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms
 	qDebug() << matchResult;
 	//-------------------------------------------------------------------------
 
-    QiRuleManager::instance();
+
 
     // register metatypes
     qRegisterMetaType<RyPipeData_ptr>("RyPipeData_ptr");
@@ -79,9 +78,9 @@ int main(int argc, char *argv[])
 	ConnectionMonitorWSServer wsServer;
 	wsServer.start();
 	QObject::connect(&w.pipeTableModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), &wsServer, SLOT(handleConnectionChange(QModelIndex, QModelIndex)));
-	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionAdded(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionAdd(ConnectionData_ptr)));
-	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionUpdate(ConnectionData_ptr)));
-	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(ConnectionData_ptr)), &wsServer, SLOT(handleConnectionRemove(ConnectionData_ptr)));
+	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionAdded(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionAdd(RyPipeData_ptr)));
+	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionUpdate(RyPipeData_ptr)));
+	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionRemove(RyPipeData_ptr)));
 
     //QString status;
     //    status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());

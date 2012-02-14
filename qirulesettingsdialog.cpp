@@ -1,6 +1,5 @@
 #include "qirulesettingsdialog.h"
 #include "ui_rule_config.h"
-#include "qirulemanager.h"
 
 QiRuleSettingsDialog::QiRuleSettingsDialog(QWidget *parent) :
     QDialog(parent),

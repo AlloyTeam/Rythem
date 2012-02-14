@@ -6,28 +6,28 @@ ConnectionMonitorWSServer::ConnectionMonitorWSServer(QObject *parent) :
 {
 }
 
-void ConnectionMonitorWSServer::handleConnectionAdd(ConnectionData_ptr p){
+void ConnectionMonitorWSServer::handleConnectionAdd(RyPipeData_ptr p){
 	sendConnectionChangePackageToClients(p);
 }
 
-void ConnectionMonitorWSServer::handleConnectionUpdate(ConnectionData_ptr p){
+void ConnectionMonitorWSServer::handleConnectionUpdate(RyPipeData_ptr p){
 	sendConnectionChangePackageToClients(p);
 }
 
-void ConnectionMonitorWSServer::handleConnectionRemove(ConnectionData_ptr){
+void ConnectionMonitorWSServer::handleConnectionRemove(RyPipeData_ptr){
 	qDebug() << "connection removed";
 }
 
-void ConnectionMonitorWSServer::handleConnectionChange(QModelIndex topLeft, QModelIndex bottomRight){
+void ConnectionMonitorWSServer::handleConnectionChange(QModelIndex , QModelIndex ){
 
 }
 
-void ConnectionMonitorWSServer::sendConnectionChangePackageToClients(ConnectionData_ptr p){
+void ConnectionMonitorWSServer::sendConnectionChangePackageToClients(RyPipeData_ptr p){
 	char s[] = ", ";
 	QString package;
 	QTextStream (&package) << p->id << s
-						   << p->requestMethod << s
-						   << p->returnCode << s
+                                                   << p->method << s
+                                                   << p->responseStatus << s
 						   << p->getRequestHeader("Content-Type");
 	sendToAllClients(package.toLocal8Bit());
 }

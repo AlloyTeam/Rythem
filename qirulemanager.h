@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QtCore>
 #include <QMap>
-#include <qiconnectiondata.h>
+#include <rypipedata.h>
 #include <QApplication>
 #include <QScriptEngine>
 
@@ -138,9 +138,9 @@ public:
     QMap<ConfigKey,QVariant> getConfig(int i){
         return configGroups.at(i);
     }
-    QMap<ConfigKey,QVariant> getRule(ConnectionData_ptr connectionData,bool* isMatch=0);
+    QMap<ConfigKey,QVariant> getRule(RyPipeData_ptr connectionData,bool* isMatch=0);
 
-    bool isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_ptr connectionData);
+    bool isRuleMatch(QMap<ConfigKey,QVariant> rule, RyPipeData_ptr connectionData);
     static bool isRuleNeedBlockOrientResponse(int ruleType){
         //qDebug()<<ruleType;
         switch(ruleType){
@@ -153,7 +153,7 @@ public:
         }
     }
 
-    static QPair<QByteArray,QByteArray> getReplaceContent(QMap<ConfigKey,QVariant> rule,ConnectionData_ptr data=ConnectionData_ptr(new QiConnectionData));
+    static QPair<QByteArray,QByteArray> getReplaceContent(QMap<ConfigKey,QVariant> rule,RyPipeData_ptr data=RyPipeData_ptr());
 
 private:
 

@@ -1,15 +1,15 @@
-#include "qirulelocalfiles.h"
+#include "ryrulelocalfiles.h"
 #include <QScriptEngine>
 #include <QScriptValue>
 #include <QDir>
 
-QiRuleLocalFiles::QiRuleLocalFiles(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
-	QiRule2(name, type, pattern, replacement, enable, remote)
+RyRuleLocalFiles::RyRuleLocalFiles(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
+	RyRule(name, type, pattern, replacement, enable, remote)
 {
 
 }
 
-bool QiRuleLocalFiles::match(const QString &url) const{
+bool RyRuleLocalFiles::match(const QString &url) const{
 	QRegExp rx(pattern(), Qt::CaseInsensitive, QRegExp::Wildcard);
 	return rx.exactMatch(url);
 }
@@ -34,7 +34,7 @@ bool QiRuleLocalFiles::match(const QString &url) const{
 	comment: "just some comment"
   }
   */
-QPair<QByteArray, QByteArray> QiRuleLocalFiles::replace(ConnectionData_ptr) const{
+QPair<QByteArray, QByteArray> RyRuleLocalFiles::replace(RyPipeData_ptr) const{
 	QPair<QByteArray, QByteArray> result;
 	QFile f(replacement());
 	bool fileCanOpen = f.open(QFile::ReadOnly| QIODevice::Text);

@@ -1,6 +1,7 @@
-#ifndef QIWINHTTP
-#define QIWINHTTP
-#include "qiwinhttp.h"
+#ifdef Q_OS_WIN
+#ifndef RYWINHTTP
+#define RYWINHTTP
+#include "rywinhttp.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QStringList>
@@ -206,7 +207,7 @@ static QList<QNetworkProxy> parseServerList(const QNetworkProxyQuery &query, con
 
 
 
-QiWinHttp::QiWinHttp(QObject *parent) :
+RyWinHttp::RyWinHttp(QObject *parent) :
     QObject(parent){
 }
 
@@ -345,7 +346,7 @@ void QWindowsSystemProxy::init()
 }
 
 //== end 1
-QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
+QList<QNetworkProxy> RyWinHttp::queryProxy(const QNetworkProxyQuery &query){
     //qDebug()<<"querying "<<query.url().toString();
 
 
@@ -449,7 +450,7 @@ QList<QNetworkProxy> QiWinHttp::queryProxy(const QNetworkProxyQuery &query){
     return result;
 }
 
-void QiWinHttp::setupProxy(QString host,int port){
+void RyWinHttp::setupProxy(QString host,int port){
     QWindowsSystemProxy *sp = systemProxy();
     if (!sp)
         return ;
@@ -457,7 +458,7 @@ void QiWinHttp::setupProxy(QString host,int port){
     QMutexLocker locker(&sp->mutex);
     Q_UNUSED(locker);
 }
-void QiWinHttp::restoreProxy(){
+void RyWinHttp::restoreProxy(){
     QWindowsSystemProxy *sp = systemProxy();
     if (!sp)
         return ;
@@ -475,7 +476,7 @@ void QiWinHttp::restoreProxy(){
     }
 }
 
-void QiWinHttp::init(){
+void RyWinHttp::init(){
     QWindowsSystemProxy *sp = systemProxy();
     if (!sp)
         return;
@@ -483,4 +484,6 @@ void QiWinHttp::init(){
     Q_UNUSED(locker);
     sp->init();
 }
+#endif
+
 #endif

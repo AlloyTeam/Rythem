@@ -1,21 +1,21 @@
-#include "qiruleremotecontent.h"
+#include "ryruleremotecontent.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QEventLoop>
 
-QiRuleRemoteContent::QiRuleRemoteContent(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
-	QiRule2(name, type, pattern, replacement, enable, remote)
+RyRuleRemoteContent::RyRuleRemoteContent(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
+	RyRule(name, type, pattern, replacement, enable, remote)
 {
 
 }
 
-bool QiRuleRemoteContent::match(const QString &url) const{
+bool RyRuleRemoteContent::match(const QString &url) const{
 	QRegExp rx(pattern(), Qt::CaseInsensitive, QRegExp::Wildcard);
 	return rx.exactMatch(url);
 }
 
-QPair<QByteArray, QByteArray> QiRuleRemoteContent::replace(ConnectionData_ptr) const{
+QPair<QByteArray, QByteArray> RyRuleRemoteContent::replace(RyPipeData_ptr) const{
 	//load remote content
 	QNetworkAccessManager networkAccessManager;
 	QNetworkReply *reply = networkAccessManager.get(QNetworkRequest(QUrl(replacement())));

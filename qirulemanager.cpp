@@ -11,7 +11,7 @@ QiRuleManager *QiRuleManager::instance(){
 
 //extern static QScriptEngine QiRuleManager::engine;
 
-QMap<QiRuleManager::ConfigKey,QVariant> QiRuleManager::getRule(ConnectionData_ptr connectionData,bool *isMatch){
+QMap<QiRuleManager::ConfigKey,QVariant> QiRuleManager::getRule(RyPipeData_ptr connectionData,bool *isMatch){
     *isMatch = false;
     for(int i=0,l=configGroups.size();i<l;++i){//TODO 优先级
         QMap<ConfigKey,QVariant> configGroup = configGroups.at(i);
@@ -29,7 +29,7 @@ QMap<QiRuleManager::ConfigKey,QVariant> QiRuleManager::getRule(ConnectionData_pt
     return emptyRule;
 }
 
-bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_ptr connectionData){
+bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, RyPipeData_ptr connectionData){
     int type = qVariantValue<int>(rule[ConfigKey_RuleType]);
     //TODO
     QString entry = rule[ConfigKey_RulePattern].toString();
@@ -59,7 +59,7 @@ bool QiRuleManager::isRuleMatch(QMap<ConfigKey,QVariant> rule, ConnectionData_pt
 
     return false;
 }
-QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVariant> rule,ConnectionData_ptr connectionData){
+QPair<QByteArray,QByteArray> QiRuleManager::getReplaceContent(QMap<ConfigKey,QVariant> rule,RyPipeData_ptr connectionData){
 
     //TODO 重构
 

@@ -6,15 +6,15 @@
 #include <QDebug>
 #include <QSharedPointer>
 
-class QiConnectionData {
+class QiConnectoionData {
 private:
 public:
-    QiConnectionData(int socketDescriptor=-1);
-    ~QiConnectionData(){
+    QiConnectoionData(int socketDescriptor=-1);
+    ~QiConnectoionData(){
         //qDebug()<<"~connectionData";
     }
 
-    inline QiConnectionData(const QiConnectionData& p){//copy ctor
+    inline QiConnectoionData(const QiConnectoionData& p){//copy ctor
         qDebug()<<"connectionData copy ctor";
         number = p.number;
 
@@ -94,10 +94,10 @@ private:
     void setRequestRawData(QByteArray request);//only for copy Ctor
     void setResponseRawData(QByteArray response);//only for copy Ctor
 };
-typedef QSharedPointer<const QiConnectionData> ConnectionData_const_ptr;
-typedef QSharedPointer<QiConnectionData> ConnectionData_ptr;
-typedef const QSharedPointer<QiConnectionData> ConnectionData_ptr_const;
-typedef const QSharedPointer<const QiConnectionData> ConnectionData_const_ptr_const;
+typedef QSharedPointer<const QiConnectoionData> ConnectionData_const_ptr;
+typedef QSharedPointer<QiConnectoionData> ConnectionData_ptr;
+typedef const QSharedPointer<QiConnectoionData> ConnectionData_ptr_const;
+typedef const QSharedPointer<const QiConnectoionData> ConnectionData_const_ptr_const;
 
 
 

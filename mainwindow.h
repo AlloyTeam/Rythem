@@ -14,9 +14,9 @@ namespace Ui {
 }
 class QiProxyServer;
 class QiPipe;
-class QiConnectionData;
+class RyPipeData;
 class QItemSelectionModel;
-class QiJsBridge:public QObject{
+class RyJsBridge:public QObject{
         Q_OBJECT
     public slots:
         void doAction(const QString &msgType,const QString msg=""){
@@ -33,6 +33,7 @@ class QiJsBridge:public QObject{
         }
    signals:
         void ruleChanged();
+        void pipeChanged();
 };
 
 class MainWindow : public QMainWindow
@@ -72,7 +73,7 @@ protected:
 private:
     Ui::MainWindow *ui;
     QVector<QiPipe*> *pipes;
-    QiJsBridge *jsBridge;
+    RyJsBridge *jsBridge;
     void createMenus();
     QiProxyServer *server;
 

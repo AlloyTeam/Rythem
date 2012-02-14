@@ -1,5 +1,5 @@
 #include "qiddlerpipetablemodel.h"
-#include "qiconnectiondata.h"
+#include "rypipedata.h"
 #include <QVector>
 #include <QStringList>
 #include <QDebug>
@@ -13,10 +13,10 @@ QiddlerPipeTableModel::~QiddlerPipeTableModel(){
     qDebug()<<"~QiddlerPipeTableModel";
 }
 
-int QiddlerPipeTableModel::rowCount( const QModelIndex & parent ) const{
+int QiddlerPipeTableModel::rowCount( const QModelIndex & ) const{
     return pipesVector.count();
 }
-int QiddlerPipeTableModel::columnCount(const QModelIndex &parent) const{
+int QiddlerPipeTableModel::columnCount(const QModelIndex &) const{
     return 9;
 }
 
@@ -94,7 +94,7 @@ bool QiddlerPipeTableModel::itemLessThan(RyPipeData_ptr a,RyPipeData_ptr b){
                 rypipeDataGetDataByColumn(b,1);
 }
 
-void QiddlerPipeTableModel::sort(int column, Qt::SortOrder order/* = Qt::AscendingOrder*/){
+void QiddlerPipeTableModel::sort(int column, Qt::SortOrder/* = Qt::AscendingOrder*/){
     //qDebug()<<"sort called..";
     _sortingColumn = column;
     //rypipeDataGetDataByColumn(a,_sortingColumn),

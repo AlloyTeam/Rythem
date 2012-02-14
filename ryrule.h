@@ -1,8 +1,8 @@
-#ifndef QIRULE2_H
-#define QIRULE2_H
+#ifndef RYRULE_H
+#define RYRULE_H
 
 #include <QtCore>
-#include "qiconnectiondata.h"
+#include "rypipedata.h"
 
 enum RuleType{
 	COMPLEX_ADDRESS_REPLACE = 1,
@@ -13,22 +13,22 @@ enum RuleType{
 	LOCAL_DIR_REPLACE = 6
 };
 
-class QiRule2 : public QObject
+class RyRule : public QObject
 {
 	Q_OBJECT
 public:
-	QiRule2();
-	QiRule2(const QiRule2 &rule);
-	explicit QiRule2(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
+        RyRule();
+        RyRule(const RyRule &rule);
+        explicit RyRule(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
 
-	QiRule2 operator =(const QiRule2 &rule);
-	bool operator ==(const QiRule2 &rule) const;
-	bool operator <(const QiRule2 &rule) const;
+        RyRule operator =(const RyRule &rule);
+        bool operator ==(const RyRule &rule) const;
+        bool operator <(const RyRule &rule) const;
 
 	void update(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
-	void update(const QiRule2 &rule);
+        void update(const RyRule &rule);
 	virtual bool match(const QString &url) const;
-	virtual QPair<QByteArray, QByteArray> replace(ConnectionData_ptr conn) const;
+        virtual QPair<QByteArray, QByteArray> replace(RyPipeData_ptr conn) const;
 	QString toJSON(int tabCount = 0) const;
 
 	bool isNull() const;
@@ -51,6 +51,6 @@ private:
 	bool _isRemote;
 };
 
-QDebug operator <<(QDebug dbg, const QiRule2 &rule);
+QDebug operator <<(QDebug dbg, const RyRule &rule);
 
-#endif // QIRULE2_H
+#endif // RYRULE_H

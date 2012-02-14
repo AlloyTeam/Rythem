@@ -1,4 +1,4 @@
-#include "qirulegroup2.h"
+#include "ryrulegroup.h"
 
 QiRuleGroup2::QiRuleGroup2() :
 	QObject(),
@@ -52,7 +52,7 @@ void QiRuleGroup2::update(const QiRuleGroup2 &group){
 	update(group.groupName(), group.isEnable(), group.isRemote());
 }
 
-void QiRuleGroup2::addRule(QiRule2 *value, int index){
+void QiRuleGroup2::addRule(RyRule *value, int index){
 	//remove existed rule with the same name first
 	int existIndex = _rules.indexOf(value);
 	if(existIndex != -1) this->removeRuleAt(existIndex);
@@ -76,24 +76,24 @@ int QiRuleGroup2::getRuleIndex(const QString name) const{
 	return -1;
 }
 
-QiRule2 *QiRuleGroup2::getRule(const QString name) const{
+RyRule *QiRuleGroup2::getRule(const QString name) const{
 	int index = this->getRuleIndex(name);
 	return _rules.value(index);
 }
 
-QiRule2 *QiRuleGroup2::getRuleAt(const int index) const{
+RyRule *QiRuleGroup2::getRuleAt(const int index) const{
 	return _rules.at(index);
 }
 
-void QiRuleGroup2::updateRule(const QString name, const QiRule2 &newValue){
+void QiRuleGroup2::updateRule(const QString name, const RyRule &newValue){
 	int index = this->getRuleIndex(name);
 	if(index != -1){
 		this->updateRuleAt(index, newValue);
 	}
 }
 
-void QiRuleGroup2::updateRuleAt(const int index, const QiRule2 &newValue){
-	QiRule2 *rule = _rules.at(index);
+void QiRuleGroup2::updateRuleAt(const int index, const RyRule &newValue){
+	RyRule *rule = _rules.at(index);
 	rule->update(newValue);
 	emit changed();
 }
@@ -112,10 +112,10 @@ void QiRuleGroup2::removeRuleAt(const int index){
 }
 
 //判斷一下返回結果的isNull()
-void QiRuleGroup2::match(QList<QiRule2 *> *result, const QString &url) const{
+void QiRuleGroup2::match(QList<RyRule *> *result, const QString &url) const{
 	int i, length = _rules.length();
 	for(i=0; i<length; i++){
-		QiRule2 *rule = _rules.at(i);
+		RyRule *rule = _rules.at(i);
 		if(rule->match(url)){
 			result->append(rule);
 		}

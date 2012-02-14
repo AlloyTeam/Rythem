@@ -1,24 +1,24 @@
-#ifndef QIRULEMANAGER2_H
-#define QIRULEMANAGER2_H
+#ifndef RYRULEMANAGER_H
+#define RYRULEMANAGER_H
 
 #include <QtCore>
 #include <QHttp>
-#include "qirule2.h"
-#include "qirulecomplexaddress.h"
-#include "qirulesimpleaddress.h"
-#include "qiruleremotecontent.h"
-#include "qirulelocalfile.h"
-#include "qirulelocalfiles.h"
-#include "qirulelocaldir.h"
-#include "qirulegroup2.h"
-#include "qipipe.h"
-#include "qiconnectiondata.h"
+#include "ryrule.h"
+#include "ryrulecomplexaddress.h"
+#include "ryrulesimpleaddress.h"
+#include "ryruleremotecontent.h"
+#include "ryrulelocalfile.h"
+#include "ryrulelocalfiles.h"
+#include "ryrulelocaldir.h"
+#include "ryrulegroup.h"
+#include "ryconnection.h"
+#include "rypipedata.h"
 
-class QiRuleManager2 : public QObject
+class RyRuleManager : public QObject
 {
 	Q_OBJECT
 public:
-	explicit QiRuleManager2(QString localFile = "", QString host = "", QString address = "", QString path = "");
+        explicit RyRuleManager(QString localFile = "", QString host = "", QString address = "", QString path = "");
 	void setLocalConfig(QString localFile, bool reload = false);
 	void setRemoteConfig(QString host, QString addr, QString path, bool reload = false);
 	QString remoteConfigURL();
@@ -31,9 +31,9 @@ public:
 	void addRuleGroup(QiRuleGroup2 *value, int index = -1);
 	QString configusToJSON(int tabCount = 0, bool localOnly = false) const;
 
-	void getMatchRules(QList<QiRule2 *> *result, const QString &url, const QString &groupName = "") const;
-	void replace(ConnectionData_ptr connectionData) const;
-	void replace(ConnectionData_ptr connectionData, const QList<QiRule2 *> *rules) const;
+	void getMatchRules(QList<RyRule *> *result, const QString &url, const QString &groupName = "") const;
+        void replace(RyPipeData_ptr connectionData) const;
+        void replace(RyPipeData_ptr connectionData, const QList<RyRule *> *rules) const;
 
 	QString localConfigFile;
 	QString remoteHost;
@@ -52,8 +52,8 @@ public slots:
 private:
 	QHttp remoteConfigLoader;
 	void parseConfigContent(QList<QiRuleGroup2 *> *result, QString json, bool remote = false);
-	void findMatchInGroups(QList<QiRule2 *> *result, const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const;
+	void findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const;
 	
 };
 
-#endif // QIRULEMANAGER2_H
+#endif // RYRULEMANAGER_H

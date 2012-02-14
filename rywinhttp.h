@@ -1,5 +1,6 @@
-#ifndef QIWINHTTP_H
-#define QIWINHTTP_H
+#ifdef Q_OS_WIN
+#ifndef RYWINHTTP_H
+#define RYWINHTTP_H
 
 
 
@@ -13,11 +14,11 @@
 #include <QNetworkProxyQuery>
 
 
-class QiWinHttp : public QObject
+class RyWinHttp : public QObject
 {
     Q_OBJECT
 public:
-    explicit QiWinHttp(QObject *parent = 0);
+    explicit RyWinHttp(QObject *parent = 0);
 signals:
 
 public slots:
@@ -29,4 +30,5 @@ public:
     static void restoreProxy();
 };
 
-#endif // QIWINHTTP_H
+#endif // RYWINHTTP_H
+#endif // Q_OS_WIN

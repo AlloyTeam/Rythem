@@ -1,16 +1,16 @@
-#include "qirulelocaldir.h"
+#include "ryrulelocaldir.h"
 
-QiRuleLocalDir::QiRuleLocalDir(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
-	QiRule2(name, type, pattern, replacement, enable, remote)
+RyRuleLocalDir::RyRuleLocalDir(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
+	RyRule(name, type, pattern, replacement, enable, remote)
 {
 
 }
 
-bool QiRuleLocalDir::match(const QString &url) const{
+bool RyRuleLocalDir::match(const QString &url) const{
 	return (url.indexOf(pattern()) != -1);
 }
 
-QPair<QByteArray, QByteArray> QiRuleLocalDir::replace(ConnectionData_ptr conn) const{
+QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const{
 	QPair<QByteArray, QByteArray> result;
 	QByteArray header, body;
 	QString status;

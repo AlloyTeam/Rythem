@@ -1,10 +1,10 @@
-#include "qirule2.h"
+#include "ryrule.h"
 
-QiRule2::QiRule2() :QObject(){
+RyRule::RyRule() :QObject(){
 
 }
 
-QiRule2::QiRule2(const QiRule2 &rule) :
+RyRule::RyRule(const RyRule &rule) :
 	QObject(),
 	_name(rule.name()),
 	_type(rule.type()),
@@ -16,7 +16,7 @@ QiRule2::QiRule2(const QiRule2 &rule) :
 
 }
 
-QiRule2::QiRule2(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
+RyRule::RyRule(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
 	QObject(),
 	_name(name),
 	_type(type),
@@ -27,20 +27,20 @@ QiRule2::QiRule2(QString name, int type, QString pattern, QString replacement, b
 {
 }
 
-QiRule2 QiRule2::operator =(const QiRule2 &rule){
+RyRule RyRule::operator =(const RyRule &rule){
 	this->update(rule.name(), rule.type(), rule.pattern(), rule.replacement(), rule.isEnable(), rule.isRemoteRule());
 	return *this;
 }
 
-bool QiRule2::operator ==(const QiRule2 &rule) const{
+bool RyRule::operator ==(const RyRule &rule) const{
 	return this->name() == rule.name();
 }
 
-bool QiRule2::operator <(const QiRule2 &rule) const{
+bool RyRule::operator <(const RyRule &rule) const{
 	return this->type() < rule.type();
 }
 
-void QiRule2::update(QString name, int type, QString pattern, QString replacement, bool enable, bool remote){
+void RyRule::update(QString name, int type, QString pattern, QString replacement, bool enable, bool remote){
 	if(!_isRemote){
 		_isRemote = remote;
 		_isEnable = enable;
@@ -52,21 +52,21 @@ void QiRule2::update(QString name, int type, QString pattern, QString replacemen
 	}
 }
 
-void QiRule2::update(const QiRule2 &rule){
+void RyRule::update(const RyRule &rule){
 	this->update(rule.name(), rule.type(), rule.pattern(), rule.replacement(), rule.isEnable(), rule.isRemoteRule());
 }
 
-bool QiRule2::match(const QString &) const{
+bool RyRule::match(const QString &) const{
 	//override this method in different type of rule
 	return false;
 }
 
-QPair<QByteArray, QByteArray> QiRule2::replace(ConnectionData_ptr) const{
+QPair<QByteArray, QByteArray> RyRule::replace(RyPipeData_ptr) const{
 	//override this method in different type of rule
 	return QPair<QByteArray, QByteArray>();
 }
 
-QString QiRule2::toJSON(int tabCount) const{
+QString RyRule::toJSON(int tabCount) const{
 	QString tabs = QString("\t").repeated(tabCount);
 	if(!isNull()){
 		QString result;
@@ -82,29 +82,29 @@ QString QiRule2::toJSON(int tabCount) const{
 	else return "{}";
 }
 
-bool QiRule2::isNull() const{
+bool RyRule::isNull() const{
 	return (!_pattern.length() && !_replacement.length());
 }
-bool QiRule2::isRemoteRule() const{
+bool RyRule::isRemoteRule() const{
 	return _isRemote;
 }
-bool QiRule2::isEnable() const{
+bool RyRule::isEnable() const{
 	return _isEnable;
 }
-QString QiRule2::name() const{
+QString RyRule::name() const{
 	return _name;
 }
-int QiRule2::type() const{
+int RyRule::type() const{
 	return _type;
 }
-QString QiRule2::pattern() const{
+QString RyRule::pattern() const{
 	return _pattern;
 }
-QString QiRule2::replacement() const{
+QString RyRule::replacement() const{
 	return _replacement;
 }
 
-QDebug operator <<(QDebug dbg, const QiRule2 &rule){
+QDebug operator <<(QDebug dbg, const RyRule &rule){
 	dbg.nospace() << "(pattern=" << rule.pattern() << ", replace=" << rule.replacement() << ")";
 	return dbg.space();
 }

@@ -36,6 +36,7 @@ class RyPipeData : public QObject
         */
         quint64 socketConnectionId;
         QString host;
+        QString replacedHost;
         quint16 port;
         QString method;
         QString path;

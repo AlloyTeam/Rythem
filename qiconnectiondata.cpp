@@ -2,14 +2,14 @@
 #include <QDebug>
 #include <QStringList>
 
-QiConnectionData::QiConnectionData(int socketDescriptor){
+QiConnectoionData::QiConnectoionData(int socketDescriptor){
     //qDebug()<<"connectionData contructed:";
     id=-1;
     returnCode = -1;
 }
 
 
-void QiConnectionData::setRequestHeader(QByteArray header){
+void QiConnectoionData::setRequestHeader(QByteArray header){
     requestHeaderRawData = header;
     header.replace("\r\n","\n");
     int i=0,l=header.length();
@@ -98,7 +98,7 @@ void QiConnectionData::setRequestHeader(QByteArray header){
         i=j+1;
     }
 }
-void QiConnectionData::setResponseHeader(QByteArray header){
+void QiConnectoionData::setResponseHeader(QByteArray header){
     responseHeaderRawData = header;
     //TODO.. Ctrl+c & Ctrl+v from setRequestHeader
     header.replace("\r\n","\n");
@@ -138,17 +138,17 @@ void QiConnectionData::setResponseHeader(QByteArray header){
 }
 
 
-QByteArray QiConnectionData::getResponseHeader(QByteArray name)const{
+QByteArray QiConnectoionData::getResponseHeader(QByteArray name)const{
     return allResponseHeaders[name];
 }
-QByteArray QiConnectionData::getResponseHeader()const{
+QByteArray QiConnectoionData::getResponseHeader()const{
 
 }
-QByteArray QiConnectionData::getResponseBody()const{
+QByteArray QiConnectoionData::getResponseBody()const{
 
 }
 
-QByteArray QiConnectionData::getRequestHeader() const{
+QByteArray QiConnectoionData::getRequestHeader() const{
     if(requestRawData.isEmpty()){
         return requestRawData;
     }
@@ -162,10 +162,10 @@ QByteArray QiConnectionData::getRequestHeader() const{
         return requestRawData.left(i);
     }
 }
-QByteArray QiConnectionData::getRequestHeader(QByteArray name) const{
+QByteArray QiConnectoionData::getRequestHeader(QByteArray name) const{
     return allRequestHeaders.value(name,QByteArray());
 }
-QByteArray QiConnectionData::getRequestBody()const{
+QByteArray QiConnectoionData::getRequestBody()const{
     if(requestRawData.isEmpty()){
         return QByteArray();
     }
@@ -181,7 +181,7 @@ QByteArray QiConnectionData::getRequestBody()const{
     return QByteArray();
 
 }
-bool QiConnectionData::appendResponseBody(QByteArray newContent){
+bool QiConnectoionData::appendResponseBody(QByteArray newContent){
     responseBody.append(newContent);
     //qDebug()<<"appending response body:"<<responseBody;
     if(this->getResponseHeader("Transfer-Encoding").toLower() == "chunked"){
@@ -285,7 +285,7 @@ bool QiConnectionData::appendResponseBody(QByteArray newContent){
     }
     return true;
 }
-bool QiConnectionData::appendRequestBody(QByteArray newContent){
+bool QiConnectoionData::appendRequestBody(QByteArray newContent){
     requestBody.append(newContent);
     requestRawDataToSend.append(newContent);
 
@@ -300,24 +300,24 @@ bool QiConnectionData::appendRequestBody(QByteArray newContent){
 
 
 //apis for replace rule
-void QiConnectionData::setHost(QString newHost){
+void QiConnectoionData::setHost(QString newHost){
     //QString oldHost = host;
     host = newHost;
     allRequestHeaders["Host"] = QByteArray().append(newHost);
 }
 
-void QiConnectionData::setRemoteAddress(QString address,int port){
+void QiConnectoionData::setRemoteAddress(QString address,int port){
 
 }
 
-void QiConnectionData::setPath(QString path){
+void QiConnectoionData::setPath(QString path){
 
 }
 
-void QiConnectionData::setRequestRawData(QByteArray request){//only for copy Ctor
+void QiConnectoionData::setRequestRawData(QByteArray request){//only for copy Ctor
 
 }
-void QiConnectionData::setResponseRawData(QByteArray response){//only for copy Ctor
+void QiConnectoionData::setResponseRawData(QByteArray response){//only for copy Ctor
 
 }
 

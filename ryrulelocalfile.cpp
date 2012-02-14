@@ -1,8 +1,8 @@
-#include "qirulelocalfile.h"
+#include "ryrulelocalfile.h"
 
-QMap<QString, QString> QiRuleLocalFile::mimeMap = QiRuleLocalFile::initMimeMap();
+QMap<QString, QString> RyRuleLocalFile::mimeMap = RyRuleLocalFile::initMimeMap();
 
-QMap<QString, QString> QiRuleLocalFile::initMimeMap(){
+QMap<QString, QString> RyRuleLocalFile::initMimeMap(){
 	QMap<QString, QString> map;
 	map.insert("html",	"text/html");
 	map.insert("js",	"text/javascript");
@@ -15,18 +15,18 @@ QMap<QString, QString> QiRuleLocalFile::initMimeMap(){
 	return map;
 }
 
-QiRuleLocalFile::QiRuleLocalFile(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
-	QiRule2(name, type, pattern, replacement, enable, remote)
+RyRuleLocalFile::RyRuleLocalFile(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
+	RyRule(name, type, pattern, replacement, enable, remote)
 {
 
 }
 
-bool QiRuleLocalFile::match(const QString &url) const{
+bool RyRuleLocalFile::match(const QString &url) const{
 	QRegExp rx(pattern(), Qt::CaseInsensitive, QRegExp::Wildcard);
 	return rx.exactMatch(url);
 }
 
-QPair<QByteArray, QByteArray> QiRuleLocalFile::replace(ConnectionData_ptr) const{
+QPair<QByteArray, QByteArray> RyRuleLocalFile::replace(RyPipeData_ptr) const{
 	//open local file for read
 	QFile file(replacement());
 	QFileInfo fileInfo(file);

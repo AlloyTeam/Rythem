@@ -2,8 +2,8 @@
 #include "ui_mainwindow.h"
 
 #include <QTcpServer>
-#include "qiconnectiondata.h"
-#include "qiproxyserver.h"
+#include "rypipedata.h"
+#include "ryproxyserver.h"
 #include <QSettings>
 #include <QVariant>
 #include <QUrl>
@@ -103,7 +103,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setColumnWidth(1,30);
     ui->tableView->setSortingEnabled(true);
 
-    jsBridge = new QiJsBridge();
+    jsBridge = new RyJsBridge();
 
     addJsObject();
     connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
@@ -159,7 +159,7 @@ void MainWindow::onNewPipe(RyPipeData_ptr pipeData){
     pipeTableModel.addItem(pipeData);
 }
 
-void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight){
+void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
     //qDebug()<<"onSelectionChange";
     int row = topLeft.row();
     RyPipeData_ptr data = pipeTableModel.getItem(row);
@@ -223,7 +223,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
 }
 
-void MainWindow::dragEnterEvent(QDragEnterEvent *event){
+void MainWindow::dragEnterEvent(QDragEnterEvent *){
 
 }
 
