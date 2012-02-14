@@ -16,6 +16,8 @@ Composer::Composer(QWidget *parent) :
     connect(ui->sendbtn,SIGNAL(clicked()),SLOT(onSendBtnClick()));
     connect(ui->disconnectbtn,SIGNAL(clicked()),SLOT(onDisConnectBtnClick()));
 
+    setAcceptDrops(true);
+
     ui->requestsComboBox->clear();
 
     QStringList requestStr;
@@ -159,6 +161,31 @@ void Composer::setupProxy(QString host,qint16 port){
     qDebug()<<host<<port;
     //socket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,host,port));
 
+}
+
+void Composer::dragEnterEvent(QDragEnterEvent *event){
+    qDebug()<<"drag enter";
+    if (event->mimeData()->hasText()) {
+        if (event->source() == this) {
+            event->setDropAction(Qt::MoveAction);
+            event->accept();
+        } else {
+            event->acceptProposedAction();
+        }
+    } else {
+        event->ignore();
+    }
+}
+
+void Composer::dropEvent(QDropEvent *event){
+    qDebug()<<event->source();
+    if (event->mimeData()->hasText()) {
+        const QMimeData *mime = event->mimeData();
+        qDebug()<<"drop text="<<mime->text();
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
 }
 
 void Composer::onConnectBtnClick(){

@@ -33,7 +33,7 @@
 #ifdef Q_OS_WIN32
 #include "zlib/zlib.h"
 #else
-#include "zlib.h"
+#include <zlib.h>
 #endif
 
 QByteArray gzipDecompress(QByteArray data){
@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     addJsObject();
     connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
-    ui->webView->load(QUrl("http://127.0.0.1:8889/test/"));
+    ui->webView->load(QUrl("http://127.0.0.1:8889/manager/RythemManagerUI/rules.html"));
 
     // should use slot to do this
     //ui->composer->setupProxy(RyProxyServer::instance()->serverAddress().toString(),
@@ -203,6 +203,28 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex bottomRight)
 
 
     data.clear();
+}
+
+
+void MainWindow::mousePressEvent(QMouseEvent *event){
+    qDebug()<<"mouseenter";
+    QTableView *table = static_cast<QTableView*>(childAt(event->pos()));
+    if (!table || table!=ui->tableView){
+        return;
+    }
+    qDebug()<<"is table";
+    QPoint hotSpot = event->pos() - table->pos();
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setText("child->text()");
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mimeData);
+    //drag->setPixmap(pixmap);
+    drag->setHotSpot(hotSpot);
+    drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event){
+
 }
 
 void MainWindow::toggleProxy(){

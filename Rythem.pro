@@ -44,7 +44,8 @@ SOURCES += main.cpp\
     ryproxyserver.cpp \
     rypipedata.cpp \
     ryconnection.cpp \
-    composer.cpp
+    composer.cpp \
+    rypipetableview.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -80,7 +81,8 @@ HEADERS  += mainwindow.h \
     ryproxyserver.h \
     rypipedata.h \
     ryconnection.h \
-    composer.h
+    composer.h \
+    rypipetableview.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
@@ -104,7 +106,7 @@ mac:CONFIG += app_bundle
 
 
 win32:LIBS += G:\QtSDK\mingw\lib\libwininet.a
-mac:LIBS += -framework SystemConfiguration -framework coreFoundation
+mac:LIBS += -framework SystemConfiguration -framework coreFoundation -lz
 
 RESOURCES += \
     httpfiles.qrc

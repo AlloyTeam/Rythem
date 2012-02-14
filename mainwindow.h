@@ -65,6 +65,10 @@ public:
 	}ProxyInfo;
 	QiddlerPipeTableModel pipeTableModel;
 
+protected:
+        void mousePressEvent(QMouseEvent *);
+        void dragEnterEvent(QDragEnterEvent *);
+
 private:
     Ui::MainWindow *ui;
     QVector<QiPipe*> *pipes;

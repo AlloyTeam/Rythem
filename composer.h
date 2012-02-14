@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTcpSocket>
+#include "rypipedata.h"
 
 namespace Ui {
     class Composer;
@@ -16,6 +17,10 @@ class Composer : public QWidget
         explicit Composer(QWidget *parent = 0);
         ~Composer();
         void setupProxy(QString host,qint16 port);
+
+    protected:
+        void dragEnterEvent(QDragEnterEvent *event);
+        void dropEvent(QDropEvent *event);
 
     private:
         Ui::Composer *ui;

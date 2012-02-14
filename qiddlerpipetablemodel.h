@@ -26,6 +26,7 @@ public:
 public slots:
     void addItem(RyPipeData_ptr p);
     void removeItems();
+    //void removeItemAtIndex();
     void removeAllItem();
 
     RyPipeData_ptr getItem(int column);
@@ -41,7 +42,7 @@ signals:
 public slots:
 
 private:
-    int pipeNumber;
+    int _pipeNumber;
     int _sortingColumn;
 };
 

@@ -5,7 +5,7 @@
 #include <QDebug>
 
 QiddlerPipeTableModel::QiddlerPipeTableModel(QObject *parent) :
-    QAbstractTableModel(parent),pipeNumber(0){
+    QAbstractTableModel(parent),_pipeNumber(0){
 }
 QiddlerPipeTableModel::~QiddlerPipeTableModel(){
     blockSignals(true);
@@ -130,10 +130,10 @@ void QiddlerPipeTableModel::updateItem(RyPipeData_ptr p){
 void QiddlerPipeTableModel::addItem(RyPipeData_ptr p){
     //qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
     RyPipeData_ptr p1 = p;
-    ++pipeNumber;
-    p1->number=pipeNumber;
+    ++_pipeNumber;
+    p1->number=_pipeNumber;
 
-    this->beginInsertRows(index(pipeNumber-1, 0),pipeNumber-1,pipeNumber-1);
+    this->beginInsertRows(index(_pipeNumber-1, 0),_pipeNumber-1,_pipeNumber-1);
 
     //TODO thread safe?
 	pipesMap[p1->id] = p1;
