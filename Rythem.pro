@@ -16,7 +16,6 @@ SOURCES += main.cpp\
     qiddlerpipetablemodel.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
     rywinhttp.cpp \
-    qirulemanager.cpp \
     bytearray.cpp \
     websocketserver.cpp \
     websocketclient.cpp \
@@ -46,7 +45,6 @@ HEADERS  += mainwindow.h \
     qnetworkproxyfactoryexendforpac.h \
     rywinhttp.h \
     rypipedata.h \
-    qirulemanager.h \
     bytearray.h \
     websocketserver.h \
     websocketclient.h \
