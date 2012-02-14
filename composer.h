@@ -31,6 +31,8 @@ class Composer : public QWidget
 
         QList<QStringList> _requests;
 
+        RyPipeData_ptr pipeData;
+
     private slots:
         void onConnected();
         void onData();

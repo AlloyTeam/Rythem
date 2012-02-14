@@ -1,6 +1,12 @@
 #include "ryrulemanager.h"
 #include <QtScript>
 
+Q_GLOBAL_STATIC(RyRuleManager, ruleManager)
+RyRuleManager *RyRuleManager::instance(){
+    return ruleManager();
+}
+
+
 RyRuleManager::RyRuleManager(QString localFile, QString host, QString address, QString path) :
 	QObject(),
 	localConfigFile(localFile),

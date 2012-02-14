@@ -21,11 +21,11 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QTableView" name="tableView"/>
-      <widget class="QTabWidget" name="tabWidget">
+      <widget class="QTabWidget" name="tollTabs">
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="inspectorTab">
         <attribute name="title">
          <string>Inspector</string>
         </attribute>
@@ -35,8 +35,60 @@
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
-           <widget class="QPlainTextEdit" name="requestTextEdit"/>
-           <widget class="QPlainTextEdit" name="responseTextEdit"/>
+           <widget class="QTabWidget" name="requestInspectorTabs">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="requestInspectorTextview">
+             <attribute name="title">
+              <string>TextView</string>
+             </attribute>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QTextEdit" name="requestTextEdit"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_7">
+             <attribute name="title">
+              <string>webForms</string>
+             </attribute>
+            </widget>
+           </widget>
+           <widget class="QTabWidget" name="responseInspectorTabs">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <widget class="QWidget" name="responseInspectorTextView">
+             <attribute name="title">
+              <string>TextView</string>
+             </attribute>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QPlainTextEdit" name="responseTextEdit"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="responseInspectorImageView">
+             <attribute name="title">
+              <string>ImageView</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="responseInspectorHexView">
+             <attribute name="title">
+              <string>HexView</string>
+             </attribute>
+            </widget>
+           </widget>
           </widget>
          </item>
         </layout>

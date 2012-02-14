@@ -18,6 +18,7 @@ class RyRuleManager : public QObject
 {
 	Q_OBJECT
 public:
+        static RyRuleManager* instance();
         explicit RyRuleManager(QString localFile = "", QString host = "", QString address = "", QString path = "");
 	void setLocalConfig(QString localFile, bool reload = false);
 	void setRemoteConfig(QString host, QString addr, QString path, bool reload = false);

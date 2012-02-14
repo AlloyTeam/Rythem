@@ -29,12 +29,13 @@
 
 #include "qirulesettingsdialog.h"
 
-#include "ryproxyserver.h"
 #ifdef Q_OS_WIN32
 #include "zlib/zlib.h"
 #else
 #include <zlib.h>
 #endif
+
+#include <QPixmap>
 
 QByteArray gzipDecompress(QByteArray data){
     if (data.size() <= 4) {
@@ -89,7 +90,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     pipeTableModel(new QiddlerPipeTableModel()),
     ui(new Ui::MainWindow),
-    pipes(new QVector<QiPipe*>),
     isUsingCapture(false)
 
 #ifdef Q_OS_WIN
@@ -163,7 +163,13 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
     //qDebug()<<"onSelectionChange";
     int row = topLeft.row();
     RyPipeData_ptr data = pipeTableModel.getItem(row);
+
+    ui->tollTabs->setCurrentWidget(ui->inspectorTab);
+    ui->requestInspectorTabs->setCurrentWidget(ui->requestInspectorTextview);
+
+    //TODO
     ui->requestTextEdit->setPlainText(data->requestHeaderRawData() +"\r\n\r\n"+data->requestBodyRawData() );
+
 
 
     QByteArray encoding("UTF-8");
@@ -176,28 +182,34 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
     bool isEncrypted = !data->getResponseHeader("Content-Encoding").isEmpty();
 
 
+
+
+    QByteArray decrypedData =
+            (data->isResponseChunked()?
+              data->responseBodyRawDataUnChunked()
+              :data->responseBodyRawData());;
+    if(isEncrypted){
+        decrypedData = gzipDecompress(decrypedData);
+    }
+
+    if(data->getResponseHeader("Content-Type").toLower().indexOf("image")!=-1){
+        ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorImageView);
+        QPixmap pixmap;
+        pixmap.loadFromData(decrypedData);
+        ui->label->setPixmap(pixmap);
+    }else{
+        ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorTextView);
+    }
+
+    // show in textview
     QTextCodec* oldCodec = QTextCodec::codecForCStrings();
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
-    if(isEncrypted){
-        QByteArray decrypedData =
-                (data->isResponseChunked()?
-                  data->responseBodyRawDataUnChunked()
-                  :data->responseBodyRawData());
-        decrypedData = gzipDecompress(decrypedData);
-        //decrypedData.append(data->getResponseHeader("Content-Encoding"));
-        ui->responseTextEdit->setPlainText(QString((
-                                                  data->responseHeaderRawData()
-                                                +"\r\n\r\n"
-                                                + decrypedData
-                                               ).data())
-                                           );
-    }else{
-        ui->responseTextEdit->setPlainText(QString((data->responseHeaderRawData()+"\r\n\r\n"
-                                                + (data->isResponseChunked()?
-                                                       data->responseBodyRawDataUnChunked()
-                                                       :data->responseBodyRawData())))
-                                           );
-    }
+    ui->responseTextEdit->setPlainText(QString((
+                                              data->responseHeaderRawData()
+                                            +"\r\n\r\n"
+                                            + decrypedData
+                                           ).data())
+                                       );
     QTextCodec::setCodecForCStrings(oldCodec);
 
 

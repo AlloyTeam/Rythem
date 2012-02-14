@@ -115,8 +115,8 @@ RyConnection * RyProxyServer::_getConnection(int handle){
     //qDebug()<<"getConnection:"
     //          <<time.toMSecsSinceEpoch();
     //if(!_cacheConnections.contains(handle)){
-    qDebug()<<"_lastConnectionId"<<_lastConnectionId;
-    _lastConnectionId++;
+    //qDebug()<<"_lastConnectionId"<<_lastConnectionId;
+        _lastConnectionId++;
         QThread *newThread = new QThread();
 
         RyConnection *connection = new RyConnection(handle,_lastConnectionId);
@@ -181,7 +181,7 @@ void RyProxyServer::onPipeError(RyPipeData_ptr){
 
 
 void RyProxyServer::onThreadTerminated(){
-    qDebug()<<"thread terminated";
+    //qDebug()<<"thread terminated";
     QThread *t = (QThread*)sender();
     if(t){
         t->deleteLater();
@@ -189,7 +189,7 @@ void RyProxyServer::onThreadTerminated(){
 }
 
 void RyProxyServer::onConnectionClosed(){
-    qDebug()<<"connection closed";
+    //qDebug()<<"connection closed";
     RyConnection *connection = qobject_cast<RyConnection*>(sender());
 
     _connections.removeOne(connection);

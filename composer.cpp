@@ -136,8 +136,21 @@ void Composer::onConnected(){
 
 void Composer::onData(){
     QByteArray ba = socket->readAll();
+    if(pipeData->responseBodyRawData().isEmpty()){
+        pipeData->parseResponse(&ba);
+    }else{
+        pipeData->appendResponseBody(&ba);
+    }
+
+    QByteArray baResponse = pipeData->responseHeaderRawData();
+    baResponse.append("\r\n\r\n");
+    if(pipeData->isResponseChunked()){
+        baResponse.append(pipeData->responseBodyRawDataUnChunked());
+    }else{
+        baResponse.append(pipeData->responseBodyRawData());
+    }
     //qDebug()<<"response:"<<QString(ba);
-    ui->response->setPlainText(ui->response->toPlainText()+QString(ba).replace("\r\n","\\r\\n\r\n"));
+    ui->response->setPlainText(QString(baResponse).replace("\r\n","\\r\\n\r\n"));
 
 }
 
@@ -228,7 +241,12 @@ void Composer::sendData(const QByteArray &ba){
       /lview?type=text&callback=auto_gen_1&loc=QQ_FC_RX_text1,QQ_FC_RX_text2,QQ_FC_RX_text3,QQ_FC_RX_text4,QQ_FC_RX_text5,QQ_FC_DZ_text1,QQ_FC_DZ_text2,QQ_FC_DZ_text3,QQ_FC_DZ_text4,QQ_FC_DZ_text5,QQ_FC_XP_text1,QQ_FC_XP_text2,QQ_FC_XP_text3,QQ_FC_XP_text4,QQ_FC_XP_text5,QQ_FC_ESF_text1,QQ_FC_ESF_text2,QQ_FC_ESF_text3,QQ_FC_ESF_text4,QQ_FC_ESF_text5,QQ_SX_ZS_Test1,QQ_SX_ZS_Test2,QQ_SX_ZS_Test3,QQ_SX_ZS_Test4,QQ_SX_ZS_Test5,QQ_SX_ZS_Test6,QQ_SX_ZS_Test7,QQ_SX_ZS_Test8,QQ_SX_ZS_Test9,QQ_SX_ZS_Test10,QQ_SX_LX_Test1,QQ_SX_LX_Test2,QQ_SX_LX_Test3,QQ_SX_LX_Test4,QQ_SX_LX_Test5,QQ_SX_LX_Test6,QQ_SX_LX_Test7,QQ_SX_LX_Test8,QQ_SX_LX_Test9,QQ_SX_LX_Test10&k=&t=%E8%85%BE%E8%AE%AF%E9%A6%96%E9%A1%B5&r=&s=
 
     */
+    pipeData.clear();
+    pipeData = RyPipeData_ptr(new RyPipeData(0));
     QByteArray ba2 = ba;
+    pipeData->parseRequest(&ba2);
+
+    ba2 = ba;
     ba2.replace("\n","\r\n");
     //qDebug()<<"sending:"<<QString(ba2).replace("\r","\\r").replace("\n","\\n");
     if(socket->isOpen()){

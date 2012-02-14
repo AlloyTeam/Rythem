@@ -21,7 +21,7 @@ RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent
 }
 
 RyConnection::~RyConnection(){
-    qDebug()<<"~RyConnection pipeTotal:"<<_pipeTotal<<"_connection id = "<<_connectionId;
+    //qDebug()<<"~RyConnection pipeTotal:"<<_pipeTotal<<"_connection id = "<<_connectionId;
     if(_requestSocket){
         _requestSocket->disconnect(this);
         _requestSocket->blockSignals(true);
@@ -29,7 +29,7 @@ RyConnection::~RyConnection(){
         delete _requestSocket;
         _requestSocket = NULL;
     }
-    qDebug()<<"~RyConnection end";
+    //qDebug()<<"~RyConnection end";
     //qDebug()<<"~RyConnection in main"
     //        << (QApplication::instance()->thread() == QThread::currentThread());
     //QThread::currentThread()->quit();
@@ -114,7 +114,7 @@ void RyConnection::onRequestClose(){
     emit connectionClose();
     closed = true;
 }
-void RyConnection::onRequestError(QAbstractSocket::SocketError){
+void RyConnection::onRequestError(QAbstractSocket::SocketError err){
     //qDebug()<<"request error";
     if(_responseSocket){
         _responseSocket->blockSignals(true);
@@ -135,6 +135,21 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError){
         }else{//maybe remote connection disconnect with error
             //if(!_sendingPipeData->isPackageFound()){
             //   _sendingPipeData->markAsError();
+                if(_sendingPipeData->responseHeaderRawData().isEmpty()){
+                    QByteArray ba;
+                    QByteArray bc("request error:(browser disconnect)");
+                    int count = bc.size();
+                    ba.append(QString("HTTP/1.0 %1 \r\n"
+                                                           "Server: Rythem \r\n"
+                                                           "Content-Type: %2 \r\n"
+                                                           "Content-Length: %3 \r\n\r\n"
+                                                           ).arg("200")
+                                                            .arg("text")
+                                                            .arg(count));
+                    ba.append(bc);
+
+                    _sendingPipeData->parseResponse(&ba);
+                }
                 emit pipeError(_sendingPipeData);
             //}
 

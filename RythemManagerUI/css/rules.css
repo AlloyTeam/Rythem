@@ -47,6 +47,7 @@ html, body{
 	display: none;
 }
 .button{
+        cursor: pointer;
 	display: inline-block;
 	padding: 2px 12px;
 	border: 1px solid #CCC;
@@ -54,11 +55,18 @@ html, body{
 	-webkit-border-radius: 6px;
 	-webkit-user-select: none;
 }
+.button:hover{
+        background: #fa3;
+        color:white;
+}
 .button.confirm{
 
 }
 .button.cancel{
 
+}
+.editable{
+        cursor:pointer;
 }
 /*input[type="checkbox"]{
 	width: 13px;

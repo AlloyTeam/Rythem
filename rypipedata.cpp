@@ -7,6 +7,8 @@
 RyPipeData::RyPipeData(quint64 connectionId,QObject *parent):
     QObject(parent){
     socketConnectionId = connectionId;
+    _isContentLenthUnLimit =false;
+    _isResponseChunked = false;
 }
 
 
@@ -20,20 +22,26 @@ int RyPipeData::parseRequest(QByteArray* request,bool* isRequestOk){
     }
     if(deviderIndex == -1){// no devider
         _dataToSend.clear();
-        *isRequestOk = false;
+        if(isRequestOk){
+            *isRequestOk = false;
+        }
         return -1;
     }
     QByteArray headerBa = request->left(deviderIndex);
     if( ! parseRequestHeader(headerBa) ){// invalid header
         _dataToSend.clear();
-        *isRequestOk = false;
+        if(isRequestOk){
+            *isRequestOk = false;
+        }
         return -1;
     }
     // eat the header bytes
     request->remove(0,deviderIndex+deviderSize);
 
     //qDebug()<<_requestHeaders;
-    *isRequestOk = true;
+    if(isRequestOk){
+        *isRequestOk = true;
+    }
     if(appendRequestBody(request)){
         return 0;
     }else{

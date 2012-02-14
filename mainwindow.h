@@ -9,15 +9,23 @@
 #include <QFileDialog>
 #include <QDebug>
 
+
+#include "ryrulemanager.h"
+#include "ryproxyserver.h"
+
 namespace Ui {
     class MainWindow;
 }
-class QiProxyServer;
-class QiPipe;
 class RyPipeData;
 class QItemSelectionModel;
 class RyJsBridge:public QObject{
         Q_OBJECT
+    public:
+        RyJsBridge():QObject(){
+            //RyRuleManager *manager = RyRuleManager::instance();
+            //connect(manager,SIGNAL(localConfigLoaded()),SLOT)
+        }
+
     public slots:
         void doAction(const QString &msgType,const QString msg=""){
             qDebug()<<"doAction "<<msgType<< msg;
@@ -32,8 +40,7 @@ class RyJsBridge:public QObject{
             return "";
         }
    signals:
-        void ruleChanged();
-        void pipeChanged();
+        void ruleChanged(QString json);
 };
 
 class MainWindow : public QMainWindow
@@ -72,10 +79,9 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    QVector<QiPipe*> *pipes;
     RyJsBridge *jsBridge;
     void createMenus();
-    QiProxyServer *server;
+    RyProxyServer *server;
 
     bool isUsingCapture;
     ProxyInfo previousProxyInfo;
