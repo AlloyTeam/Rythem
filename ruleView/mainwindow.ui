@@ -16,14 +16,14 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTreeView" name="ruleTreeView">
-      <property name="headerHidden">
+     <widget class="RuleTreeView" name="RuleTreeView" native="true">
+      <property name="headerHidden" stdset="0">
        <bool>true</bool>
       </property>
-      <attribute name="headerVisible">
-       <bool>false</bool>
-      </attribute>
      </widget>
+    </item>
+    <item>
+     <widget class="QTestTree" name="treeView"/>
     </item>
    </layout>
   </widget>
@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>400</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -48,6 +48,27 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>RuleTreeView</class>
+   <extends>QTreeView</extends>
+   <header>ruletreeview.h</header>
+   <container>1</container>
+  </customwidget>
+
+  <customwidget>
+   <class>Test2</class>
+   <extends>QTreeView</extends>
+   <header>test2.h</header>
+   <container>1</container>
+  </customwidget>
+
+  <customwidget>
+   <class>QTestTree</class>
+   <extends>QTreeView</extends>
+   <header>qtesttree.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

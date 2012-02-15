@@ -13,10 +13,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     ruletreemodel.cpp \
-    ruletreedelegate.cpp
+    ruletreedelegate.cpp \
+    ruletreeview.cpp \
+    qtesttree.cpp \
+    test2.cpp
 
 HEADERS  += mainwindow.h \
     ruletreemodel.h \
-    ruletreedelegate.h
+    ruletreedelegate.h \
+    ruletreeview.h \
+    qtesttree.h \
+    test2.h
 
 FORMS    += mainwindow.ui

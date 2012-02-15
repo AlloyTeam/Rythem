@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     model = new RuleTreeModel();
     delegate = new RuleTreeDelegate();
     ui->ruleTreeView->setModel(model);
+
     ui->ruleTreeView->setItemDelegate(delegate);
 
 }
