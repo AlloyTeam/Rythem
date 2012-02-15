@@ -1,6 +1,8 @@
 #ifndef RYWINHTTP
 #define RYWINHTTP
+#ifdef Q_WS_WIN
 #include "rywinhttp.h"
+#endif
 #include <QMutex>
 #include <QMutexLocker>
 #include <QStringList>

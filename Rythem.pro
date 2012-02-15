@@ -78,7 +78,9 @@ win32:HEADERS += zlib/zutil.h \
     zlib/deflate.h \
     zlib/crc32.h
 
-mac:HEADERS -= qiwinhttp.h
+mac:HEADERS -= rywinhttp.h
+
+mac:SOURCES -= rywinhttp.cpp
 
 FORMS    += mainwindow.ui \
     rule_config.ui \
