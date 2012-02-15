@@ -42,7 +42,7 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="rules.js" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="rules.js" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/js/rules.js">
               <provider selected="true" editor-type-id="text-editor">
                 <state line="248" column="9" selection-start="8058" selection-end="8058" vertical-scroll-proportion="0.53509784">
@@ -68,10 +68,10 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="rules.css" pinned="false" current="false" current-in-tab="true">
+          <file leaf-file-name="rules.css" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/css/rules.css">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="188" column="1" selection-start="3014" selection-end="3014" vertical-scroll-proportion="0.7756041">
+                <state line="177" column="0" selection-start="2835" selection-end="2835" vertical-scroll-proportion="0.58573073">
                   <folding />
                 </state>
               </provider>
@@ -102,7 +102,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="438" />
+    <option name="x" value="306" />
     <option name="y" value="22" />
     <option name="width" value="1473" />
     <option name="height" value="1004" />
@@ -180,7 +180,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="438" y="22" width="1473" height="1004" extended-state="0" />
+    <frame x="306" y="22" width="1473" height="1004" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -266,13 +266,6 @@
         <state line="371" column="36" selection-start="13136" selection-end="13136" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/rules.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="130" column="1" selection-start="2057" selection-end="2057" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/rules.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="248" column="9" selection-start="8058" selection-end="8058" vertical-scroll-proportion="0.53509784">
@@ -281,6 +274,13 @@
             <marker date="1329289690000" expanded="true" signature="7157:7272" placeholder="..." />
             <marker date="1329289690000" expanded="true" signature="7469:7639" placeholder="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/rules.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="177" column="0" selection-start="2835" selection-end="2835" vertical-scroll-proportion="0.58573073">
+          <folding />
         </state>
       </provider>
     </entry>
