@@ -14,15 +14,11 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     ruletreemodel.cpp \
     ruletreedelegate.cpp \
-    ruletreeview.cpp \
-    qtesttree.cpp \
-    test2.cpp
+    ruletreeview.cpp
 
 HEADERS  += mainwindow.h \
     ruletreemodel.h \
     ruletreedelegate.h \
-    ruletreeview.h \
-    qtesttree.h \
-    test2.h
+    ruletreeview.h
 
 FORMS    += mainwindow.ui
