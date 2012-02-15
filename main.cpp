@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
 
 	//new rule manager test----------------------------------------------------
         qDebug()<<qApp->applicationDirPath();
-        RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
-        manager->localConfigFile = qApp->applicationDirPath()+"/config.txt";
+		RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
+		manager->localConfigFile = qApp->applicationDirPath()+"/../../../../Rythem/configs.txt";
         manager->loadConfig(); //2ms
         QList<RyRule *> matchResult;
-        manager->getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms
+		manager->getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms
 	qDebug() << matchResult;
 	//-------------------------------------------------------------------------
 

@@ -44,12 +44,10 @@ class RyJsBridge:public QObject{
         QString getConfigs(){
             RyRuleManager *manager = RyRuleManager::instance();
             QString s = manager->configusToJSON();
-            s.prepend("configs =  ");
-            s.remove("\r");
+			s.remove("\r");
             s.remove("\n");
-            s.remove("\t");
-            s.append(";");
-            return s;
+			s.remove("\t");
+			return s;
         }
         bool updateConfigs(QString json){
             RyRuleManager *manager = RyRuleManager::instance();

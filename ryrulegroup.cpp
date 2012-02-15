@@ -133,7 +133,7 @@ QString QiRuleGroup2::toJSON(int tabCount, bool withName) const{
 	QString result;
         QString name = withName ? ("\"" + groupName() + "\": ") : "";
 	QTextStream(&result) << tabs << name << "{\n"
-                             << tabs << "\t\"name\":"<<"\""<<groupName()<<"\","
+							 << tabs << "\t\"name\":"<<"\""<<groupName()<<"\",\n"
                              << tabs << "\t\"enable\":" << isEnable() << ",\n"
                              << tabs << "\t\"rules\":[\n" << list.join(",\n") << "\n"
                              << tabs << "\t]\n"

@@ -43,6 +43,7 @@ void RyRuleManager::parseConfigContent(QList<QiRuleGroup2 *> *result, QString js
 		groupsIt.next();
 		//constructor the rule group
 		QString groupName = groupsIt.value().property("name").toString();
+		if(!groupName.length()) continue;
 		bool groupEnable = groupsIt.value().property("enable").toBool();
 		QiRuleGroup2 *group = new QiRuleGroup2(groupName, groupEnable, remote);
 		QScriptValueIterator rulesIt(groupsIt.value().property("rules"));
@@ -66,6 +67,10 @@ void RyRuleManager::parseConfigContent(QList<QiRuleGroup2 *> *result, QString js
 			bool rEnable = r.property("enable").toBool();
 			int rType = r.property("type").toInt32();
 
+			QScriptValue ruleObj = r.property("rule");
+			QString rPattern = ruleObj.property("pattern").toString();
+			QString rReplace = ruleObj.property("replace").toString();
+/*
                         QScriptValueIterator rulesIt2(r.property("rule"));
                         QString rPattern;
                         QString rReplace;
@@ -75,6 +80,7 @@ void RyRuleManager::parseConfigContent(QList<QiRuleGroup2 *> *result, QString js
                             rPattern = rulesIt2.value().property("pattern").toString();
                             rReplace = rulesIt2.value().property("replace").toString();
                         }
+						*/
 			switch(rType){
 			case COMPLEX_ADDRESS_REPLACE:
 				//ignore complex address replace rule
@@ -183,7 +189,7 @@ QString RyRuleManager::configusToJSON(int tabCount, bool localOnly) const{
 	QStringList groups;
 	int i, length = localGroups.length();
 	for(i=0; i<length; i++){
-                groups << localGroups.at(i)->toJSON(tabCount + 1, false);
+				groups << localGroups.at(i)->toJSON(tabCount + 1, false);
 	}
 	if(!localOnly){
 		length = remoteGroups.length();
@@ -193,7 +199,7 @@ QString RyRuleManager::configusToJSON(int tabCount, bool localOnly) const{
 	}
 	QString result;
         QTextStream(&result) << tabs << "{\"groups\":[\r\n"
-                                                 << tabs << groups.join(",\r\n") << "\r\n"
+												 << tabs << groups.join(",\r\n") << "\r\n"
                                                  << tabs << "]}";
         qDebug()<<result;
 	return result;

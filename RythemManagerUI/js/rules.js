@@ -80,9 +80,10 @@ function updateConfigs(){
         /**
          * 设置规则是否启用
          * @param {Boolean} enable
-         * @param {Boolean} excludeCheckbox 是否忽略掉勾选框
+         * @param {Boolean} [excludeCheckbox=false] 是否忽略掉勾选框
          */
         setEnable: function(enable, excludeCheckbox){
+			alert(this.__el.classList);
             this.__config.enable = enable;
             if(enable){
                 this.__el.classList.remove('disabled');
@@ -96,6 +97,7 @@ function updateConfigs(){
                 this.__checkbox.disabled = !enable;
             }
             //TODO call client's API to update rule
+			alert('shit');
         },
         /**
          * 获取dom元素
@@ -382,64 +384,7 @@ function updateConfigs(){
     var groupsContainer;
 
     var groups = [];
-    var configs = [
-        {
-            "name": "group1",
-            "enable": true,
-            "rules": [{
-                "name": "complex address example",
-                "type": 1,
-                "enable": true,
-                "rule": [{
-                    "pattern": "http://abc.com/a",
-                    "replace": "123.com"
-                }, {
-                    "pattern": "http://abc.com/b",
-                    "replace": "456.com"
-                }]
-            }, {
-                "name": "simple address example",
-                "type": 2,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com",
-                    "replace": "172.168.0.1"
-                }
-            }, {
-                "name": "remote content example",
-                "type": 3,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/a.html",
-                    "replace": "http://123.com/just_a_test/somedir/b.html"
-                }
-            }, {
-                "name": "local file example",
-                "type": 4,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/b.html",
-                    "replace": "files.qzmin"
-                }
-            }, {
-                "name": "local files example",
-                "type": 5,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/c.html",
-                    "replace": "C:/a.html.qzmin"
-                }
-            }, {
-                "name": "local directory example",
-                "type": 6,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/mydir/&amp;&quot;",
-                    "replace": "C:/replacement/"
-                }
-            }]
-        }
-    ];
+    var configs = [];
     function cleanup(){
         for(var i=0; i<groups.length; i++){
             groupsContainer.removeChild(groups[i].getEl());
@@ -621,11 +566,11 @@ function updateConfigs(){
         });
 
 		if(window.App){
-			var config = window.App.getConfigs();
-			config = config.replace(/&quot;/g,"\'");
-			eval(config);
+			var rawConfig = window.App.getConfigs();
+			rawConfig = rawConfig.replace(/&quot;/g,"\'");
+			rawConfig = eval('(' + rawConfig + ')');
 		}
-        createGroups(configs.groups);
+        createGroups(rawConfig.groups);
     }
 
     window.refreshRulesCallback = function(groupsConfigs){
