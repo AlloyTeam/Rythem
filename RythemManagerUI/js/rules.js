@@ -101,7 +101,7 @@ function updateConfigs(){
             if(!excludeCheckbox){
                 this.__checkbox.disabled = !enable;
             }
-			updateConfigs()
+			updateConfigs();
         },
         /**
          * 获取dom元素
@@ -247,6 +247,7 @@ function updateConfigs(){
         if(groupConfig.rules.length){
             this.expand();
         }
+		this.setEnable(groupConfig.enable);
 
         checkbox.addEventListener('change', function(e){ me.onCheckboxChange(e); });
 
@@ -264,8 +265,6 @@ function updateConfigs(){
                 this.addRule(groupConfig.rules[i]);
             }
         }
-
-        this.setEnable(groupConfig.enable);
     }
     RuleGroup.prototype = {
         /**
@@ -323,9 +322,9 @@ function updateConfigs(){
                 this.__el.classList.add('disabled');
             }
             this.__checkbox.checked = enable;
-            for(var i=0; i<this.__rules.length; i++){
-                this.__rules[i].setEnable(enable);
-            }
+			for(var i=0; i<this.__rules.length; i++){
+    	        this.__rules[i].setEnable(enable);
+        	}
 			updateConfigs();
         },
         getConfig: function(){

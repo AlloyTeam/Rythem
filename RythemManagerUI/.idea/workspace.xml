@@ -45,11 +45,11 @@
           <file leaf-file-name="rules.js" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/js/rules.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="12" column="36" selection-start="369" selection-end="369" vertical-scroll-proportion="0.21352313">
+                <state line="248" column="9" selection-start="8058" selection-end="8058" vertical-scroll-proportion="0.53509784">
                   <folding>
-                    <marker date="1329289046000" expanded="true" signature="923:1306" placeholder="..." />
-                    <marker date="1329289046000" expanded="true" signature="7156:7271" placeholder="..." />
-                    <marker date="1329289046000" expanded="true" signature="7468:7638" placeholder="..." />
+                    <marker date="1329289690000" expanded="true" signature="923:1306" placeholder="..." />
+                    <marker date="1329289690000" expanded="true" signature="7157:7272" placeholder="..." />
+                    <marker date="1329289690000" expanded="true" signature="7469:7639" placeholder="..." />
                   </folding>
                 </state>
               </provider>
@@ -139,8 +139,8 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="options.lastSelected" value="editor.preferences.tabs" />
     <property name="DefaultHtmlFileTemplate" value="Html5" />
-    <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
@@ -275,11 +275,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/js/rules.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="36" selection-start="369" selection-end="369" vertical-scroll-proportion="0.21352313">
+        <state line="248" column="9" selection-start="8058" selection-end="8058" vertical-scroll-proportion="0.53509784">
           <folding>
-            <marker date="1329289046000" expanded="true" signature="923:1306" placeholder="..." />
-            <marker date="1329289046000" expanded="true" signature="7156:7271" placeholder="..." />
-            <marker date="1329289046000" expanded="true" signature="7468:7638" placeholder="..." />
+            <marker date="1329289690000" expanded="true" signature="923:1306" placeholder="..." />
+            <marker date="1329289690000" expanded="true" signature="7157:7272" placeholder="..." />
+            <marker date="1329289690000" expanded="true" signature="7469:7639" placeholder="..." />
           </folding>
         </state>
       </provider>

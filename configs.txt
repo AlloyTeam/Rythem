@@ -13,14 +13,14 @@
 			{
 				"name":"local files example",
 				"type":5,
-				"enable":1,
+				"enable":0,
 				"rule":{"pattern":"http://abc.com/c.html",
 				"replace":"C:/a.html.qzmin"}
 			},
 			{
 				"name":"local directory example",
 				"type":6,
-				"enable":1,
+				"enable":0,
 				"rule":{"pattern":"http://abc.com/mydir/",
 				"replace":"C:/replacement/"}
 			},
