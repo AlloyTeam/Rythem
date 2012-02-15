@@ -5,22 +5,22 @@
 		"rules":[
 			{
 				"name":"local file example",
-				"type":4,
+				"type":6,
 				"enable":1,
 				"rule":{"pattern":"http://abc.com/b.html",
-				"replace":"files.qzmin"}
+				"replace":"/Users/emrelax/qt-projects/Rythem-build-desktop-Desktop_Qt_4_7_4_for_GCC__Qt_SDK____/Rythem.app/Contents/Resources/"}
 			},
 			{
 				"name":"local files example",
 				"type":5,
-				"enable":0,
+				"enable":1,
 				"rule":{"pattern":"http://abc.com/c.html",
 				"replace":"C:/a.html.qzmin"}
 			},
 			{
 				"name":"local directory example",
 				"type":6,
-				"enable":0,
+				"enable":1,
 				"rule":{"pattern":"http://abc.com/mydir/",
 				"replace":"C:/replacement/"}
 			},

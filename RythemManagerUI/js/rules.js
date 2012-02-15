@@ -67,6 +67,8 @@ function updateConfigs(){
 		this.__selectFileField = selectFileField;
 		this.__selectDirField = selectDirField;
 
+        this.updateButtonState(ruleConfig.type);
+
         select.addEventListener(	'change', 	function(e){ me.onTypeChange(e); });
         checkbox.addEventListener(	'change', 	function(e){ me.onCheckboxChange(e); });
         el.delegate('.editable', 	'dblclick', function(e, el){ me.onFieldsDoubleClick(e, el); });
@@ -147,17 +149,7 @@ function updateConfigs(){
             var index = this.__typeSelect.selectedIndex;
 			var type = Number(options[index].value);
             this.__config.type = type;
-			if(type == 4 || type == 5){
-				this.__selectFileField.classList.remove("hidden");
-				this.__selectDirField.classList.add("hidden");
-			}else if(type == 6){
-				this.__selectDirField.classList.remove("hidden");
-				this.__selectFileField.classList.add("hidden");
-			}else{
-				this.__selectFileField.classList.add("hidden");
-				this.__selectDirField.classList.add("hidden");
-			}
-			
+            this.updateButtonState(type);
 			updateConfigs();
         },
         /**
@@ -207,7 +199,19 @@ function updateConfigs(){
 			this.__replaceField.innerHTML = escapeToHtml(s);
 			this.__config.rule.replace = s;
 			updateConfigs();
-		}
+        },
+        updateButtonState:function(type){
+            if(type === 4 || type === 5){
+                this.__selectFileField.classList.remove("hidden");
+                this.__selectDirField.classList.add("hidden");
+            }else if(type === 6){
+                this.__selectDirField.classList.remove("hidden");
+                this.__selectFileField.classList.add("hidden");
+            }else{
+                this.__selectFileField.classList.add("hidden");
+                this.__selectDirField.classList.add("hidden");
+            }
+        }
     };
 
     /**

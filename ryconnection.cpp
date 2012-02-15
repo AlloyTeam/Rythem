@@ -521,7 +521,7 @@ void RyConnection::doRequestToNetwork(){
         onResponsePackageFound();
         return;
     }
-/*
+
     RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
     QList<RyRule *> matchResult;
     manager->getMatchRules(&matchResult, _sendingPipeData->fullUrl); //2ms
@@ -552,7 +552,7 @@ void RyConnection::doRequestToNetwork(){
             }
         }
     }
-*/
+
     //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
     //qDebug()<<"to connect:"<<host<<port;
     _fullUrl = _sendingPipeData->fullUrl;
