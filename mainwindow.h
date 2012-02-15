@@ -51,7 +51,8 @@ class RyJsBridge:public QObject{
         }
         bool updateConfigs(QString json){
             RyRuleManager *manager = RyRuleManager::instance();
-            qDebug()<<json;
+			qDebug() << "[JSBridge] update" << json;
+			qDebug() << "-------------------------";
 			manager->setLocalConfigContent(json, true);
         }
 

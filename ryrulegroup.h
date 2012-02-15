@@ -13,6 +13,7 @@ public:
 	QiRuleGroup2();
 	QiRuleGroup2(const QiRuleGroup2 &group);
 	explicit QiRuleGroup2(QString name, bool enable = true, bool remote = false);
+	~QiRuleGroup2();
 
 	QiRuleGroup2 operator =(const QiRuleGroup2 &group);
 	bool operator ==(const QiRuleGroup2 &group) const;

@@ -30,6 +30,13 @@ QiRuleGroup2::QiRuleGroup2(QString name, bool enable, bool remote) :
 {
 }
 
+QiRuleGroup2::~QiRuleGroup2(){
+	int i, len = _rules.length();
+	for(i=len-1; i>=0; i--){
+		this->removeRuleAt(i);
+	}
+}
+
 QiRuleGroup2 QiRuleGroup2::operator =(const QiRuleGroup2 &group){
 	this->update(group.groupName(), group.isEnable(), group.isRemote());
 	return *this;
@@ -107,6 +114,8 @@ void QiRuleGroup2::removeRule(const QString name){
 }
 
 void QiRuleGroup2::removeRuleAt(const int index){
+	RyRule *rule = _rules.at(index);
+	delete rule;
 	_rules.removeAt(index);
 	emit changed();
 }

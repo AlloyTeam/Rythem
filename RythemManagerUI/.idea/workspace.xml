@@ -27,7 +27,7 @@
           <file leaf-file-name="rules.html" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/rules.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="19" column="16" selection-start="477" selection-end="477" vertical-scroll-proportion="-4.5">
+                <state line="19" column="16" selection-start="477" selection-end="477" vertical-scroll-proportion="0.0">
                   <folding />
                 </state>
               </provider>
@@ -45,11 +45,11 @@
           <file leaf-file-name="rules.js" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/js/rules.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="385" column="23" selection-start="13030" selection-end="13030" vertical-scroll-proportion="0.62945914">
+                <state line="12" column="36" selection-start="369" selection-end="369" vertical-scroll-proportion="0.21352313">
                   <folding>
-                    <marker date="1329273966000" expanded="true" signature="796:1179" placeholder="..." />
-                    <marker date="1329273966000" expanded="true" signature="7175:7290" placeholder="..." />
-                    <marker date="1329273966000" expanded="true" signature="7487:7657" placeholder="..." />
+                    <marker date="1329289046000" expanded="true" signature="923:1306" placeholder="..." />
+                    <marker date="1329289046000" expanded="true" signature="7156:7271" placeholder="..." />
+                    <marker date="1329289046000" expanded="true" signature="7468:7638" placeholder="..." />
                   </folding>
                 </state>
               </provider>
@@ -71,7 +71,7 @@
           <file leaf-file-name="rules.css" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/css/rules.css">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="148" column="1" selection-start="2327" selection-end="2327" vertical-scroll-proportion="0.4315305">
+                <state line="188" column="1" selection-start="3014" selection-end="3014" vertical-scroll-proportion="0.7756041">
                   <folding />
                 </state>
               </provider>
@@ -139,8 +139,8 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="options.lastSelected" value="editor.preferences.tabs" />
     <property name="DefaultHtmlFileTemplate" value="Html5" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
@@ -254,16 +254,16 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/rules.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="16" selection-start="477" selection-end="477" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/jo2/jo2.dom.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="371" column="36" selection-start="13136" selection-end="13136" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rules.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="16" selection-start="477" selection-end="477" vertical-scroll-proportion="-4.5">
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/css/rules.css">
@@ -275,11 +275,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/js/rules.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="385" column="23" selection-start="13030" selection-end="13030" vertical-scroll-proportion="0.62945914">
+        <state line="12" column="36" selection-start="369" selection-end="369" vertical-scroll-proportion="0.21352313">
           <folding>
-            <marker date="1329273966000" expanded="true" signature="796:1179" placeholder="..." />
-            <marker date="1329273966000" expanded="true" signature="7175:7290" placeholder="..." />
-            <marker date="1329273966000" expanded="true" signature="7487:7657" placeholder="..." />
+            <marker date="1329289046000" expanded="true" signature="923:1306" placeholder="..." />
+            <marker date="1329289046000" expanded="true" signature="7156:7271" placeholder="..." />
+            <marker date="1329289046000" expanded="true" signature="7468:7638" placeholder="..." />
           </folding>
         </state>
       </provider>

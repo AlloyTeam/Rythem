@@ -4,20 +4,6 @@
 		"enable":1,
 		"rules":[
 			{
-				"name":"simple address example",
-				"type":2,
-				"enable":1,
-				"rule":{"pattern":"http://abc.com",
-				"replace":"172.168.0.1"}
-			},
-			{
-				"name":"remote content example",
-				"type":3,
-				"enable":1,
-				"rule":{"pattern":"http://abc.com/a.html",
-				"replace":"http://123.com/just_a_test/somedir/b.html"}
-			},
-			{
 				"name":"local file example",
 				"type":4,
 				"enable":1,
@@ -37,7 +23,34 @@
 				"enable":1,
 				"rule":{"pattern":"http://abc.com/mydir/",
 				"replace":"C:/replacement/"}
+			},
+			{
+				"name":"",
+				"type":5,
+				"enable":1,
+				"rule":{"pattern":"oh yeah",
+				"replace":"wa"}
 			}
+		]
+	},
+	{
+		"name":"wa",
+		"enable":1,
+		"rules":[
+			{
+				"name":"",
+				"type":4,
+				"enable":1,
+				"rule":{"pattern":"hey",
+				"replace":"123"}
+			}
+		]
+	},
+	{
+		"name":"wwa",
+		"enable":0,
+		"rules":[
+
 		]
 	}
 ]}

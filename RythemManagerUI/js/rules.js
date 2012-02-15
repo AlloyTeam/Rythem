@@ -8,11 +8,17 @@ function unescapeFromHtml(html){
  var s = html.replace(/&amp;/g,"&").replace(/&nbsp;/," ").replace(/&gt;/g,">").replace(/&lt;/,"<");
  return s;
 }
+var oldConfigs;
 function updateConfigs(){
 	var s = JSON.stringify(configs);
-	s = '{"groups":'+s+'}';
-	//alert(s);
-	window.App.updateConfigs(s);
+	var changed = (s != oldConfigs);
+	if(changed){
+		console.log('updating configs ...');
+		if(window.App){
+			window.App.updateConfigs('{"groups":'+s+'}');
+		}
+		oldConfigs = s;
+	}
 }
     /**
      * 项目里的每条规则，支持编辑和启用/禁用，会自动同步相关的数据
@@ -95,7 +101,7 @@ function updateConfigs(){
             if(!excludeCheckbox){
                 this.__checkbox.disabled = !enable;
             }
-            //TODO call client's API to update rule
+			updateConfigs()
         },
         /**
          * 获取dom元素
@@ -141,7 +147,6 @@ function updateConfigs(){
             var index = this.__typeSelect.selectedIndex;
 			var type = Number(options[index].value);
             this.__config.type = type;
-            //TODO call client's API to update rule type
 			if(type == 4 || type == 5){
 				this.__selectFileField.classList.remove("hidden");
 				this.__selectDirField.classList.add("hidden");
@@ -188,7 +193,6 @@ function updateConfigs(){
 				}else if(this.__replaceField == e.srcElement){
 					this.__config.rule.replace = unescapeFromHtml(e.srcElement.innerHTML);
 				}
-                //TODO call client's API to update rule
 				updateConfigs();
             }
         },
@@ -322,7 +326,7 @@ function updateConfigs(){
             for(var i=0; i<this.__rules.length; i++){
                 this.__rules[i].setEnable(enable);
             }
-            //TODO call client's API to update rules configs
+			updateConfigs();
         },
         getConfig: function(){
             return this.__config;
@@ -383,6 +387,57 @@ function updateConfigs(){
 
     var groups = [];
     var configs = [];
+	var TEST_CONFIGS = {
+	    "version": 1.0,
+	    "groups": [
+	        {
+	            "name": "group1",
+	            "enable": true,
+	            "rules": [{
+	                "name": "simple address example",
+	                "type": 2,
+	                "enable": true,
+	                "rule": {
+	                    "pattern": "http://abc.com",
+	                    "replace": "172.168.0.1"
+	                }
+	            }, {
+	                "name": "remote content example",
+	                "type": 3,
+	                "enable": true,
+	                "rule": {
+	                    "pattern": "http://abc.com/a.html",
+	                    "replace": "http://123.com/just_a_test/somedir/b.html"
+	                }
+	            }, {
+	                "name": "local file example",
+	                "type": 4,
+	                "enable": true,
+	                "rule": {
+	                    "pattern": "http://abc.com/b.html",
+	                    "replace": "files.qzmin"
+	                }
+	            }, {
+	                "name": "local files example",
+	                "type": 5,
+	                "enable": true,
+	                "rule": {
+	                    "pattern": "http://abc.com/c.html",
+	                    "replace": "C:/a.html.qzmin"
+	                }
+	            }, {
+	                "name": "local directory example",
+	                "type": 6,
+	                "enable": true,
+	                "rule": {
+	                    "pattern": "http://abc.com/mydir/",
+	                    "replace": "C:/replacement/"
+	            	}
+				}]
+	        }
+	    ]
+	};
+
     function cleanup(){
         for(var i=0; i<groups.length; i++){
             groupsContainer.removeChild(groups[i].getEl());
@@ -415,7 +470,7 @@ function updateConfigs(){
             groupsContainer.appendChild(group.getEl());
             groups.push(group);
 
-            //TODO call client's API to add the group
+			updateConfigs();
             return true;
         }
     }
@@ -446,7 +501,7 @@ function updateConfigs(){
             groupsContainer.removeChild(group.getEl());
             groups.splice(i, 1);
             configs.splice(i, 1);
-            //TODO call client's API to remove the group
+			updateConfigs();
         }
     }
     function addRule(groupName, type, pattern, replace){
@@ -463,7 +518,7 @@ function updateConfigs(){
             };
             group.addRule(c);
             configs[i].rules.push(c);
-            //TODO call client's API to add the new rule
+			updateConfigs();
         }
         else{
             alert('group ' + groupName + ' does not exist!');
@@ -475,7 +530,7 @@ function updateConfigs(){
             var group = groups[i];
             group.removeRuleAt(index);
             configs[i].rules.splice(index, 1);
-            //TODO call client's API to remove the rule
+			updateConfigs();
         }
         else{
             alert('group ' + groupName + ' does not exist!');
@@ -567,8 +622,11 @@ function updateConfigs(){
 			var rawConfig = window.App.getConfigs();
 			rawConfig = rawConfig.replace(/&quot;/g,"\'");
 			rawConfig = eval('(' + rawConfig + ')');
+			createGroups(rawConfig.groups);
 		}
-        createGroups(rawConfig.groups);
+		else{
+			createGroups(TEST_CONFIGS.groups);
+		}
     }
 
     window.refreshRulesCallback = function(groupsConfigs){

@@ -1,4 +1,5 @@
 #include "ryrulemanager.h"
+#include "ryrulegroup.h"
 #include <QtScript>
 
 Q_GLOBAL_STATIC(RyRuleManager, ruleManager)
@@ -139,11 +140,15 @@ void RyRuleManager::loadLocalConfig(){
 }
 
 bool RyRuleManager::setLocalConfigContent(QString content,bool dontSave){
+	qDebug() << "setLocalConfigContent" << content << dontSave;
     //qDebug()<<"set local config content"<<content;
-    localGroups.clear();
-    QList<QiRuleGroup2 *> groups;
-    parseConfigContent(&groups, content, false);
-    localGroups.append(groups);
+	QListIterator<QiRuleGroup2 *> it(localGroups);
+	while(it.hasNext()){
+		QiRuleGroup2 *group = it.next();
+		delete group;
+	}
+	localGroups.clear();
+	parseConfigContent(&localGroups, content, false);
     if(!dontSave){
         //qDebug()<<"toSave";
         saveLocalConfigChanges();
