@@ -83,7 +83,6 @@ function updateConfigs(){
          * @param {Boolean} [excludeCheckbox=false] 是否忽略掉勾选框
          */
         setEnable: function(enable, excludeCheckbox){
-			alert(this.__el.classList);
             this.__config.enable = enable;
             if(enable){
                 this.__el.classList.remove('disabled');
@@ -97,7 +96,6 @@ function updateConfigs(){
                 this.__checkbox.disabled = !enable;
             }
             //TODO call client's API to update rule
-			alert('shit');
         },
         /**
          * 获取dom元素

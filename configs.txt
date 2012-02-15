@@ -1,50 +1,43 @@
-{
-    "version": 1.0,
-    "groups": [
-        {
-            "name": "group1",
-            "enable": true,
-            "rules": [{
-                "name": "simple address example",
-                "type": 2,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com",
-                    "replace": "172.168.0.1"
-                }
-            }, {
-                "name": "remote content example",
-                "type": 3,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/a.html",
-                    "replace": "http://123.com/just_a_test/somedir/b.html"
-                }
-            }, {
-                "name": "local file example",
-                "type": 4,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/b.html",
-                    "replace": "files.qzmin"
-                }
-            }, {
-                "name": "local files example",
-                "type": 5,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/c.html",
-                    "replace": "C:/a.html.qzmin"
-                }
-            }, {
-                "name": "local directory example",
-                "type": 6,
-                "enable": true,
-                "rule": {
-                    "pattern": "http://abc.com/mydir/",
-                    "replace": "C:/replacement/"
-                }
-            }]
-        }
-    ]
-}
+{"groups":[
+	{
+		"name":"group1",
+		"enable":1,
+		"rules":[
+			{
+				"name":"simple address example",
+				"type":2,
+				"enable":1,
+				"rule":{"pattern":"http://abc.com",
+				"replace":"172.168.0.1"}
+			},
+			{
+				"name":"remote content example",
+				"type":3,
+				"enable":1,
+				"rule":{"pattern":"http://abc.com/a.html",
+				"replace":"http://123.com/just_a_test/somedir/b.html"}
+			},
+			{
+				"name":"local file example",
+				"type":4,
+				"enable":1,
+				"rule":{"pattern":"http://abc.com/b.html",
+				"replace":"files.qzmin"}
+			},
+			{
+				"name":"local files example",
+				"type":5,
+				"enable":1,
+				"rule":{"pattern":"http://abc.com/c.html",
+				"replace":"C:/a.html.qzmin"}
+			},
+			{
+				"name":"local directory example",
+				"type":6,
+				"enable":1,
+				"rule":{"pattern":"http://abc.com/mydir/",
+				"replace":"C:/replacement/"}
+			}
+		]
+	}
+]}

@@ -17,6 +17,11 @@ RyRuleManager::RyRuleManager(QString localFile, QString host, QString address, Q
 	connect(&remoteConfigLoader, SIGNAL(requestFinished(int,bool)), this, SLOT(onRemoteConfigLoaded(int,bool)));
 }
 
+RyRuleManager::~RyRuleManager(){
+	this->saveLocalConfigChanges();
+	qDebug() << "[RuleManager] i am dead";
+}
+
 void RyRuleManager::setLocalConfig(QString localFile, bool reload){
 	localConfigFile = localFile;
 	if(reload) loadLocalConfig();
