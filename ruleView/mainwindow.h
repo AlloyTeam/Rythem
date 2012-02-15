@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "ruletreemodel.h"
+#include "ruletreedelegate.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,6 +20,7 @@ public:
 private:
     Ui::MainWindow *ui;
     RuleTreeModel *model;
+    RuleTreeDelegate *delegate;
 };
 
 #endif // MAINWINDOW_H
