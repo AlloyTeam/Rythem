@@ -1,11 +1,20 @@
-#QiProxyServer# 监听代理端口.
-每个连接用一个#QiPipe# 处理.
-每个连接的数据（请求与响应）都用一个 #QiPipeData# 保存，以QSharedPointer进行管理。
-#QiPipeData#
-    只能在QPipe里产生并修改。
+代码结构及流程
+1，RyProxyServer为代理侦听类
+2，RyConnection为掌管每个请求的client socket及remote socket并处理相应的请求
+3，RyPipeData保存各个http请求的信息
+4，RyRuleManager做规则替换相关的操作
 
-#QiReplaceRuleManager#
-
-QiResponse:
-    QiResponseLocal: return local replace files;
-    QiRespnoseRemote: return remote content(including host replace rules)
+以上几个类的关系：
+1，当 RyProxyServer 检测到有新的client socket时，生成一个RyConnection实例，并将相应socket id传入。
+2，RyConnection 对此 client socket传入数据分析，解包成若干http请求，
+     2.1 每解析到一个http包生成一个RyPipeData实例，并压入缓冲队列pipeList
+     2.2 生成pipeData后，如果当前有未完成的pipeData，结束，否则跳到2.3
+     2.3 通过RyRuleManger检测是否有当前相应的替换规则
+         如有匹配规则，跳到2.3
+         如无匹配规则，跳到2.4
+     2.3 如获取规则则照获修改RyPipeData，如修改后的pipeData已有内容（内容替换类规则）
+         跳到2.5，否则跳到2.4
+     2.4 向远程socket写入当前pipeData的http request 数据并监听返回
+         当远程返回数据解包完成，跳到2.5
+     2.5 获取下一个队列中的pipeData，如果为空，结束，否则跳到2.2步
+3，当RyConnection解析到新的请求包时，或解析到返回包时，发出相应的signal
