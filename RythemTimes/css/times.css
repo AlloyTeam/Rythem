@@ -41,6 +41,7 @@
 	margin: 0 6px;
 	border: 1px solid #CCC;
 	-webkit-border-radius: 6px;
+	cursor: pointer;
 }
 .conn > .name{
 	font-size: 12px;

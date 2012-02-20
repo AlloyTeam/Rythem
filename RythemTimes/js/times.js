@@ -15,8 +15,11 @@
 		 * @param {String} header
 		 */
 		setRequestHeader: function(header){
+			var lines = header.split('\r\n');
+			var requestLine = lines[0].split(' ');
 			this.requestHeader = header;
-			//TODO parse the request header
+			this.requestMethod = requestLine[0];
+			this.requestUrl = requestLine[1];
 			return this;
 		},
 		/**
@@ -74,7 +77,7 @@
 			return this;
 		},
 		getFullUrl: function(){
-			return 'www.???.com';
+			return this.requestUrl || '?';
 		},
 		getRequestName: function(){
 			return this.id.toString();
@@ -83,7 +86,7 @@
 			return 'www.???.com';
 		},
 		getRequestMethod: function(){
-			return 'GET';
+			return this.requestMethod || '?'
 		},
 		getResponseStatus: function(){
 			return '0';
