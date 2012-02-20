@@ -109,7 +109,11 @@ OTHER_FILES += \
     RythemManagerUI/lib/jo2/jo2.js \
     RythemManagerUI/lib/jo2/jo2.dom.js \
     RythemManagerUI/lib/jo2/jo2.css \
-    RythemManagerUI/lib/jo2/jo2.console.js
+    RythemManagerUI/lib/jo2/jo2.console.js \
+    RythemTimes/index.html \
+    RythemTimes/lib/backbone.js \
+    RythemTimes/js/times.js \
+    RythemTimes/css/times.css
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

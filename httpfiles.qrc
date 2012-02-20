@@ -30,4 +30,10 @@
         <file>RythemManagerUI/js/rules.js</file>
         <file>RythemManagerUI/css/rules.css</file>
     </qresource>
+    <qresource prefix="/web/waterfall">
+        <file>RythemTimes/index.html</file>
+        <file>RythemTimes/lib/backbone.js</file>
+        <file>RythemTimes/js/times.js</file>
+        <file>RythemTimes/css/times.css</file>
+    </qresource>
 </RCC>
