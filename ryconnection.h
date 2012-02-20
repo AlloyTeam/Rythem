@@ -96,6 +96,11 @@ class RyConnection:public QObject{
         RyPipeData_ptr nextPipe();
         void appendPipe(RyPipeData_ptr);
 
+        //for performance
+        RyPipeData::PerformanceDateTime _receivingPerformance;
+        RyPipeData::PerformanceDateTime _sendingPerformance;
+        //because one connection may has more than one socets;
+        qint64 _lastSocketConnectedDateTime;
 
 };
 

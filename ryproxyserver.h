@@ -61,7 +61,7 @@ class RyProxyServer : public QTcpServer,public QRunnable
         void onThreadTerminated();
         void onConnectionClosed();
 
-        
+
 };
 
 #endif // RYPROXYSERVER_H

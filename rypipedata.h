@@ -50,6 +50,64 @@ class RyPipeData : public QObject
         QString responseStatus;
         QString responseResone;
 
+
+        //for performance
+        class PerformanceDateTime{
+            public:
+                PerformanceDateTime(){
+                    reset();
+                }
+                PerformanceDateTime(const PerformanceDateTime& other){
+                    setToOther(other);
+                }
+                PerformanceDateTime& operator =(const PerformanceDateTime& other){
+                    if(&other == this){
+                        return *this;
+                    }
+                    setToOther(other);
+                    return *this;
+                }
+
+                void reset(){
+                    clientConnected = -1;
+                    requestBegin = -1;
+                    requestDone = -1;
+                    responseConnected = -1;
+                    responseBegin = -1;
+                    responseDone = -1;
+                }
+
+                qint64 clientConnected;
+                qint64 requestBegin;
+                qint64 requestDone;
+                qint64 responseConnected;
+                qint64 responseBegin;
+                qint64 responseDone;
+            private:
+                void setToOther(const PerformanceDateTime& other){
+                    if(other.clientConnected !=-1){
+                        clientConnected = other.clientConnected;
+                    }
+                    if(other.requestBegin!=-1){
+                        requestBegin = other.requestBegin;
+                    }
+                    if(other.requestDone!=-1){
+                        requestDone = other.requestDone;
+                    }
+                    if(other.responseConnected!=-1){
+                        responseConnected = other.responseConnected;
+                    }
+                    if(other.responseBegin!=-1){
+                        responseBegin = other.responseBegin;
+                    }
+                    if(other.responseDone!=-1){
+                        responseDone = other.responseDone;
+                    }
+                }
+
+        };
+        PerformanceDateTime performances;
+
         QString getRequestHeader(const QString& name)const;
         QString getResponseHeader(const QString& name)const;
 
@@ -106,6 +164,7 @@ class RyPipeData : public QObject
         int _responseBodyRemain;//response body remain bytes to receive
 
         void parseHeaders(const QList<QByteArray>& headers,QMap<QString,QString>*);
+
 
 
 };

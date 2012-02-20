@@ -20,6 +20,8 @@ RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent
     _requestState = _responseState = ConnectionStateInit;
     //qDebug()<<"RyConnection"<<socketHandle;
     //setHandle(socketHandle);
+
+    _receivingPerformance.clientConnected = QDateTime::currentMSecsSinceEpoch();
 }
 
 RyConnection::~RyConnection(){
@@ -94,6 +96,9 @@ void RyConnection::run(){
 
 //private slots
 void RyConnection::onRequestReadyRead(){
+    if(_receivingPerformance.requestBegin ==-1){
+        _receivingPerformance.requestBegin = QDateTime::currentMSecsSinceEpoch();
+    }
     QByteArray newContent = _requestSocket->readAll();
     //qDebug()<<"requestReadyRead"<<newContent;
 
@@ -133,7 +138,8 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError err){
             //_responseState = ConnectionStatePackageFound;
             //qDebug()<<"respones close when content-length not found";
             //qDebug()<<_sendingPipeData->responseBodyRawData();
-            emit pipeComplete(_sendingPipeData);
+            //emit pipeComplete(_sendingPipeData);
+            onResponsePackageFound();
         }else{//maybe remote connection disconnect with error
             //if(!_sendingPipeData->isPackageFound()){
             //   _sendingPipeData->markAsError();
@@ -152,7 +158,9 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError err){
 
                     _sendingPipeData->parseResponse(&ba);
                 }
-                emit pipeError(_sendingPipeData);
+                //emit pipeError(_sendingPipeData);
+                //TODO
+                onResponsePackageFound();
             //}
 
         }
@@ -166,6 +174,11 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError err){
 }
 
 void RyConnection::onResponseConnected(){
+    if(_sendingPerformance.responseConnected==-1){
+        _sendingPerformance.responseConnected = QDateTime::currentMSecsSinceEpoch();
+    }
+
+
     //qDebug()<<_responseSocket->state() ;
     _connectionNotOkTime = 0;
     //qDebug()<<"onResponseConnected begin";
@@ -236,19 +249,20 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
             byteToWrite.append(s);
             QByteArray ba = QByteArray("nRythem:remote server close");
             _sendingPipeData->parseResponse(&byteToWrite);
-            emit pipeError(_sendingPipeData);
+            onResponsePackageFound();
+            //emit pipeError(_sendingPipeData);
         }else if(_sendingPipeData->isContentLenthUnLimit()){
-            //_responseState = ConnectionStatePackageFound;
             qDebug()<<"respones close when content-length not found";
-            //qDebug()<<_sendingPipeData->responseBodyRawData();
-            emit pipeComplete(_sendingPipeData);
+            onResponsePackageFound();
+            //emit pipeComplete(_sendingPipeData);
         }else{//maybe remote connection disconnect with error
             //   when the response doesn't complete.
             //if(!_sendingPipeData->isPackageFound()){
             //   _sendingPipeData->markAsError();
 
             //}
-            emit pipeComplete(_sendingPipeData);
+            onResponsePackageFound();
+            //emit pipeComplete(_sendingPipeData);
 
         }
         _sendingPipeData.clear();
@@ -283,6 +297,7 @@ void RyConnection::onRequestHeaderFound(){
 }
 
 void RyConnection::onRequestPackageFound(){
+    _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
     if(_receivingPipeData->method == "CONNECT"){
         _isConnectTunnel = true;
         qDebug()<<"requestPackageFound"
@@ -291,9 +306,13 @@ void RyConnection::onRequestPackageFound(){
                 <<_receivingPipeData->dataToSend();
     }
     _requestState = ConnectionStatePackageFound;
+    _receivingPipeData->performances = _receivingPerformance;
     emit pipeBegin(_receivingPipeData);
     appendPipe(_receivingPipeData);
     _receivingPipeData.clear();
+
+    _lastSocketConnectedDateTime = _receivingPerformance.clientConnected;
+    _receivingPerformance.reset();
     doRequestToNetwork();
 }
 
@@ -302,6 +321,8 @@ void RyConnection::onResponseHeaderFound(){
 }
 
 void RyConnection::onResponsePackageFound(){
+    _sendingPerformance.responseDone = QDateTime::currentMSecsSinceEpoch();
+    _sendingPipeData->performances = _sendingPerformance;
     _responseState = ConnectionStatePackageFound;
     emit pipeComplete(_sendingPipeData);
     /*
@@ -311,6 +332,7 @@ void RyConnection::onResponsePackageFound(){
             <<_sendingPipeData->responseBodyRawData().size();
     */
     _sendingPipeData.clear();
+    _sendingPerformance.reset();
     doRequestToNetwork();
 
 

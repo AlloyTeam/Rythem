@@ -17,7 +17,7 @@ int QiddlerPipeTableModel::rowCount( const QModelIndex & ) const{
     return pipesVector.count();
 }
 int QiddlerPipeTableModel::columnCount(const QModelIndex &) const{
-    return 9;
+    return 11;
 }
 
 QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
@@ -42,6 +42,9 @@ QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
             return QString::number(p->responseBodyRawData().size());
         case 9:
             return p->getResponseHeader("Cache-Control");
+        case 10:
+            qDebug()<<QString::number(p->performances.responseDone)<<QString::number(p->performances.requestBegin);
+            return QString::number(p->performances.responseDone - p->performances.requestBegin);
         default:
             return QString("-");
     }
@@ -73,7 +76,7 @@ QVariant QiddlerPipeTableModel::headerData(int section, Qt::Orientation orientat
 
     //TODO
     QStringList headers;
-    headers<<"#"<<"#2"<<"#3(socket)"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching";
+    headers<<"#"<<"#2"<<"#3(socket)"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching"<<"all time";
 
     if (orientation == Qt::Horizontal) {
         if(section< headers.size() ){
