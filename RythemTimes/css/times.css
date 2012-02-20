@@ -1,0 +1,54 @@
+*{
+	padding: 0;
+	margin: 0;
+	font-size: 10px;
+}
+.hgroup{
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+}
+.vgroup{
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+}
+.cgroup{
+	display: -webkit-box;
+	-webkit-box-align: center;
+	-webkit-box-pack: center;
+}
+.spacer{
+	-webkit-box-flex: 1;
+}
+
+#socketGroups{
+
+}
+.socket{
+	border-bottom: dashed 1px #CCC;
+}
+.socket:last-child{
+	border-bottom: none;
+}
+.socket > header{
+	padding: 10px;
+	border-right: dashed 1px #CCC;
+}
+.conns{
+	padding: 10px;
+}
+.conn{
+	padding: 6px;
+	margin: 0 6px;
+	border: 1px solid #CCC;
+	-webkit-border-radius: 6px;
+}
+.conn > .name{
+	font-size: 12px;
+	font-weight: bold;
+}
+.conn > .host{
+	color: #999;
+}
+.conn > .detail{
+	color: #999;
+}
