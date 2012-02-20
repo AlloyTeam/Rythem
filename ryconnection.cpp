@@ -325,7 +325,7 @@ void RyConnection::parseRequest(){
         return;
     }
     if(_receivingPipeData.isNull()){
-        _receivingPipeData = RyPipeData_ptr(new RyPipeData(_connectionId));
+        _receivingPipeData = RyPipeData_ptr(new RyPipeData(_handle,_connectionId));
         _pipeTotal++;
         _receivingPipeData->id = RyProxyServer::instance()->nextPipeId();
     }

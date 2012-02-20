@@ -242,7 +242,7 @@ void Composer::sendData(const QByteArray &ba){
 
     */
     pipeData.clear();
-    pipeData = RyPipeData_ptr(new RyPipeData(0));
+    pipeData = RyPipeData_ptr(new RyPipeData(0,0));
     QByteArray ba2 = ba;
     pipeData->parseRequest(&ba2);
 

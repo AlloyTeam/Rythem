@@ -27,18 +27,20 @@ QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
         case 1:
             return QString::number(p->socketConnectionId);
         case 2:
-            return ((p->responseStatus.isEmpty())?QString("-"):p->responseStatus);
+            return QString::number(p->socketHandle);
         case 3:
-            return p->httpVersion;
+            return ((p->responseStatus.isEmpty())?QString("-"):p->responseStatus);
         case 4:
-            return p->host;
+            return p->httpVersion;
         case 5:
-            return p->serverIp;
+            return p->host;
         case 6:
-            return p->path;
+            return p->serverIp;
         case 7:
-            return QString::number(p->responseBodyRawData().size());
+            return p->path;
         case 8:
+            return QString::number(p->responseBodyRawData().size());
+        case 9:
             return p->getResponseHeader("Cache-Control");
         default:
             return QString("-");
@@ -71,7 +73,7 @@ QVariant QiddlerPipeTableModel::headerData(int section, Qt::Orientation orientat
 
     //TODO
     QStringList headers;
-    headers<<"#"<<"#2"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching";
+    headers<<"#"<<"#2"<<"#3(socket)"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching";
 
     if (orientation == Qt::Horizontal) {
         if(section< headers.size() ){

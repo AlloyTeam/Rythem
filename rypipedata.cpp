@@ -4,8 +4,9 @@
 #include <QStringList>
 
 
-RyPipeData::RyPipeData(quint64 connectionId,QObject *parent):
+RyPipeData::RyPipeData(int _socketHandle,quint64 connectionId,QObject *parent):
     QObject(parent){
+    this->socketHandle = _socketHandle;
     socketConnectionId = connectionId;
     _isContentLenthUnLimit =false;
     _isResponseChunked = false;
