@@ -11,6 +11,8 @@ class RyPipeData : public QObject
     public:
         explicit RyPipeData(int socketHandle,quint64 socketConnectionId,QObject *parent = 0);
 
+        bool operator <(RyPipeData &pipeData);
+
         // return byte remain (if the request/response has content-length but
         //   not complete yet
         int parseRequest(QByteArray* request,bool* isRequestOk=0);

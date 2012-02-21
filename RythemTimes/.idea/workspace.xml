@@ -34,7 +34,7 @@
       <file leaf-file-name="times.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/times.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="0" selection-start="990" selection-end="990" vertical-scroll-proportion="0.88785046">
+            <state line="41" column="39" selection-start="1088" selection-end="1088" vertical-scroll-proportion="0.30373833">
               <folding />
             </state>
           </provider>
@@ -55,10 +55,10 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/css/times.css" />
         <option value="$PROJECT_DIR$/index.html" />
-        <option value="$PROJECT_DIR$/js/times.js" />
         <option value="$PROJECT_DIR$/lib/parseuri.js" />
+        <option value="$PROJECT_DIR$/css/times.css" />
+        <option value="$PROJECT_DIR$/js/times.js" />
       </list>
     </option>
   </component>
@@ -130,6 +130,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="RythemTimes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="RythemTimes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="css" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -236,9 +250,16 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/lib/parseuri.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="2" selection-start="1027" selection-end="1027" vertical-scroll-proportion="0.76311606">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/css/times.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="13" selection-start="288" selection-end="288" vertical-scroll-proportion="0.04292528">
+        <state line="4" column="23" selection-start="66" selection-end="66" vertical-scroll-proportion="0.093457945">
           <folding />
         </state>
       </provider>
@@ -250,16 +271,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/parseuri.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="2" selection-start="1027" selection-end="1027" vertical-scroll-proportion="0.76311606">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/times.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="0" selection-start="990" selection-end="990" vertical-scroll-proportion="0.88785046">
+        <state line="41" column="39" selection-start="1088" selection-end="1088" vertical-scroll-proportion="0.30373833">
           <folding />
         </state>
       </provider>

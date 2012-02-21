@@ -86,7 +86,8 @@ mac:SOURCES -= rywinhttp.cpp
 
 FORMS    += mainwindow.ui \
     rule_config.ui \
-    composer.ui
+    composer.ui \
+    waterfallwindow.ui
 
 mac:CONFIG += app_bundle
 
@@ -116,7 +117,8 @@ OTHER_FILES += \
     RythemTimes/lib/backbone.js \
     RythemTimes/js/times.js \
     RythemTimes/css/times.css \
-    static/icloud_64.png
+    static/icloud_64.png \
+    RythemTimes/lib/parseuri.js
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

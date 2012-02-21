@@ -12,6 +12,10 @@ RyPipeData::RyPipeData(int _socketHandle,quint64 connectionId,QObject *parent):
     _isResponseChunked = false;
 }
 
+bool RyPipeData::operator <(RyPipeData &pipeData){
+    return this->performances.requestBegin < pipeData.performances.requestBegin;
+}
+
 
 int RyPipeData::parseRequest(QByteArray* request,bool* isRequestOk){
     // get header body devider

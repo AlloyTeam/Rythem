@@ -35,6 +35,7 @@
         <file>RythemTimes/lib/backbone.js</file>
         <file>RythemTimes/js/times.js</file>
         <file>RythemTimes/css/times.css</file>
+        <file>RythemTimes/lib/parseuri.js</file>
     </qresource>
     <qresource prefix="/static">
         <file>static/icloud_64.png</file>

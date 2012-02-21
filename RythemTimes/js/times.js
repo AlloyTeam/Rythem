@@ -22,7 +22,6 @@
 			header = header.split('\r\n\r\n')[0];
 			var lines = header.split('\r\n');
 			var firstLine = lines[0].split(' ');
-
 			//parse the first line("GET /xxx HTTP/1.1" for request or "HTTP/1.1 200 OK" for response)
 			var method, url, host, path, requestName, httpVersion, status, description;
 			if(parseInt(firstLine[1])){
@@ -42,14 +41,12 @@
 				path = uri.path;
 				requestName = uri.file;
 			}
-
 			//parse the header fields
 			var i, len = lines.length, fields = {};
 			for(i=1; i<len; i++){
 				var kv = lines[i].split(': ');
 				fields[kv[0]] = kv[1];
 			}
-
 			return {
 				isRequest: true,
 				method: method,
@@ -248,18 +245,39 @@
 		}
 	}
 
+	/**
+	 * update all connections, this method is invoke by the client
+	 * conns = [conn1, conn2, ...]
+	 * conn = {id, socketID, requestHeader, responseHeader, startTime, responseStartTime, responseFinishTime}
+	 * @param conns
+	 */
+	function updateAllConnections(conns){
+		var i, len=conns.length;
+		for(i=0; i<len; i++){
+			var conn = conns[i];
+			var c = Connection.get(conn.id, conn.socketID);
+			c.setRequestHeader(conn.requestHeader);
+			c.setResponseHeader(conn.responseHeader);
+			c.setStartTime(conn.startTime);
+			c.setResponseStartTime(conn.responseStartTime);
+			c.setResponseFinishTime(conn.responseFinishTime);
+			updateConnUI(c);
+		}
+	}
+
 	function main(){
-		var c1 = Connection.get(1, 'socket a');
+		/*var c1 = Connection.get(1, 'socket a');
 		var c2 = Connection.get(2, 'socket a');
 		var c3 = Connection.get(3, 'socket b');
 		var c4 = Connection.get(4, 'socket a');
 		updateConnUI(c1);
 		updateConnUI(c2);
 		updateConnUI(c3);
-		updateConnUI(c4);
+		updateConnUI(c4);*/
 	}
 
 	window.Connection = Connection;
+	window.updateAllConnections = updateAllConnections;
 	document.addEventListener('DOMContentLoaded', main);
 
 })();

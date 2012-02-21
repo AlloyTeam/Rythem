@@ -8,11 +8,10 @@
 #include <QSettings>
 #include <QVariant>
 #include <QUrl>
-
-
 #include <QNetworkConfigurationManager>
 #include <QMAp>
 #include <QList>
+#include <QMessageBox>
 
 #ifdef Q_WS_WIN32
 #include "wininet.h"
@@ -246,9 +245,17 @@ void MainWindow::onWaterfallActionTriggered(){
         pipes.append(data);
     }
 
-    WaterfallWindow *win = new WaterfallWindow();
-    win->setPipeData(pipes);
-    win->show();
+    if(pipes.length()){
+        //deleteLater would be call when win close, don't worry about the memory
+        WaterfallWindow *win = new WaterfallWindow();
+        win->setPipeData(pipes);
+        win->show();
+    }
+    else{
+        QMessageBox box;
+        box.setText("Please select some network request first");
+        box.exec();
+    }
 }
 
 
