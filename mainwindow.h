@@ -78,7 +78,7 @@ public slots:
         void toggleProxy();
 
         void onSelectionChange(QModelIndex,QModelIndex);
-
+        void onWaterfallActionTriggered();
 
 
 public:

@@ -8,18 +8,64 @@
 	var Connection = function(id, socketID){
 		this.id = id;
 		this.socketID = socketID;
+		this.requestHeader = {};
+		this.responseHeader = {};
 	};
 	Connection.prototype = {
+		/**
+		 * parse http request/response header
+		 * @param {String} header
+		 * @return {Object}
+		 */
+		parseHttpHeader: function(header){
+			//split the header
+			header = header.split('\r\n\r\n')[0];
+			var lines = header.split('\r\n');
+			var firstLine = lines[0].split(' ');
+
+			//parse the first line("GET /xxx HTTP/1.1" for request or "HTTP/1.1 200 OK" for response)
+			var method, url, host, path, requestName, httpVersion, status, description;
+			if(parseInt(firstLine[1])){
+				//this is a response
+				httpVersion = firstLine[0];
+				status = parseInt(firstLine[1]);
+				description = firstLine[2];
+			}
+			else{
+				//this is a request
+				method = firstLine[0];
+				url = firstLine[1];
+				httpVersion = firstLine[2];
+
+				var uri = parseUri(url);
+				host = uri.host;
+				path = uri.path;
+				requestName = uri.file;
+			}
+
+			//parse the header fields
+			var i, len = lines.length, fields = {};
+			for(i=1; i<len; i++){
+				var kv = lines[i].split(': ');
+				fields[kv[0]] = kv[1];
+			}
+
+			return {
+				isRequest: true,
+				method: method,
+				url: url,
+				httpVersion: httpVersion,
+				status: status,
+				desc: description,
+				fields: fields
+			};
+		},
 		/**
 		 * set request header
 		 * @param {String} header
 		 */
 		setRequestHeader: function(header){
-			var lines = header.split('\r\n');
-			var requestLine = lines[0].split(' ');
-			this.requestHeader = header;
-			this.requestMethod = requestLine[0];
-			this.requestUrl = requestLine[1];
+			this.requestHeader = this.parseHttpHeader(header);
 			return this;
 		},
 		/**
@@ -27,7 +73,7 @@
 		 * @param {String} header
 		 */
 		setResponseHeader: function(header){
-			this.responseHeader = header;
+			this.responseHeader = this.parseHttpHeader(header);
 			return this;
 		},
 		/**
@@ -77,19 +123,19 @@
 			return this;
 		},
 		getFullUrl: function(){
-			return this.requestUrl || '?';
+			return this.requestHeader.url || '?';
 		},
 		getRequestName: function(){
 			return this.id.toString();
 		},
 		getRequestHost: function(){
-			return 'www.???.com';
+			return this.requestHeader.host || '?';
 		},
 		getRequestMethod: function(){
-			return this.requestMethod || '?'
+			return this.requestHeader.method || '?';
 		},
 		getResponseStatus: function(){
-			return '0';
+			return this.responseHeader.status || 0;
 		},
 		getStartTime: function(){
 			return this.startTime
@@ -111,14 +157,14 @@
 		},
 		toString: function(){
 			return JSON.stringify({
-				"id": 					this.id,
-				"socketID": 			this.socketID,
-				"startTime": 			this.getStartTime(),
-				"responseStartTime": 	this.getResponseStartTime(),
-				"responseFinishTime": 	this.getResponseFinishTime(),
-				"waitTime": 			this.getWaitTime(),
-				"responseTime": 		this.getResponseTime(),
-				"sessionTime": 			this.getSessionTime()
+				id: 				this.id,
+				socketID: 			this.socketID,
+				startTime: 			this.getStartTime(),
+				responseStartTime: 	this.getResponseStartTime(),
+				responseFinishTime: this.getResponseFinishTime(),
+				waitTime: 			this.getWaitTime(),
+				responseTime: 		this.getResponseTime(),
+				sessionTime: 		this.getSessionTime()
 			});
 		}
 	};

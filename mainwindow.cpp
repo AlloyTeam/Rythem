@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "waterfallwindow.h"
 
 #include <QTcpServer>
 #include "rypipedata.h"
@@ -127,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
     connect(ui->actionRemoveAll,SIGNAL(triggered()),&pipeTableModel,SLOT(removeAllItem()));
+    connect(ui->actionWaterfall, SIGNAL(triggered()), this, SLOT(onWaterfallActionTriggered()));
 }
 
 MainWindow::~MainWindow()
@@ -231,6 +233,22 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
 
 
     data.clear();
+}
+
+
+void MainWindow::onWaterfallActionTriggered(){
+    QModelIndexList list = ui->tableView->selectionModel()->selectedRows();
+    QList<RyPipeData_ptr> pipes;
+    QListIterator<QModelIndex> it(list);
+    while(it.hasNext()){
+        QModelIndex i = it.next();
+        RyPipeData_ptr data = pipeTableModel.getItem(i.row());
+        pipes.append(data);
+    }
+
+    WaterfallWindow *win = new WaterfallWindow();
+    win->setPipeData(pipes);
+    win->show();
 }
 
 

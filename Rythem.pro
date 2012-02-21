@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     ryrulesimpleaddress.cpp \
     ryruleremotecontent.cpp \
     ryrulelocalfile.cpp \
-    ryrulelocaldir.cpp
+    ryrulelocaldir.cpp \
+    waterfallwindow.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -65,7 +66,8 @@ HEADERS  += mainwindow.h \
     ryruleremotecontent.h \
     ryrulelocalfiles.h \
     ryrulelocalfile.h \
-    ryrulecomplexaddress.h
+    ryrulecomplexaddress.h \
+    waterfallwindow.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
@@ -113,7 +115,8 @@ OTHER_FILES += \
     RythemTimes/index.html \
     RythemTimes/lib/backbone.js \
     RythemTimes/js/times.js \
-    RythemTimes/css/times.css
+    RythemTimes/css/times.css \
+    static/icloud_64.png
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

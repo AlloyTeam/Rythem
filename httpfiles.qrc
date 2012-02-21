@@ -36,4 +36,7 @@
         <file>RythemTimes/js/times.js</file>
         <file>RythemTimes/css/times.css</file>
     </qresource>
+    <qresource prefix="/static">
+        <file>static/icloud_64.png</file>
+    </qresource>
 </RCC>

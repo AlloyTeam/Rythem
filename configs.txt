@@ -30,6 +30,20 @@
 				"enable":1,
 				"rule":{"pattern":"oh yeah",
 				"replace":"wa"}
+			},
+			{
+				"name":"",
+				"type":4,
+				"enable":1,
+				"rule":{"pattern":"wa",
+				"replace":"wa"}
+			},
+			{
+				"name":"",
+				"type":4,
+				"enable":1,
+				"rule":{"pattern":"hey",
+				"replace":"hey"}
 			}
 		]
 	},
