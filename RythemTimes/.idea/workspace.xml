@@ -25,7 +25,7 @@
       <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="34" selection-start="526" selection-end="526" vertical-scroll-proportion="-13.125">
+            <state line="21" column="34" selection-start="526" selection-end="526" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -34,7 +34,7 @@
       <file leaf-file-name="times.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/times.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="41" column="39" selection-start="1088" selection-end="1088" vertical-scroll-proportion="0.30373833">
+            <state line="47" column="47" selection-start="1213" selection-end="1213" vertical-scroll-proportion="-0.7943925">
               <folding />
             </state>
           </provider>
@@ -93,6 +93,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -149,7 +150,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -252,28 +252,24 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/lib/parseuri.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="2" selection-start="1027" selection-end="1027" vertical-scroll-proportion="0.76311606">
-          <folding />
-        </state>
+        <state line="32" column="2" selection-start="1027" selection-end="1027" vertical-scroll-proportion="0.76311606" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/css/times.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="23" selection-start="66" selection-end="66" vertical-scroll-proportion="0.093457945">
-          <folding />
-        </state>
+        <state line="4" column="23" selection-start="66" selection-end="66" vertical-scroll-proportion="0.093457945" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="34" selection-start="526" selection-end="526" vertical-scroll-proportion="-13.125">
+        <state line="21" column="34" selection-start="526" selection-end="526" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/times.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="39" selection-start="1088" selection-end="1088" vertical-scroll-proportion="0.30373833">
+        <state line="47" column="47" selection-start="1213" selection-end="1213" vertical-scroll-proportion="-0.7943925">
           <folding />
         </state>
       </provider>

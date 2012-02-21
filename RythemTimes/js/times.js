@@ -21,9 +21,17 @@
 			//split the header
 			header = header.split('\r\n\r\n')[0];
 			var lines = header.split('\r\n');
-			var firstLine = lines[0].split(' ');
+
+			//parse the header fields
+			var i, len = lines.length, fields = {};
+			for(i=1; i<len; i++){
+				var kv = lines[i].split(': ');
+				fields[kv[0]] = kv[1];
+			}
+
 			//parse the first line("GET /xxx HTTP/1.1" for request or "HTTP/1.1 200 OK" for response)
-			var method, url, host, path, requestName, httpVersion, status, description;
+			var firstLine = lines[0].split(' ');
+			var method, url, host, path, file, httpVersion, status, description;
 			if(parseInt(firstLine[1])){
 				//this is a response
 				httpVersion = firstLine[0];
@@ -37,20 +45,17 @@
 				httpVersion = firstLine[2];
 
 				var uri = parseUri(url);
-				host = uri.host;
+				host = uri.host || fields['Host'];
 				path = uri.path;
-				requestName = uri.file;
-			}
-			//parse the header fields
-			var i, len = lines.length, fields = {};
-			for(i=1; i<len; i++){
-				var kv = lines[i].split(': ');
-				fields[kv[0]] = kv[1];
+				file = uri.file;
 			}
 			return {
 				isRequest: true,
 				method: method,
 				url: url,
+				host: host,
+				path: path,
+				file: file,
 				httpVersion: httpVersion,
 				status: status,
 				desc: description,
@@ -123,7 +128,7 @@
 			return this.requestHeader.url || '?';
 		},
 		getRequestName: function(){
-			return this.id.toString();
+			return this.requestHeader.file || this.id.toString();
 		},
 		getRequestHost: function(){
 			return this.requestHeader.host || '?';
