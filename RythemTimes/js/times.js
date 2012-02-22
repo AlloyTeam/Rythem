@@ -248,42 +248,54 @@
 
 	function updateConnUI(conn){
 		var el = document.getElementById('conn-' + conn.id);
-		if(el){
-			el.querySelector('.name').textContent = conn.getRequestName();
-			el.querySelector('.host').textContent = conn.getRequestHost();
-			el.querySelector('.detail').textContent = conn.getRequestMethod() + ' ' + conn.getResponseStatus();
-			return el;
-		}
-		else{
-			var waitTime = conn.getWaitTime();
-			var responseTime = conn.getResponseTime();
-			var waitTimeLen = Math.round(waitTime/100) || 1;
-			var totalTimeLen = (Math.round(responseTime/100) || 1) + waitTime;
-			var detailText = [
-				conn.getRequestMethod(),
-				conn.getResponseStatus(),
-				conn.getResponseContentLength()/1000 + 'KB'
-			].join(' ');
-			var timeText = [
-				waitTime,
-				waitTime + responseTime
-			].join('/');
+		if(!el){
 			var item = document.createElement('div');
 			item.id = 'conn-' + conn.id;
 			item.className = 'conn min';
 			item.innerHTML = '\
 				<div class="info">\
-					<div class="name">' + conn.getRequestName() + '</div>\
-					<div class="host">' + conn.getRequestHost() + '</div>\
-					<div class="detail">' + detailText + '</div> \
+					<div class="name"></div>\
+					<div class="host"></div>\
+					<div class="detail"></div> \
 				</div>\
-				<div class="time" style="width:' + totalTimeLen + 'px" title="' + timeText + '">\
-					<div class="wait" style="width:' + waitTimeLen + 'px" title="' + timeText + '"></div>\
+				<div class="time">\
+					<div class="wait"></div>\
 				</div>';
 			var socket = getSocketUI(conn.socketID);
 			socket.querySelector('.conns').appendChild(item);
-			return item;
+			el = item;
 		}
+
+		//get time value and time bar length (in px)
+		var waitTime = conn.getWaitTime();
+		var responseTime = conn.getResponseTime();
+		var waitTimeLen = Math.round(waitTime/10) || 1;
+		var totalTimeLen = (Math.round(responseTime/10) || 1) + waitTimeLen;
+
+		//time text is use as tooltip of the time bar
+		var timeText = [
+			waitTime,
+			responseTime,
+			(waitTime + responseTime)
+		].join('|') + 'ms';
+
+		//detail text (request method, response status and response content length)
+		var detailText = [
+			conn.getRequestMethod(),
+			conn.getResponseStatus(),
+			conn.getResponseContentLength()/1000 + 'KB'
+		].join(' ');
+
+		el.querySelector('.name').textContent = conn.getRequestName();
+		el.querySelector('.host').textContent = conn.getRequestHost();
+		el.querySelector('.detail').textContent = detailText;
+		var timebar = el.querySelector('.time');
+		var waitbar = el.querySelector('.wait');
+		timebar.style['width'] = totalTimeLen + 'px';
+		waitbar.style['width'] = waitTimeLen + 'px';
+		timebar.title = timeText;
+		waitbar.title = timeText;
+		return el;
 	}
 
 	/**
@@ -312,7 +324,8 @@
 	}
 
 	function main(){
-
+		//var c = Connection.get(1, 2);
+		//updateConnUI(c);
 	}
 
 	document.addEventListener('DOMContentLoaded', main);
