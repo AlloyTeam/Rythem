@@ -142,7 +142,7 @@
 			return this.requestHeader.url || '?';
 		},
 		getRequestName: function(){
-			return this.requestHeader.file || this.id.toString();
+			return this.requestHeader.file || '/';
 		},
 		getRequestHost: function(){
 			return this.requestHeader.host || '?';
@@ -312,8 +312,7 @@
 	}
 
 	function main(){
-		var c = Connection.get(1, 2);
-		updateConnUI(c);
+
 	}
 
 	document.addEventListener('DOMContentLoaded', main);
