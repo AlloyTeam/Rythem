@@ -174,6 +174,9 @@
 		getSessionTime: function(){
 			return this.responseFinishTime - this.startTime;
 		},
+		getTimeGap: function(anotherConn){
+			return this.startTime - anotherConn.getResponseFinishTime();
+		},
 		toString: function(){
 			return JSON.stringify({
 				id: 				this.id,
@@ -231,6 +234,10 @@
 	var socketGroupsEl = document.getElementById('socketGroups');
 	var startTime = 0;
 
+	/**
+	 * get the socket group element by socket id
+	 * @param socketID
+	 */
 	function getSocketUI(socketID){
 		var el = document.getElementById('socket-' + socketID);
 		if(el){
@@ -246,6 +253,10 @@
 		}
 	}
 
+	/**
+	 * update corresponding http request element
+	 * @param {Connection} conn
+	 */
 	function updateConnUI(conn){
 		var el = document.getElementById('conn-' + conn.id);
 		if(!el){
@@ -256,7 +267,8 @@
 				<div class="info">\
 					<div class="name"></div>\
 					<div class="host"></div>\
-					<div class="detail"></div> \
+					<div class="detail"></div>\
+					<div class="timing"></div>\
 				</div>\
 				<div class="time">\
 					<div class="wait"></div>\
@@ -272,12 +284,22 @@
 		var waitTimeLen = Math.round(waitTime/10) || 1;
 		var totalTimeLen = (Math.round(responseTime/10) || 1) + waitTimeLen;
 
+		//get time gap between this conn and the previous one in the same socket
+		var socket = Connection.sockets[conn.socketID];
+		var index = socket.indexOf(conn);
+		var gap = 0;
+		if(index > 0){
+			//compare requeset start time with the previous request in the same socket
+			gap = conn.getTimeGap(socket[index - 1]);
+		}
+		else{
+			//compare request start time with the beginning time
+			gap = conn.getStartTime() - startTime;
+		}
+		el.marginLeft = Math.round(gap / 10);
+
 		//time text is use as tooltip of the time bar
-		var timeText = [
-			waitTime,
-			responseTime,
-			(waitTime + responseTime)
-		].join('|') + 'ms';
+		var timeText = waitTime + '+' + responseTime + '=' + (waitTime + responseTime) + 'ms';
 
 		//detail text (request method, response status and response content length)
 		var detailText = [
@@ -289,10 +311,14 @@
 		el.querySelector('.name').textContent = conn.getRequestName();
 		el.querySelector('.host').textContent = conn.getRequestHost();
 		el.querySelector('.detail').textContent = detailText;
+		el.querySelector('.timing').textContent = timeText;
+		el.querySelector('.info').title = conn.getFullUrl();
 		var timebar = el.querySelector('.time');
 		var waitbar = el.querySelector('.wait');
-		timebar.style['width'] = totalTimeLen + 'px';
-		waitbar.style['width'] = waitTimeLen + 'px';
+		timebar.width = totalTimeLen;
+		waitbar.width = waitTimeLen;
+		//timebar.style['width'] = totalTimeLen + 'px';
+		//waitbar.style['width'] = waitTimeLen + 'px';
 		timebar.title = timeText;
 		waitbar.title = timeText;
 		return el;
@@ -309,8 +335,8 @@
 		for(i=0; i<len; i++){
 			var conn = conns[i];
 			var c = Connection.get(conn.id, conn.socketID);
-			if(!startTime){
-				startTime = c.startTime;
+			if(!startTime && conn.startTime){
+				startTime = conn.startTime;
 			}
 			c.setHeaders(
 				conn.host, conn.url, conn.method, conn.status,
@@ -321,6 +347,7 @@
 			c.setResponseFinishTime(conn.responseFinishTime);
 			updateConnUI(c);
 		}
+		startTime = 0;
 	}
 
 	function main(){

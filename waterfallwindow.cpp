@@ -16,16 +16,22 @@ WaterfallWindow::~WaterfallWindow()
     qDebug() << "[WaterfallWindow] i am dead";
 }
 
+bool compareRequestTime(RyPipeData_ptr p1, RyPipeData_ptr p2){
+    return p1->performances.requestBegin < p2->performances.requestBegin;
+}
+
 void WaterfallWindow::setPipeData(QList<RyPipeData_ptr> list){
     //save the list first
     pipes = list;
     if(loaded){
         //constructor the js object
-        qSort(pipes);
+        qSort(pipes.begin(), pipes.end(), compareRequestTime);
         QStringList results;
         QListIterator<RyPipeData_ptr> it(list);
+        qDebug() << "--------------------------";
         while(it.hasNext()){
             RyPipeData_ptr p = it.next();
+            qDebug() << "requestBegin" << p->performances.requestBegin;
             QString result;
             QTextStream stream(&result);
             stream << "{id:" << p->id
@@ -46,7 +52,6 @@ void WaterfallWindow::setPipeData(QList<RyPipeData_ptr> list){
         //invoke js update method
         QWebFrame *frame = ui->webView->page()->mainFrame();
         QString args = "[" + results.join(",") + "]";
-        qDebug() << args;
         frame->evaluateJavaScript("window.updateAllConnections(" + args + ")");
     }
 }

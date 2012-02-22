@@ -31,26 +31,26 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="times.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="times.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/times.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="279" column="24" selection-start="7472" selection-end="7472" vertical-scroll-proportion="0.55607474">
+            <state line="302" column="0" selection-start="8235" selection-end="8235" vertical-scroll-proportion="0.0">
               <folding>
-                <marker date="1329888401000" expanded="true" signature="6782:6807" placeholder="..." />
-                <marker date="1329888401000" expanded="true" signature="6782:6838" placeholder="..." />
-                <marker date="1329888401000" expanded="true" signature="6782:6871" placeholder="..." />
-                <marker date="1329888401000" expanded="true" signature="6782:6890" placeholder="..." />
-                <marker date="1329888401000" expanded="true" signature="6914:6957" placeholder="..." />
-                <marker date="1329888401000" expanded="true" signature="6914:6939" placeholder="..." />
+                <marker date="1329894149000" expanded="true" signature="7049:7074" placeholder="..." />
+                <marker date="1329894149000" expanded="true" signature="7049:7105" placeholder="..." />
+                <marker date="1329894149000" expanded="true" signature="7049:7138" placeholder="..." />
+                <marker date="1329894149000" expanded="true" signature="7049:7189" placeholder="..." />
+                <marker date="1329894149000" expanded="true" signature="7213:7256" placeholder="..." />
+                <marker date="1329894149000" expanded="true" signature="7213:7238" placeholder="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="times.css" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="times.css" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/css/times.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="58" column="18" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0">
+            <state line="74" column="26" selection-start="1002" selection-end="1002" vertical-scroll-proportion="0.6962617">
               <folding />
             </state>
           </provider>
@@ -72,9 +72,9 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/lib/parseuri.js" />
-        <option value="$PROJECT_DIR$/css/times.css" />
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/js/times.js" />
+        <option value="$PROJECT_DIR$/css/times.css" />
       </list>
     </option>
   </component>
@@ -271,11 +271,6 @@
         <state line="32" column="2" selection-start="1027" selection-end="1027" vertical-scroll-proportion="0.76311606" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/times.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="58" column="18" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="14" column="20" selection-start="389" selection-end="389" vertical-scroll-proportion="-8.75">
@@ -285,15 +280,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/js/times.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="279" column="24" selection-start="7472" selection-end="7472" vertical-scroll-proportion="0.55607474">
+        <state line="302" column="0" selection-start="8235" selection-end="8235" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1329888401000" expanded="true" signature="6782:6807" placeholder="..." />
-            <marker date="1329888401000" expanded="true" signature="6782:6838" placeholder="..." />
-            <marker date="1329888401000" expanded="true" signature="6782:6871" placeholder="..." />
-            <marker date="1329888401000" expanded="true" signature="6782:6890" placeholder="..." />
-            <marker date="1329888401000" expanded="true" signature="6914:6957" placeholder="..." />
-            <marker date="1329888401000" expanded="true" signature="6914:6939" placeholder="..." />
+            <marker date="1329894149000" expanded="true" signature="7049:7074" placeholder="..." />
+            <marker date="1329894149000" expanded="true" signature="7049:7105" placeholder="..." />
+            <marker date="1329894149000" expanded="true" signature="7049:7138" placeholder="..." />
+            <marker date="1329894149000" expanded="true" signature="7049:7189" placeholder="..." />
+            <marker date="1329894149000" expanded="true" signature="7213:7256" placeholder="..." />
+            <marker date="1329894149000" expanded="true" signature="7213:7238" placeholder="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/times.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="74" column="26" selection-start="1002" selection-end="1002" vertical-scroll-proportion="0.6962617">
+          <folding />
         </state>
       </provider>
     </entry>
