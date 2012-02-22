@@ -204,6 +204,9 @@ void RyConnection::onResponseConnected(){
     }
 }
 void RyConnection::onResponseReadyRead(){
+    if(_sendingPerformance.responseBegin == -1){
+        _sendingPerformance.responseBegin = QDateTime::currentMSecsSinceEpoch();
+    }
     //qDebug()<<"onResponsReadyRead"<<handle();
     QByteArray newContent = _responseSocket->readAll();
 

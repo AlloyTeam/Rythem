@@ -50,7 +50,6 @@
 				file = uri.file;
 			}
 			return {
-				isRequest: true,
 				method: method,
 				url: url,
 				host: host,
@@ -77,6 +76,21 @@
 		setResponseHeader: function(header){
 			this.responseHeader = this.parseHttpHeader(header);
 			return this;
+		},
+		setHeaders: function(host, url, method, status, reqContentLength, respContentLength){
+			var parsedUrl = parseUri(url);
+			this.requestHeader = {
+				method: method,
+				url: url,
+				host: host,
+				path: parsedUrl.path,
+				file: parsedUrl.file,
+				contentLength: reqContentLength
+			};
+			this.responseHeader = {
+				status: status,
+				contentLength: respContentLength
+			};
 		},
 		/**
 		 * set request start time
@@ -138,6 +152,9 @@
 		},
 		getResponseStatus: function(){
 			return this.responseHeader.status || 0;
+		},
+		getResponseContentLength: function(){
+			return this.responseHeader.contentLength || 0;
 		},
 		getStartTime: function(){
 			return this.startTime
@@ -212,6 +229,7 @@
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	var socketGroupsEl = document.getElementById('socketGroups');
+	var startTime = 0;
 
 	function getSocketUI(socketID){
 		var el = document.getElementById('socket-' + socketID);
@@ -237,13 +255,23 @@
 			return el;
 		}
 		else{
+			var waitTime = Math.round(conn.getWaitTime()/100) || 1;
+			var totalTime = (Math.round(conn.getResponseTime()/100) || 1) + waitTime;
+			var detailText = [
+				conn.getRequestMethod(),
+				conn.getResponseStatus(),
+				conn.getResponseContentLength()
+			].join(' ');
 			var item = document.createElement('div');
 			item.id = 'conn-' + conn.id;
 			item.className = 'conn';
 			item.innerHTML = '\
 				<div class="name">' + conn.getRequestName() + '</div>\
 				<div class="host">' + conn.getRequestHost() + '</div>\
-				<div class="detail">' + conn.getRequestMethod() + ' ' + conn.getResponseStatus() + '</div> ';
+				<div class="detail">' + detailText + '</div> \
+				<div class="time" style="width:' + totalTime + 'px">\
+					<div class="wait" style="width:' + waitTime + 'px"></div>\
+				</div>';
 			var socket = getSocketUI(conn.socketID);
 			socket.querySelector('.conns').appendChild(item);
 			return item;
@@ -261,8 +289,13 @@
 		for(i=0; i<len; i++){
 			var conn = conns[i];
 			var c = Connection.get(conn.id, conn.socketID);
-			c.setRequestHeader(conn.requestHeader);
-			c.setResponseHeader(conn.responseHeader);
+			if(!startTime){
+				startTime = c.startTime;
+			}
+			c.setHeaders(
+				conn.host, conn.url, conn.method, conn.status,
+				conn.requestContentLength, conn.responseContentLength
+			);
 			c.setStartTime(conn.startTime);
 			c.setResponseStartTime(conn.responseStartTime);
 			c.setResponseFinishTime(conn.responseFinishTime);
@@ -271,14 +304,7 @@
 	}
 
 	function main(){
-		/*var c1 = Connection.get(1, 'socket a');
-		var c2 = Connection.get(2, 'socket a');
-		var c3 = Connection.get(3, 'socket b');
-		var c4 = Connection.get(4, 'socket a');
-		updateConnUI(c1);
-		updateConnUI(c2);
-		updateConnUI(c3);
-		updateConnUI(c4);*/
+
 	}
 
 	window.Connection = Connection;

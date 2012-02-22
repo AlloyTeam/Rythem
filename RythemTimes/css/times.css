@@ -32,6 +32,7 @@
 }
 .socket > header{
 	padding: 10px;
+	min-width: 30px;
 	border-right: dashed 1px #CCC;
 }
 .conns{
@@ -53,4 +54,17 @@
 }
 .conn > .detail{
 	color: #999;
+}
+.conn > .time{
+	margin-top: 5px;
+	min-width: 1px;
+	height: 10px;
+	border: 1px solid #369;
+	background-color: #FF0;
+	overflow: hidden;
+}
+.conn > .time > .wait{
+	min-width: 1px;
+	height: 10px;
+	background-color: #F00;
 }

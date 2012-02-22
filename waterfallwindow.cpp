@@ -29,12 +29,16 @@ void WaterfallWindow::setPipeData(QList<RyPipeData_ptr> list){
             QString result;
             QTextStream stream(&result);
             stream << "{id:" << p->id
-                   << ", socketID:"   << p->socketConnectionId
-                   << ", requestHeader:\""      << QString(p->requestHeaderRawData()).replace("\r\n", "\\r\\n") << "\""
-                   << ", responseHeader:\""     << QString(p->responseHeaderRawData()).replace("\r\n", "\\r\\n") << "\""
-                   << ", startTime:"            << p->performances.requestBegin
-                   << ", responseStartTime:"    << p->performances.responseBegin
-                   << ", responseFinishTime:"   << p->performances.responseDone
+                   << ", socketID:"                 << p->socketConnectionId
+                   << ", host:\""                   << p->host << "\""
+                   << ", url:\""                    << p->fullUrl << "\""
+                   << ", method:\""                 << p->method << "\""
+                   << ", status:"                   << p->responseStatus
+                   << ", startTime:"                << p->performances.requestBegin
+                   << ", responseStartTime:"        << p->performances.responseBegin
+                   << ", responseFinishTime:"       << p->performances.responseDone
+                   << ", requestContentLength:"     << p->requestBodyRawData().length()
+                   << ", responseContentLength:"    << p->responseBodyRawData().length()
                    << "}";
             results << result;
         }

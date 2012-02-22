@@ -22,19 +22,30 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="34" selection-start="526" selection-end="526" vertical-scroll-proportion="0.0">
+            <state line="7" column="42" selection-start="175" selection-end="175" vertical-scroll-proportion="0.1699029">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="times.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="times.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/times.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="47" column="47" selection-start="1213" selection-end="1213" vertical-scroll-proportion="-0.7943925">
+            <state line="270" column="50" selection-start="7457" selection-end="7457" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1329880095000" expanded="true" signature="7525:7601" placeholder="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="times.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/css/times.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="62" column="27" selection-start="887" selection-end="887" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -55,10 +66,10 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/lib/parseuri.js" />
         <option value="$PROJECT_DIR$/css/times.css" />
         <option value="$PROJECT_DIR$/js/times.js" />
+        <option value="$PROJECT_DIR$/index.html" />
       </list>
     </option>
   </component>
@@ -257,19 +268,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/css/times.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="23" selection-start="66" selection-end="66" vertical-scroll-proportion="0.093457945" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="34" selection-start="526" selection-end="526" vertical-scroll-proportion="0.0">
+        <state line="62" column="27" selection-start="887" selection-end="887" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/times.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="47" selection-start="1213" selection-end="1213" vertical-scroll-proportion="-0.7943925">
+        <state line="270" column="50" selection-start="7457" selection-end="7457" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1329880095000" expanded="true" signature="7525:7601" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="42" selection-start="175" selection-end="175" vertical-scroll-proportion="0.1699029">
           <folding />
         </state>
       </provider>
