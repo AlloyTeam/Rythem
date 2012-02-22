@@ -48,14 +48,24 @@
 	-webkit-border-radius: 6px;
 	cursor: pointer;
 }
-.conn > .name{
+.conn.min{
+	border: none;
+	padding: 0;
+}
+.conn > .info{
+
+}
+.conn.min > .info{
+	display: none;
+}
+.conn > .info > .name{
 	font-size: 12px;
 	font-weight: bold;
 }
-.conn > .host{
+.conn > .info > .host{
 	color: #999;
 }
-.conn > .detail{
+.conn > .info > .detail{
 	color: #999;
 }
 .conn > .time{

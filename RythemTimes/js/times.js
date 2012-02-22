@@ -255,22 +255,30 @@
 			return el;
 		}
 		else{
-			var waitTime = Math.round(conn.getWaitTime()/100) || 1;
-			var totalTime = (Math.round(conn.getResponseTime()/100) || 1) + waitTime;
+			var waitTime = conn.getWaitTime();
+			var responseTime = conn.getResponseTime();
+			var waitTimeLen = Math.round(waitTime/100) || 1;
+			var totalTimeLen = (Math.round(responseTime/100) || 1) + waitTime;
 			var detailText = [
 				conn.getRequestMethod(),
 				conn.getResponseStatus(),
-				conn.getResponseContentLength()
+				conn.getResponseContentLength()/1000 + 'KB'
 			].join(' ');
+			var timeText = [
+				waitTime,
+				waitTime + responseTime
+			].join('/');
 			var item = document.createElement('div');
 			item.id = 'conn-' + conn.id;
-			item.className = 'conn';
+			item.className = 'conn min';
 			item.innerHTML = '\
-				<div class="name">' + conn.getRequestName() + '</div>\
-				<div class="host">' + conn.getRequestHost() + '</div>\
-				<div class="detail">' + detailText + '</div> \
-				<div class="time" style="width:' + totalTime + 'px">\
-					<div class="wait" style="width:' + waitTime + 'px"></div>\
+				<div class="info">\
+					<div class="name">' + conn.getRequestName() + '</div>\
+					<div class="host">' + conn.getRequestHost() + '</div>\
+					<div class="detail">' + detailText + '</div> \
+				</div>\
+				<div class="time" style="width:' + totalTimeLen + 'px" title="' + timeText + '">\
+					<div class="wait" style="width:' + waitTimeLen + 'px" title="' + timeText + '"></div>\
 				</div>';
 			var socket = getSocketUI(conn.socketID);
 			socket.querySelector('.conns').appendChild(item);
@@ -304,12 +312,16 @@
 	}
 
 	function main(){
-		//var c = Connection.get(1, 2);
-		//updateConnUI(c);
+		var c = Connection.get(1, 2);
+		updateConnUI(c);
 	}
+
+	document.addEventListener('DOMContentLoaded', main);
+	document.documentElement.delegate('.conn', 'click', function(e, el){
+		el.classList.toggle('min');
+	}, false, true);
 
 	window.Connection = Connection;
 	window.updateAllConnections = updateAllConnections;
-	document.addEventListener('DOMContentLoaded', main);
 
 })();

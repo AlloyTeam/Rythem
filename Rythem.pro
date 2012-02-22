@@ -118,7 +118,9 @@ OTHER_FILES += \
     RythemTimes/js/times.js \
     RythemTimes/css/times.css \
     static/icloud_64.png \
-    RythemTimes/lib/parseuri.js
+    RythemTimes/lib/parseuri.js \
+    RythemTimes/lib/jo2.js \
+    RythemTimes/lib/jo2.dom.js
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")
