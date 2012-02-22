@@ -304,7 +304,8 @@
 	}
 
 	function main(){
-
+		//var c = Connection.get(1, 2);
+		//updateConnUI(c);
 	}
 
 	window.Connection = Connection;

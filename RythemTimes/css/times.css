@@ -20,6 +20,9 @@
 .spacer{
 	-webkit-box-flex: 1;
 }
+.bold{
+	font-weight: bold;
+}
 
 #socketGroups{
 
@@ -32,7 +35,7 @@
 }
 .socket > header{
 	padding: 10px;
-	min-width: 30px;
+	width: 80px;
 	border-right: dashed 1px #CCC;
 }
 .conns{
