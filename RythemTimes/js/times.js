@@ -156,26 +156,54 @@
 		getResponseContentLength: function(){
 			return this.responseHeader.contentLength || 0;
 		},
+		/**
+		 * 請求開始的時間
+		 */
 		getStartTime: function(){
 			return this.startTime
 		},
+		/**
+		 * 開始接收到response的時間
+		 */
 		getResponseStartTime: function(){
 			return this.responseStartTime
 		},
+		/**
+		 * response接收完畢的時間
+		 */
 		getResponseFinishTime: function(){
 			return this.responseFinishTime
 		},
+		/**
+		 * 請求開始到開始接收到response之間的等待時間
+		 */
 		getWaitTime: function(){
 			return this.responseStartTime - this.startTime;
 		},
+		/**
+		 * 開始接收到response到接收完畢之間的時間
+		 */
 		getResponseTime: function(){
 			return this.responseFinishTime - this.responseStartTime;
 		},
+		/**
+		 * 從請求開始到response接收完畢的整段時間
+		 */
 		getSessionTime: function(){
 			return this.responseFinishTime - this.startTime;
 		},
-		getTimeGap: function(anotherConn){
-			return this.startTime - anotherConn.getResponseFinishTime();
+		/**
+		 * 與同一個socket上的前一個請求之間所間隔的時間，即該socket發送本請求前的空閒時間
+		 */
+		getIdelTime: function(){
+			var socket = Connection.sockets[this.socketID];
+			var index = socket.indexOf(this);
+			if(index > 0){
+				return this.startTime - socket[index-1].getResponseFinishTime();
+			}
+			else{
+				return Connection.beginningTime ? this.startTime - Connection.beginningTime : 0;
+			}
 		},
 		toString: function(){
 			return JSON.stringify({
@@ -192,6 +220,7 @@
 	};
 	Connection.sockets = {};
 	Connection.conns = {};
+	Connection.beginningTime = 0;
 	/**
 	 * create a new connection instance, or return an existing one
 	 * @param {uint} id
@@ -232,7 +261,6 @@
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	var socketGroupsEl = document.getElementById('socketGroups');
-	var startTime = 0;
 
 	/**
 	 * get the socket group element by socket id
@@ -247,7 +275,12 @@
 			var group = document.createElement('article');
 			group.id = 'socket-' + socketID;
 			group.className = 'socket hgroup';
-			group.innerHTML = '<header>' + socketID + '</header><div class="conns hgroup"></div>';
+			group.setData('id', socketID);
+			group.innerHTML =
+				'<header>\
+					<div class="title">' + socketID + '</div>\
+				</header>\
+				<div class="conns hgroup"></div>';
 			socketGroupsEl.appendChild(group);
 			return group;
 		}
@@ -285,18 +318,7 @@
 		var totalTimeLen = (Math.round(responseTime/10) || 1) + waitTimeLen;
 
 		//get time gap between this conn and the previous one in the same socket
-		var socket = Connection.sockets[conn.socketID];
-		var index = socket.indexOf(conn);
-		var gap = 0;
-		if(index > 0){
-			//compare requeset start time with the previous request in the same socket
-			gap = conn.getTimeGap(socket[index - 1]);
-		}
-		else{
-			//compare request start time with the beginning time
-			gap = conn.getStartTime() - startTime;
-		}
-		el.marginLeft = Math.round(gap / 10);
+		el.marginLeft = Math.round(conn.getIdelTime() / 10);
 
 		//time text is use as tooltip of the time bar
 		var timeText = waitTime + '+' + responseTime + '=' + (waitTime + responseTime) + 'ms';
@@ -335,8 +357,8 @@
 		for(i=0; i<len; i++){
 			var conn = conns[i];
 			var c = Connection.get(conn.id, conn.socketID);
-			if(!startTime && conn.startTime){
-				startTime = conn.startTime;
+			if(!Connection.beginningTime && conn.startTime){
+				Connection.beginningTime = conn.startTime;
 			}
 			c.setHeaders(
 				conn.host, conn.url, conn.method, conn.status,
@@ -347,7 +369,37 @@
 			c.setResponseFinishTime(conn.responseFinishTime);
 			updateConnUI(c);
 		}
-		startTime = 0;
+		Connection.beginningTime = 0;
+	}
+
+	function toggleSocketDetailPanel(){
+		var panel = document.getElementById('socketDetail');
+		panel.classList.toggle('hidden');
+		return !panel.classList.contains('hidden');
+	}
+	function updateSocketDetailPanel(el){
+		var panel = document.getElementById('socketDetail');
+		panel.left = el.absoluteLeft + 5;
+		panel.top = el.absoluteTop + 5;
+
+		var socketID = el.parentNode.getData('id');
+		var conns = Connection.sockets[socketID];
+		var requestCount = conns.length;
+		var requestTime = 0, requestWaitTime = 0, responseTime = 0, idelTime = 0;
+		var i, len=conns.length;
+		for(i=0; i<len; i++){
+			var c = conns[i];
+			requestTime += c.getSessionTime();
+			requestWaitTime += c.getWaitTime();
+			responseTime += c.getResponseTime();
+			idelTime += c.getIdelTime();
+		}
+		panel.querySelector('header').textContent = socketID;
+		panel.querySelector('.item.requestCount > mark').textContent = requestCount;
+		panel.querySelector('.item.requestTime > mark').textContent = requestTime;
+		panel.querySelector('.item.requestWaitTime > mark').textContent = requestWaitTime;
+		panel.querySelector('.item.responseTime > mark').textContent = responseTime;
+		//panel.querySelector('.item.idelTime > mark').textContent = idelTime;
 	}
 
 	function main(){
@@ -356,9 +408,19 @@
 	}
 
 	document.addEventListener('DOMContentLoaded', main);
-	document.documentElement.delegate('.conn', 'click', function(e, el){
+
+	socketGroupsEl.delegate('.conn', 'click', function(e, el){
 		el.classList.toggle('min');
 	}, false, true);
+
+	socketGroupsEl.delegate('.socket > header', 'click', function(e, el){
+		var visible = toggleSocketDetailPanel();
+		if(visible) updateSocketDetailPanel(el);
+	}, false, true);
+
+	document.getElementById('socketDetail').addEventListener('click', function(){
+		toggleSocketDetailPanel();
+	});
 
 	window.Connection = Connection;
 	window.updateAllConnections = updateAllConnections;

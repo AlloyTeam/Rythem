@@ -25,32 +25,34 @@
       <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="20" selection-start="389" selection-end="389" vertical-scroll-proportion="-8.75">
+            <state line="26" column="34" selection-start="713" selection-end="713" vertical-scroll-proportion="-14.25">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="times.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="times.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/times.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="302" column="0" selection-start="8235" selection-end="8235" vertical-scroll-proportion="0.0">
+            <state line="396" column="61" selection-start="10962" selection-end="10962" vertical-scroll-proportion="0.35612082">
               <folding>
-                <marker date="1329894149000" expanded="true" signature="7049:7074" placeholder="..." />
-                <marker date="1329894149000" expanded="true" signature="7049:7105" placeholder="..." />
-                <marker date="1329894149000" expanded="true" signature="7049:7138" placeholder="..." />
-                <marker date="1329894149000" expanded="true" signature="7049:7189" placeholder="..." />
-                <marker date="1329894149000" expanded="true" signature="7213:7256" placeholder="..." />
-                <marker date="1329894149000" expanded="true" signature="7213:7238" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7125:7189" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7125:7151" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7627:7652" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7627:7683" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7627:7716" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7627:7767" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7791:7834" placeholder="..." />
+                <marker date="1329899356000" expanded="true" signature="7791:7816" placeholder="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="times.css" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="times.css" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/css/times.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="74" column="26" selection-start="1002" selection-end="1002" vertical-scroll-proportion="0.6962617">
+            <state line="94" column="11" selection-start="1282" selection-end="1282" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -73,8 +75,8 @@
       <list>
         <option value="$PROJECT_DIR$/lib/parseuri.js" />
         <option value="$PROJECT_DIR$/index.html" />
-        <option value="$PROJECT_DIR$/js/times.js" />
         <option value="$PROJECT_DIR$/css/times.css" />
+        <option value="$PROJECT_DIR$/js/times.js" />
       </list>
     </option>
   </component>
@@ -122,48 +124,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="RythemTimes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="RythemTimes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lib" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="RythemTimes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="RythemTimes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="RythemTimes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="RythemTimes" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="css" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -183,6 +143,24 @@
     <list size="0" />
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="DETECT_NESTED_COPIES" value="true" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <configuration useDefault="false">$USER_HOME$/.subversion_IDEA</configuration>
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="b1f80a52-4520-4acd-b226-f096a2ad3bb3" name="Default" comment="" />
@@ -271,31 +249,40 @@
         <state line="32" column="2" selection-start="1027" selection-end="1027" vertical-scroll-proportion="0.76311606" />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/lib/jo2.dom.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="22" selection-start="1963" selection-end="1963" vertical-scroll-proportion="0.3323782">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/times.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="94" column="11" selection-start="1282" selection-end="1282" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="20" selection-start="389" selection-end="389" vertical-scroll-proportion="-8.75">
+        <state line="26" column="34" selection-start="713" selection-end="713" vertical-scroll-proportion="-14.25">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/times.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="302" column="0" selection-start="8235" selection-end="8235" vertical-scroll-proportion="0.0">
+        <state line="396" column="61" selection-start="10962" selection-end="10962" vertical-scroll-proportion="0.35612082">
           <folding>
-            <marker date="1329894149000" expanded="true" signature="7049:7074" placeholder="..." />
-            <marker date="1329894149000" expanded="true" signature="7049:7105" placeholder="..." />
-            <marker date="1329894149000" expanded="true" signature="7049:7138" placeholder="..." />
-            <marker date="1329894149000" expanded="true" signature="7049:7189" placeholder="..." />
-            <marker date="1329894149000" expanded="true" signature="7213:7256" placeholder="..." />
-            <marker date="1329894149000" expanded="true" signature="7213:7238" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7125:7189" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7125:7151" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7627:7652" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7627:7683" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7627:7716" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7627:7767" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7791:7834" placeholder="..." />
+            <marker date="1329899356000" expanded="true" signature="7791:7816" placeholder="..." />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/css/times.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="26" selection-start="1002" selection-end="1002" vertical-scroll-proportion="0.6962617">
-          <folding />
         </state>
       </provider>
     </entry>
