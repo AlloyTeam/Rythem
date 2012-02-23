@@ -122,14 +122,16 @@ void QiRuleGroup2::removeRuleAt(const int index){
 
 //判斷一下返回結果的isNull()
 void QiRuleGroup2::match(QList<RyRule *> *result, const QString &url) const{
-	int i, length = _rules.length();
-	for(i=0; i<length; i++){
-		RyRule *rule = _rules.at(i);
-                //qDebug()<<rule->toJSON();
-		if(rule->match(url)){
-			result->append(rule);
-		}
-	}
+    if(this->isEnable()){
+        int i, length = _rules.length();
+        for(i=0; i<length; i++){
+            RyRule *rule = _rules.at(i);
+                    //qDebug()<<rule->toJSON();
+            if(rule->isEnable() && rule->match(url)){
+                result->append(rule);
+            }
+        }
+    }
 }
 
 QString QiRuleGroup2::toJSON(int tabCount, bool withName) const{

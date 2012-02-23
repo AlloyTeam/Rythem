@@ -1,70 +1,15 @@
 {"groups":[
 	{
-		"name":"group1",
-		"enable":1,
-		"rules":[
-			{
-				"name":"local file example",
-				"type":6,
-				"enable":1,
-				"rule":{"pattern":"http://abc.com/b.html",
-				"replace":"/Users/emrelax/qt-projects/Rythem-build-desktop-Desktop_Qt_4_7_4_for_GCC__Qt_SDK____/Rythem.app/Contents/Resources/"}
-			},
-			{
-				"name":"local files example",
-				"type":5,
-				"enable":1,
-				"rule":{"pattern":"http://abc.com/c.html",
-				"replace":"C:/a.html.qzmin"}
-			},
-			{
-				"name":"local directory example",
-				"type":6,
-				"enable":1,
-				"rule":{"pattern":"http://abc.com/mydir/",
-				"replace":"C:/replacement/"}
-			},
-			{
-				"name":"",
-				"type":5,
-				"enable":1,
-				"rule":{"pattern":"oh yeah",
-				"replace":"wa"}
-			},
-			{
-				"name":"",
-				"type":4,
-				"enable":1,
-				"rule":{"pattern":"wa",
-				"replace":"wa"}
-			},
-			{
-				"name":"",
-				"type":4,
-				"enable":1,
-				"rule":{"pattern":"hey",
-				"replace":"hey"}
-			}
-		]
-	},
-	{
-		"name":"wa",
+		"name":"test",
 		"enable":1,
 		"rules":[
 			{
 				"name":"",
 				"type":4,
 				"enable":1,
-				"rule":{"pattern":"hey",
-				"replace":"123"}
+				"rule":{"pattern":"http://im.qq.com",
+				"replace":"/User /tongoscar/Dropbox/project&nbsp;/Rythem/Rythem/RythemManagerUI/j&nbsp;/rule&nbsp;.j"}
 			}
-		]
-	},
-	{
-		"name":"wwa",
-		"enable":0,
-		"rules":[
-
 		]
 	}
 ]}
