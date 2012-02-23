@@ -256,21 +256,23 @@ void RyRuleManager::replace(RyPipeData_ptr connectionData, const QList<RyRule *>
 		for(int i=0; i<length; i++){
 			//get the next rule and its type
 			RyRule *rule = rules->at(i);
-			bool isHostReplaceRule = (rule->type() == SIMPLE_ADDRESS_REPLACE || rule->type() == COMPLEX_ADDRESS_REPLACE);
+            if(rule->isEnable()){
+                bool isHostReplaceRule = (rule->type() == SIMPLE_ADDRESS_REPLACE || rule->type() == COMPLEX_ADDRESS_REPLACE);
 
-			//replace host
-			if(isHostReplaceRule && !hostReplaced){
-				rule->replace(connectionData);
-				hostReplaced = true;
-			}
-			//replace content
-			else if(!isHostReplaceRule && !otherReplaced){
-				rule->replace(connectionData);
-				otherReplaced = true;
-			}
+                //replace host
+                if(isHostReplaceRule && !hostReplaced){
+                    rule->replace(connectionData);
+                    hostReplaced = true;
+                }
+                //replace content
+                else if(!isHostReplaceRule && !otherReplaced){
+                    rule->replace(connectionData);
+                    otherReplaced = true;
+                }
 
-			//host and content needs only to replace once
-			if(hostReplaced && otherReplaced) return;
+                //host and content needs only to replace once
+                if(hostReplaced && otherReplaced) return;
+            }
 		}
 	}
 }
