@@ -23,7 +23,7 @@
       <widget class="QTableView" name="tableView"/>
       <widget class="QTabWidget" name="tollTabs">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="inspectorTab">
         <attribute name="title">
@@ -76,6 +76,12 @@
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
                <widget class="QLabel" name="label">
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>1000</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -130,7 +136,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

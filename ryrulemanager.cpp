@@ -238,7 +238,7 @@ void RyRuleManager::findMatchInGroups(QList<RyRule *> *result, const QString &ur
 }
 
 void RyRuleManager::getMatchRules(QList<RyRule *> *result, const QString &url, const QString &groupName) const{
-	qDebug() << "[RuleManager] finding match rule ...";
+    //qDebug() << "[RuleManager] finding match rule ...";
 	findMatchInGroups(result, url, groupName, localGroups);
 	findMatchInGroups(result, url, groupName, remoteGroups);
 }

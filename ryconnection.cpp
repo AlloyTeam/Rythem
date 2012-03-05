@@ -690,8 +690,8 @@ void RyConnection::doRequestToNetwork(){
  #endif
         _responseSocket->connectToHost(host,port);
     }else{
-        qDebug()<<"responseSocket opened"
-                <<responseState;
+        //qDebug()<<"responseSocket opened"
+        //        <<responseState;
         if(responseState == QAbstractSocket::ConnectedState){
             onResponseConnected();
         }else{

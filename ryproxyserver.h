@@ -36,6 +36,7 @@ class RyProxyServer : public QTcpServer,public QRunnable
         QMutex connectionOpMutex;
         QMutex _socketsOpMutex;
 
+        bool isStoping;
         int _maxOfSocket;
         //sockets
         // cache for reuse

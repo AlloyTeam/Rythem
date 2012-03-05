@@ -122,9 +122,9 @@ OTHER_FILES += \
     RythemTimes/lib/jo2.js \
     RythemTimes/lib/jo2.dom.js
 CONFIG(release){
-    #DEFINES += DEBUGTOFILE
+    DEFINES += DEBUGTOFILE
     #message("debug")
 }else{
-    #DEFINES -= DEBUGTOFILE
+    DEFINES -= DEBUGTOFILE
     #message("release")
 }

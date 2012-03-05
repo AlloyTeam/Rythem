@@ -132,6 +132,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    RyProxyServer* server = RyProxyServer::instance();
+    server->close();
     delete jsBridge;
     delete ui;
 }
@@ -285,7 +287,9 @@ void MainWindow::toggleProxy(){
         isUsingCapture = false;
 
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
-        proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
+        if(previousProxyInfo.enable != 0){
+            proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
+        }
         if( previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
         }

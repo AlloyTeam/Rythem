@@ -10,15 +10,19 @@ RyProxyServer::RyProxyServer(QObject *parent) :
     //qDebug()<<"server initialing";
     _lastPipeId = 0;
     _lastConnectionId = 0;
+    isStoping = false;
     setMaxSocket(30);
 }
 RyProxyServer::~RyProxyServer(){
-    //qDebug()<<"~RyProxyServer begin";
-    close();
-    //qDebug()<<"~RyProxyServer done";
+    isStoping = true;
+    this->blockSignals(true);
+    qDebug()<<"~RyProxyServer begin";
+    //close();
+    qDebug()<<"~RyProxyServer done";
 }
 
 void RyProxyServer::close(){
+    isStoping = true;
     QTcpServer::close();
     // close all sockets
     for(int i=0,l=_connections.length();i<l;++i){
@@ -27,8 +31,8 @@ void RyProxyServer::close(){
         QThread *thread = _threads.take(connection);
         connection->disconnect(this);
         //_cacheConnections.remove(connection);
-        connection->deleteLater();
         QMetaObject::invokeMethod(thread,"quit");
+        connection->deleteLater();
     }
     for(int i=0,l=_cachedSockets.values().size();i<l;++i){
         QTcpSocket *socket = _cachedSockets.values().takeFirst();
@@ -104,6 +108,10 @@ QTcpSocket* RyProxyServer::getSocket(QString address,quint16 port,bool* isFromCa
 //   when new connection come and has the same handle.
 //   reuse old RyConnection
 void RyProxyServer::incomingConnection(int handle){
+    if(isStoping){
+        qDebug()<<"incommingConnection "<<isStoping;
+        return;
+    }
     RyConnection* connection = _getConnection(handle);
     Q_UNUSED(connection)
 }
