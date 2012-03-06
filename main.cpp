@@ -15,6 +15,8 @@
 #include "ryproxyserver.h"
 #include "rypipedata.h"
 
+RyProxyServer *server;
+
 void myMessageHandler(QtMsgType type, const char *msg)
 {
         QString txt;
@@ -32,7 +34,7 @@ void myMessageHandler(QtMsgType type, const char *msg)
                 txt = QString("Fatal: %1\r\n").arg(msg);
                 abort();
         }
-        QString fileName = QString("log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
+        QString fileName = qApp->applicationDirPath()+QString("/log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
         QFile outFile(fileName);
         outFile.open(QIODevice::WriteOnly | QIODevice::Append);
         QTextStream ts(&outFile);
@@ -43,6 +45,11 @@ void myMessageHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+
+    // init global proxy server instance
+    RyProxyServer theServer;
+    RyRuleManager::instance();
+    server = &theServer;
 
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);
@@ -72,7 +79,7 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-    RyProxyServer* server = RyProxyServer::instance();
+    //RyProxyServer* server = RyProxyServer::instance();
     server->connect(server,SIGNAL(pipeBegin(RyPipeData_ptr)),&w,SLOT(onNewPipe(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
@@ -80,6 +87,7 @@ int main(int argc, char *argv[])
 
     w.show();
 
+    //a.connect(&a,SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
 
     //ConnectionMonitorWSServer wsServer;
     //wsServer.start();
@@ -92,5 +100,6 @@ int main(int argc, char *argv[])
     //    status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
     //w.statusBar()->showMessage(status);
 
-    return a.exec();
+    int ret = a.exec();
+    return ret;
 }

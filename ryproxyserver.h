@@ -5,6 +5,9 @@
 #include <QTcpServer>
 #include "ryconnection.h"
 
+class RyProxyServer;
+extern RyProxyServer* server;
+
 class RyProxyServer : public QTcpServer,public QRunnable
 {
         Q_OBJECT

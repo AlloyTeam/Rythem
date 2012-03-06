@@ -1,8 +1,8 @@
 #include "ryproxyserver.h"
 
-Q_GLOBAL_STATIC(RyProxyServer,ryProxyServer)
+//Q_GLOBAL_STATIC(RyProxyServer,ryProxyServer)
 RyProxyServer* RyProxyServer::instance(){
-    return ryProxyServer();
+    return server;
 }
 
 RyProxyServer::RyProxyServer(QObject *parent) :
@@ -38,6 +38,8 @@ void RyProxyServer::close(){
         QTcpSocket *socket = _cachedSockets.values().takeFirst();
         socket->deleteLater();
     }
+    this->blockSignals(true);
+    qDebug()<<"proxy server closed..";
 }
 
 int RyProxyServer::maxOfSocket(){

@@ -14,6 +14,7 @@
 #include "ryconnection.h"
 #include "rypipedata.h"
 
+
 class RyRuleManager : public QObject
 {
 	Q_OBJECT
@@ -58,6 +59,7 @@ private:
 	void parseConfigContent(QList<QiRuleGroup2 *> *result, QString json, bool remote = false);
 	void findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const;
 	
+    static RyRuleManager* _instance;
 };
 
 #endif // RYRULEMANAGER_H

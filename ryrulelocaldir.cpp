@@ -7,7 +7,7 @@ RyRuleLocalDir::RyRuleLocalDir(QString name, int type, QString pattern, QString 
 }
 
 bool RyRuleLocalDir::match(const QString &url) const{
-	return (url.indexOf(pattern()) != -1);
+    return (url.indexOf(pattern()) != -1);
 }
 
 QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const{
@@ -22,12 +22,22 @@ QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const
 	if(fileName.indexOf("?")!=-1){
 		fileName = fileName.left(fileName.indexOf("?"));
 		//qDebug()<<fileName;
-	}
+    }
 	if(fileName.indexOf("#")!=-1){
 		fileName = fileName.left(fileName.indexOf("#"));
 		//qDebug()<<fileName;
 	}
-	fileName.prepend(replacement());
+    QString _replaceMent = replacement();
+#ifdef Q_OS_WIN
+    if(_replaceMent.indexOf("/")==_replaceMent.length()-1){
+        _replaceMent.remove(_replaceMent.length()-1,1);
+    }
+#else
+    if(_replaceMent.indexOf("\")==_replaceMent.length()-1){
+        _replaceMent.remove(_replaceMent.length()-1,1);
+    }
+#endif
+    fileName.prepend(_replaceMent);
 	//qDebug()<<fileName;
 	QFile f(fileName);
 	bool fileCanOpen = f.open(QFile::ReadOnly | QIODevice::Text);
