@@ -2,7 +2,7 @@
 
 
 function escapeToHtml(str){
-	return str.replace(/&/g,"&amp;").replace(/s/g,"&nbsp;").replace(/\>/g,"&gt;").replace(/</g,"/&lt;");
+    return str.replace(/&/g,"&amp;").replace(/\s/g,"&nbsp;").replace(/\>/g,"&gt;").replace(/</g,"/&lt;");
 }
 function unescapeFromHtml(html){
  var s = html.replace(/&amp;/g,"&").replace(/&nbsp;/," ").replace(/&gt;/g,">").replace(/&lt;/,"<");

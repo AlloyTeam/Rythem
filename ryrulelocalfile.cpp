@@ -7,11 +7,13 @@ QMap<QString, QString> RyRuleLocalFile::initMimeMap(){
 	map.insert("html",	"text/html");
 	map.insert("js",	"text/javascript");
 	map.insert("css",	"text/css");
-	map.insert("txt",	"text/plain");
-	map.insert("jpg",	"image/jpeg");
+    map.insert("txt",	"text/plain");
+    map.insert("jpg",	"image/jpeg");
+    map.insert("jpeg",	"image/jpeg");
 	map.insert("png",	"image/png");
 	map.insert("bmp",	"image/bmp");
 	map.insert("gif",	"image/gif");
+    map.insert("manifest","text/cache-manifest");
 	return map;
 }
 
@@ -44,7 +46,7 @@ QPair<QByteArray, QByteArray> RyRuleLocalFile::replace(RyPipeData_ptr) const{
 	file.close();
 
 	//content length and content type
-	int contentLength = body.size();
+    int contentLength = body.size();
 	QString contentType = mimeMap.value(ext, "text/plain");
 
 	//create response

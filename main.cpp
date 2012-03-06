@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
     w.show();
 
 
-	ConnectionMonitorWSServer wsServer;
-	wsServer.start();
-	QObject::connect(&w.pipeTableModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), &wsServer, SLOT(handleConnectionChange(QModelIndex, QModelIndex)));
+    //ConnectionMonitorWSServer wsServer;
+    //wsServer.start();
+    //QObject::connect(&w.pipeTableModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), &wsServer, SLOT(handleConnectionChange(QModelIndex, QModelIndex)));
 	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionAdded(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionAdd(RyPipeData_ptr)));
 	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionUpdate(RyPipeData_ptr)));
 	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionRemove(RyPipeData_ptr)));
