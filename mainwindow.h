@@ -47,6 +47,7 @@ class RyJsBridge:public QObject{
             s.remove('\r');
             s.remove('\n');
             s.remove('\t');
+            s.replace("\\","\\\\");
 			return s;
         }
         bool updateConfigs(QString json){

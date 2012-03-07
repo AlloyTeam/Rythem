@@ -33,7 +33,7 @@ public:
 	void loadConfig();
 	void saveLocalConfigChanges() const;
 
-	void addRuleGroup(QiRuleGroup2 *value, int index = -1);
+    void addRuleGroup(RyRuleGroup *value, int index = -1);
 	QString configusToJSON(int tabCount = 0, bool localOnly = false) const;
 
 	void getMatchRules(QList<RyRule *> *result, const QString &url, const QString &groupName = "") const;
@@ -44,8 +44,8 @@ public:
 	QString remoteHost;
 	QString remoteAddress;
 	QString remotePath;
-	QList<QiRuleGroup2 *> localGroups;
-	QList<QiRuleGroup2 *> remoteGroups;
+    QList<RyRuleGroup *> localGroups;
+    QList<RyRuleGroup *> remoteGroups;
 	
 signals:
 	void localConfigLoaded();
@@ -56,10 +56,9 @@ public slots:
 
 private:
 	QHttp remoteConfigLoader;
-	void parseConfigContent(QList<QiRuleGroup2 *> *result, QString json, bool remote = false);
-	void findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const;
-	
-    static RyRuleManager* _instance;
+    void parseConfigContent(QList<RyRuleGroup *> *result, QString json, bool remote = false);
+    void findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<RyRuleGroup *> &list) const;
+
 };
 
 #endif // RYRULEMANAGER_H

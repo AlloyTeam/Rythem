@@ -2,16 +2,11 @@
 #include "ryrulegroup.h"
 #include <QtScript>
 
-RyRuleManager* RyRuleManager::_instance = 0;
+extern RyRuleManager *_globalManager;
 
 //Q_GLOBAL_STATIC(RyRuleManager, ruleManager)
 RyRuleManager *RyRuleManager::instance(){
-    // no use locker
-    // init it in main!
-    if(!RyRuleManager::_instance){
-        RyRuleManager::_instance = new RyRuleManager;
-    }
-    return RyRuleManager::_instance;
+    return _globalManager;
 }
 
 
@@ -47,18 +42,22 @@ QString RyRuleManager::remoteConfigURL(){
 	return "http://" + host + remotePath;
 }
 
-void RyRuleManager::parseConfigContent(QList<QiRuleGroup2 *> *result, QString json, bool remote){
-	qDebug() << "[RuleManager] parsing config content";
+void RyRuleManager::parseConfigContent(QList<RyRuleGroup *> *result, QString json, bool remote){
+    qDebug() << "[RuleManager] parsing config content"<<json;
 	QScriptEngine engine;
 	QScriptValue value = engine.evaluate("(" + json + ")");
 	QScriptValueIterator groupsIt(value.property("groups"));
 	while(groupsIt.hasNext()){
 		groupsIt.next();
 		//constructor the rule group
-		QString groupName = groupsIt.value().property("name").toString();
+        QString groupName = groupsIt.value().property("name").toString();
+        qDebug()<<"group:"<<groupName;
+        if(groupName.isEmpty()){
+            continue;
+        }
 		if(!groupName.length()) continue;
 		bool groupEnable = groupsIt.value().property("enable").toBool();
-		QiRuleGroup2 *group = new QiRuleGroup2(groupName, groupEnable, remote);
+        RyRuleGroup *group = new RyRuleGroup(groupName, groupEnable, remote);
 		QScriptValueIterator rulesIt(groupsIt.value().property("rules"));
 		while(rulesIt.hasNext()){
                         /*
@@ -76,13 +75,13 @@ void RyRuleManager::parseConfigContent(QList<QiRuleGroup2 *> *result, QString js
 			//constructor the rule
 			RyRule *rule = 0;
 			QScriptValue r = rulesIt.value();
-			QString rName = r.property("name").toString();
+            QString rName = r.property("name").toString();
 			bool rEnable = r.property("enable").toBool();
 			int rType = r.property("type").toInt32();
 
 			QScriptValue ruleObj = r.property("rule");
-			QString rPattern = ruleObj.property("pattern").toString();
-			QString rReplace = ruleObj.property("replace").toString();
+            QString rPattern = ruleObj.property("pattern").toString();
+            QString rReplace = ruleObj.property("replace").toString();
 /*
                         QScriptValueIterator rulesIt2(r.property("rule"));
                         QString rPattern;
@@ -149,9 +148,9 @@ void RyRuleManager::loadLocalConfig(){
 bool RyRuleManager::setLocalConfigContent(QString content,bool dontSave){
 	qDebug() << "setLocalConfigContent" << content << dontSave;
     //qDebug()<<"set local config content"<<content;
-	QListIterator<QiRuleGroup2 *> it(localGroups);
+    QListIterator<RyRuleGroup *> it(localGroups);
 	while(it.hasNext()){
-		QiRuleGroup2 *group = it.next();
+        RyRuleGroup *group = it.next();
 		delete group;
 	}
 	localGroups.clear();
@@ -177,13 +176,16 @@ void RyRuleManager::loadConfig(){
 }
 
 void RyRuleManager::saveLocalConfigChanges() const{
+    qDebug()<<"save:"
+            <<localConfigFile;
 	if(localConfigFile.length()){
 		QFile file(localConfigFile);
 		QFileInfo fileInfo(file);
 		if(!fileInfo.isDir()){
 			if(file.open(QIODevice::WriteOnly)){
 				QTextStream stream(&file);
-				stream << this->configusToJSON(0, true);
+                QString content = this->configusToJSON(0, true);
+                stream << content.replace("\\","\\\\");
 				if(file.flush()){
 					qDebug() << "[RuleManager] write local config done to" << localConfigFile;
 				}
@@ -218,22 +220,22 @@ QString RyRuleManager::configusToJSON(int tabCount, bool localOnly) const{
         QTextStream(&result) << tabs << "{\"groups\":[\r\n"
 												 << tabs << groups.join(",\r\n") << "\r\n"
                                                  << tabs << "]}";
-        qDebug()<<result;
+        qDebug()<<"configToJSon"<<result;
 	return result;
 }
 
-void RyRuleManager::addRuleGroup(QiRuleGroup2 *value, int index){
-	QList<QiRuleGroup2 *> &list = value->isRemote() ? remoteGroups : localGroups;
+void RyRuleManager::addRuleGroup(RyRuleGroup *value, int index){
+    QList<RyRuleGroup *> &list = value->isRemote() ? remoteGroups : localGroups;
 	int existGroup = list.indexOf(value);
 	if(existGroup != -1) list.removeAt(existGroup);
 	if(index == -1) list.append(value);
 	else list.insert(index, value);
 }
 
-void RyRuleManager::findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<QiRuleGroup2 *> &list) const{
+void RyRuleManager::findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<RyRuleGroup *> &list) const{
 	int i, len = list.length();
 	for(i=0; i<len; i++){
-		QiRuleGroup2 *group = list.at(i);
+        RyRuleGroup *group = list.at(i);
 		if((groupName.length() && groupName == group->groupName()) || !groupName.length()){
 			QList<RyRule *> groupMatch;
 			group->match(&groupMatch, url);
@@ -288,7 +290,7 @@ void RyRuleManager::onRemoteConfigLoaded(int id, bool error){
 	qDebug() << "[RuleManager] remote config loaded" << id << error;
 	if(!error){
 		QString content = remoteConfigLoader.readAll();
-		QList<QiRuleGroup2 *> groups;
+        QList<RyRuleGroup *> groups;
 		parseConfigContent(&groups, content, true);
 		remoteGroups.append(groups);
 		emit remoteConfigLoaded();

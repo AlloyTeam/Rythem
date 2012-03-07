@@ -15,6 +15,8 @@
 #include "ryproxyserver.h"
 #include "rypipedata.h"
 
+RyProxyServer *_globalServer;
+RyRuleManager *_globalManager;
 
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -46,8 +48,10 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
     // init global proxy server instance
-    RyProxyServer::instance();
-    RyRuleManager::instance();
+    RyProxyServer theServer;
+    _globalServer = &theServer;
+    RyRuleManager theManager;
+    _globalManager = &theManager;
 
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);

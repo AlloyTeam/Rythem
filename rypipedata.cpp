@@ -224,6 +224,7 @@ bool RyPipeData::parseResponseHeader(const QByteArray& headers){
     QList<QByteArray> sigs = firstLine.split(' ');
     if(sigs.length()<2){//some server return only HTTP/1.1 304
         qDebug()<<"sig length<2\n"<<firstLine;
+        qDebug()<<headers;
         return false;
     }
     responseStatus = sigs[1];

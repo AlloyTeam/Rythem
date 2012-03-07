@@ -13,7 +13,7 @@ bool RyRuleLocalDir::match(const QString &url) const{
 QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const{
 	QPair<QByteArray, QByteArray> result;
 	QByteArray header, body;
-	QString status;
+    QString status = "200 OK";
 
 	int patternIndex = conn->fullUrl.indexOf(pattern());
 	int patternLength = pattern().length();
@@ -29,14 +29,17 @@ QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const
 	}
     QString _replaceMent = replacement();
 #ifdef Q_OS_WIN
-    if(_replaceMent.indexOf("/")==_replaceMent.length()-1){
+    if(_replaceMent.indexOf("\\")==_replaceMent.length()-1){
         _replaceMent.remove(_replaceMent.length()-1,1);
     }
 #else
-    if(_replaceMent.indexOf("\")==_replaceMent.length()-1){
+    if(_replaceMent.indexOf("/")==_replaceMent.length()-1){
         _replaceMent.remove(_replaceMent.length()-1,1);
     }
 #endif
+    if(fileName=="/"){
+        fileName = "/index.html";
+    }
     fileName.prepend(_replaceMent);
 	//qDebug()<<fileName;
 	QFile f(fileName);

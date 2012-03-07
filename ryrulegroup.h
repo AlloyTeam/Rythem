@@ -6,20 +6,20 @@
 #include "rypipedata.h"
 #include "ryrulesimpleaddress.h"
 
-class QiRuleGroup2: public QObject
+class RyRuleGroup: public QObject
 {
 	Q_OBJECT
 public:
-	QiRuleGroup2();
-	QiRuleGroup2(const QiRuleGroup2 &group);
-	explicit QiRuleGroup2(QString name, bool enable = true, bool remote = false);
-	~QiRuleGroup2();
+	RyRuleGroup();
+	RyRuleGroup(const RyRuleGroup &group);
+	explicit RyRuleGroup(QString name, bool enable = true, bool remote = false);
+	~RyRuleGroup();
 
-	QiRuleGroup2 operator =(const QiRuleGroup2 &group);
-	bool operator ==(const QiRuleGroup2 &group) const;
+	RyRuleGroup operator =(const RyRuleGroup &group);
+	bool operator ==(const RyRuleGroup &group) const;
 
 	void update(QString name, bool enable = true, bool remote = false);
-	void update(const QiRuleGroup2 &group);
+	void update(const RyRuleGroup &group);
         void addRule(RyRule *value, int index = -1);
 	int length() const;
 	int getRuleIndex(const QString name) const;
