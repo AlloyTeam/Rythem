@@ -190,12 +190,18 @@ function updateConfigs(){
         },
 		onSelectFile: function(e,fieldEl){
 			var s = window.App.getFile();
+            if(s===""){
+               return;
+            }
 			this.__replaceField.innerHTML = escapeToHtml(s);
 			this.__config.rule.replace = s;
 			updateConfigs();
 		},
 		onSelectDir: function(e,fieldEl){
-			var s = window.App.getDir()+"/";
+            var s = window.App.getDir();
+            if(s===""){
+               return;
+            }
 			this.__replaceField.innerHTML = escapeToHtml(s);
 			this.__config.rule.replace = s;
 			updateConfigs();
@@ -594,10 +600,40 @@ function updateConfigs(){
         addRulePanel.typeField		= document.getElementById('newRuleType');
         addRulePanel.patternField	= document.getElementById('newRulePattern');
         addRulePanel.replaceField	= document.getElementById('newRuleReplace');
+        addRulePanel.selectFileBtn  = addRulePanel.querySelector('.button.selectFile');
+        addRulePanel.selectDirBtn  = addRulePanel.querySelector('.button.selectDir');
 
         //bind some events
         addGroupBtn.addEventListener('click', function(e){
             showAddGroupPanel();
+        });
+
+        addRulePanel.selectFileBtn.addEventListener('click', function(e){
+            var s = window.App.getFile();
+            if(s===""){
+               return;
+            }
+            addRulePanel.replaceField.value = s;
+        });
+        addRulePanel.selectDirBtn.addEventListener('click', function(e){
+            var s = window.App.getDir();
+            if(s===""){
+               return;
+            }
+            addRulePanel.replaceField.value = s;
+        });
+        addRulePanel.typeField.addEventListener("change",function(e){
+            var type = Number(e.target.value);
+            if(type === 4 || type === 5){
+                addRulePanel.selectDirBtn.classList.remove("hidden");
+                addRulePanel.selectFileBtn.classList.add("hidden");
+            }else if(type === 6){
+                addRulePanel.selectDirBtn.classList.remove("hidden");
+                addRulePanel.selectFileBtn.classList.add("hidden");
+            }else{
+                addRulePanel.selectFileBtn.classList.add("hidden");
+                addRulePanel.selectDirBtn.classList.add("hidden");
+            }
         });
         addGroupPanel.confirmBtn.addEventListener('click', function(e){
             var groupName = addGroupPanel.nameField.value;
