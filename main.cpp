@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);
 #endif
-
+    int ret;
+    {
 	//new rule manager test----------------------------------------------------
     //qDebug()<<qApp->applicationDirPath();
     RyRuleManager *manager = RyRuleManager::instance();
@@ -104,5 +105,7 @@ int main(int argc, char *argv[])
     //    status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
     //w.statusBar()->showMessage(status);
 
-    return a.exec();
+    ret = a.exec();
+    }
+    return ret;
 }
