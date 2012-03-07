@@ -17,8 +17,9 @@ signals:
 	
 public slots:
 
-private:
+public:
 	static QMap<QString, QString> mimeMap;
+private:
 	static QMap<QString, QString> initMimeMap();
 };
 

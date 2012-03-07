@@ -1,4 +1,5 @@
 #include "ryrulelocaldir.h"
+#include "ryrulelocalfile.h"
 
 RyRuleLocalDir::RyRuleLocalDir(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
 	RyRule(name, type, pattern, replacement, enable, remote)
@@ -37,7 +38,7 @@ QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const
         _replaceMent.remove(_replaceMent.length()-1,1);
     }
 #endif
-    if(fileName=="/"){
+    if(fileName=="/" || fileName.isEmpty()){
         fileName = "/index.html";
     }
     fileName.prepend(_replaceMent);
@@ -50,11 +51,12 @@ QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const
 		status = "404 Not Found";
 		body.append(QString("file:%1 not found").arg(fileName));
 	}
+    QString contentType = RyRuleLocalFile::mimeMap.value(QFileInfo(f).suffix().toLower(),"text/plain");
 	f.close();
 	int count = body.size();
-	header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
 					   .arg(status)
-					   .arg("text/html") // TODO reuse contentTypeMapping above
+                       .arg(contentType)
 					   .arg(count));
 
 	result.first = header;

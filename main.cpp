@@ -43,6 +43,8 @@ void myMessageHandler(QtMsgType type, const char *msg)
         outFile.close();
 }
 
+#define DEBUGTOFILE
+
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
@@ -102,6 +104,5 @@ int main(int argc, char *argv[])
     //    status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
     //w.statusBar()->showMessage(status);
 
-    int ret = a.exec();
-    return ret;
+    return a.exec();
 }

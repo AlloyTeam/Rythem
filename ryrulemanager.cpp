@@ -43,7 +43,7 @@ QString RyRuleManager::remoteConfigURL(){
 }
 
 void RyRuleManager::parseConfigContent(QList<RyRuleGroup *> *result, QString json, bool remote){
-    qDebug() << "[RuleManager] parsing config content"<<json;
+    //qDebug() << "[RuleManager] parsing config content"<<json;
 	QScriptEngine engine;
 	QScriptValue value = engine.evaluate("(" + json + ")");
 	QScriptValueIterator groupsIt(value.property("groups"));
@@ -51,7 +51,7 @@ void RyRuleManager::parseConfigContent(QList<RyRuleGroup *> *result, QString jso
 		groupsIt.next();
 		//constructor the rule group
         QString groupName = groupsIt.value().property("name").toString();
-        qDebug()<<"group:"<<groupName;
+        //qDebug()<<"group:"<<groupName;
         if(groupName.isEmpty()){
             continue;
         }
@@ -146,7 +146,7 @@ void RyRuleManager::loadLocalConfig(){
 }
 
 bool RyRuleManager::setLocalConfigContent(QString content,bool dontSave){
-	qDebug() << "setLocalConfigContent" << content << dontSave;
+    //qDebug() << "setLocalConfigContent" << content << dontSave;
     //qDebug()<<"set local config content"<<content;
     QListIterator<RyRuleGroup *> it(localGroups);
 	while(it.hasNext()){
@@ -176,8 +176,8 @@ void RyRuleManager::loadConfig(){
 }
 
 void RyRuleManager::saveLocalConfigChanges() const{
-    qDebug()<<"save:"
-            <<localConfigFile;
+    //qDebug()<<"save:"
+    //        <<localConfigFile;
 	if(localConfigFile.length()){
 		QFile file(localConfigFile);
 		QFileInfo fileInfo(file);
@@ -220,7 +220,7 @@ QString RyRuleManager::configusToJSON(int tabCount, bool localOnly) const{
         QTextStream(&result) << tabs << "{\"groups\":[\r\n"
 												 << tabs << groups.join(",\r\n") << "\r\n"
                                                  << tabs << "]}";
-        qDebug()<<"configToJSon"<<result;
+        //qDebug()<<"configToJSon"<<result;
 	return result;
 }
 

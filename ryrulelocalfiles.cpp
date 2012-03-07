@@ -83,7 +83,7 @@ QPair<QByteArray, QByteArray> RyRuleLocalFiles::replace(RyPipeData_ptr) const{
 		}
 	}
 	int count = body.size();
-	header.append(QString("HTTP/1.1 %1 \r\nServer: Qiddler \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
 					   .arg(status)
 					   .arg("text/javascript") // TODO reuse contentTypeMapping above
 					   .arg(encode)
