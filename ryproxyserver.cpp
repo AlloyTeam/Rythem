@@ -1,8 +1,14 @@
 #include "ryproxyserver.h"
 
+RyProxyServer* RyProxyServer::_instance = 0;
 //Q_GLOBAL_STATIC(RyProxyServer,ryProxyServer)
 RyProxyServer* RyProxyServer::instance(){
-    return server;
+    //not using locker
+    // MUST instance once in main.c
+    if(!_instance){
+        _instance = new RyProxyServer();
+    }
+    return _instance;
 }
 
 RyProxyServer::RyProxyServer(QObject *parent) :

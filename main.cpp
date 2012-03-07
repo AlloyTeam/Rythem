@@ -15,7 +15,6 @@
 #include "ryproxyserver.h"
 #include "rypipedata.h"
 
-RyProxyServer *server;
 
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -47,9 +46,8 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
     // init global proxy server instance
-    RyProxyServer theServer;
+    RyProxyServer::instance();
     RyRuleManager::instance();
-    server = &theServer;
 
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);
@@ -79,7 +77,7 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-    //RyProxyServer* server = RyProxyServer::instance();
+    RyProxyServer* server = RyProxyServer::instance();
     server->connect(server,SIGNAL(pipeBegin(RyPipeData_ptr)),&w,SLOT(onNewPipe(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));

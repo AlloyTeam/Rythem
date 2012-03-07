@@ -5,8 +5,6 @@
 #include <QTcpServer>
 #include "ryconnection.h"
 
-class RyProxyServer;
-extern RyProxyServer* server;
 
 class RyProxyServer : public QTcpServer,public QRunnable
 {
@@ -57,6 +55,8 @@ class RyProxyServer : public QTcpServer,public QRunnable
         quint64 _lastPipeId;
         quint64 _lastConnectionId;
 
+        static RyProxyServer* _instance;
+
     private slots:
         void onConnectionIdleTimeout();
         void onPipeBegin(RyPipeData_ptr);
@@ -64,6 +64,7 @@ class RyProxyServer : public QTcpServer,public QRunnable
         void onPipeError(RyPipeData_ptr);
         void onThreadTerminated();
         void onConnectionClosed();
+
 
 
 };
