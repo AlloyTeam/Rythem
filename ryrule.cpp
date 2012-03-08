@@ -61,7 +61,7 @@ bool RyRule::match(const QString &) const{
 	return false;
 }
 
-QPair<QByteArray, QByteArray> RyRule::replace(RyPipeData_ptr) const{
+QPair<QByteArray, QByteArray> RyRule::replace(RyPipeData_ptr){
 	//override this method in different type of rule
 	return QPair<QByteArray, QByteArray>();
 }

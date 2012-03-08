@@ -1,5 +1,6 @@
 #include "ryrulelocaldir.h"
 #include "ryrulelocalfile.h"
+#include <QMutexLocker>
 
 RyRuleLocalDir::RyRuleLocalDir(QString name, int type, QString pattern, QString replacement, bool enable, bool remote) :
 	RyRule(name, type, pattern, replacement, enable, remote)
@@ -11,7 +12,8 @@ bool RyRuleLocalDir::match(const QString &url) const{
     return (url.indexOf(pattern()) != -1);
 }
 
-QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn) const{
+QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn){
+    QMutexLocker locker(&mutex);
 	QPair<QByteArray, QByteArray> result;
 	QByteArray header, body;
     QString status = "200 OK";

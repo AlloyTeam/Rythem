@@ -30,7 +30,7 @@ public:
 	void update(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
         void update(const RyRule &rule);
 	virtual bool match(const QString &url) const;
-        virtual QPair<QByteArray, QByteArray> replace(RyPipeData_ptr conn) const;
+        virtual QPair<QByteArray, QByteArray> replace(RyPipeData_ptr conn);
 	QString toJSON(int tabCount = 0) const;
 
 	bool isNull() const;

@@ -28,7 +28,7 @@ bool RyRuleLocalFile::match(const QString &url) const{
 	return rx.exactMatch(url);
 }
 
-QPair<QByteArray, QByteArray> RyRuleLocalFile::replace(RyPipeData_ptr) const{
+QPair<QByteArray, QByteArray> RyRuleLocalFile::replace(RyPipeData_ptr) {
 	//open local file for read
 	QFile file(replacement());
 	QFileInfo fileInfo(file);

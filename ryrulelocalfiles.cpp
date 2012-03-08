@@ -34,7 +34,7 @@ bool RyRuleLocalFiles::match(const QString &url) const{
 	comment: "just some comment"
   }
   */
-QPair<QByteArray, QByteArray> RyRuleLocalFiles::replace(RyPipeData_ptr) const{
+QPair<QByteArray, QByteArray> RyRuleLocalFiles::replace(RyPipeData_ptr){
 	QPair<QByteArray, QByteArray> result;
 	QFile f(replacement());
 	bool fileCanOpen = f.open(QFile::ReadOnly| QIODevice::Text);

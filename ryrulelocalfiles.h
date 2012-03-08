@@ -11,7 +11,7 @@ class RyRuleLocalFiles : public RyRule
 public:
         explicit RyRuleLocalFiles(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
 	bool match(const QString &url) const;
-	QPair<QByteArray, QByteArray> replace(RyPipeData_ptr conn) const;
+    QPair<QByteArray, QByteArray> replace(RyPipeData_ptr conn);
 	
 signals:
 	
