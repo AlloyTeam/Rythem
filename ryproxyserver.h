@@ -11,7 +11,7 @@ class RyProxyServer : public QTcpServer,public QRunnable
         Q_OBJECT
     public:
         static RyProxyServer* instance();
-        explicit RyProxyServer(QObject *parent = 0);
+        explicit RyProxyServer();
         ~RyProxyServer();
         void run();
         void close();

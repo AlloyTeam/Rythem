@@ -15,8 +15,11 @@
 #include "ryproxyserver.h"
 #include "rypipedata.h"
 
-RyProxyServer *_globalServer;
-RyRuleManager *_globalManager;
+#include <QThread>
+
+
+
+QFile outFile;
 
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -35,27 +38,22 @@ void myMessageHandler(QtMsgType type, const char *msg)
                 txt = QString("Fatal: %1\r\n").arg(msg);
                 abort();
         }
-        QString fileName = qApp->applicationDirPath()+QString("/log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
-        QFile outFile(fileName);
-        outFile.open(QIODevice::WriteOnly | QIODevice::Append);
         QTextStream ts(&outFile);
         ts << txt << endl;
-        outFile.close();
 }
 
-#define DEBUGTOFILE
+//#define DEBUGTOFILE
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-    // init global proxy server instance
-    RyProxyServer theServer;
-    _globalServer = &theServer;
-    RyRuleManager theManager;
-    _globalManager = &theManager;
+
 
 #ifdef DEBUGTOFILE
+    QString fileName = qApp->applicationDirPath()+QString("/log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
+    outFile.setFileName(fileName);
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
     qInstallMsgHandler(myMessageHandler);
 #endif
     int ret;
@@ -85,6 +83,10 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     RyProxyServer* server = RyProxyServer::instance();
+    QThread thread;
+    server->moveToThread(&thread);
+    qDebug()<<"@@@";
+
     server->connect(server,SIGNAL(pipeBegin(RyPipeData_ptr)),&w,SLOT(onNewPipe(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
@@ -107,5 +109,9 @@ int main(int argc, char *argv[])
 
     ret = a.exec();
     }
+
+#ifdef DEBUGTOFILE
+    outFile.close();
+#endif
     return ret;
 }

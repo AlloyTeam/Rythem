@@ -13,7 +13,8 @@ bool RyRuleLocalDir::match(const QString &url) const{
 }
 
 QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn){
-    QMutexLocker locker(&mutex);
+    qDebug()<<"+++enter replace";
+    //QMutexLocker locker(&mutex);
 	QPair<QByteArray, QByteArray> result;
 	QByteArray header, body;
     QString status = "200 OK";
@@ -62,6 +63,7 @@ QPair<QByteArray, QByteArray> RyRuleLocalDir::replace(RyPipeData_ptr conn){
 					   .arg(count));
 
 	result.first = header;
-	result.second = body;
+    result.second = body;
+    qDebug()<<"+++exit replace";
 	return result;
 }

@@ -2,16 +2,14 @@
 #include "ryrulegroup.h"
 #include <QtScript>
 
-extern RyRuleManager *_globalManager;
-
-//Q_GLOBAL_STATIC(RyRuleManager, ruleManager)
+Q_GLOBAL_STATIC(RyRuleManager, ruleManager)
 RyRuleManager *RyRuleManager::instance(){
-    return _globalManager;
+    return ruleManager();
 }
 
 
 RyRuleManager::RyRuleManager(QString localFile, QString host, QString address, QString path) :
-	QObject(),
+    QObject(qApp),
 	localConfigFile(localFile),
 	remoteHost(host),
 	remoteAddress(address),

@@ -21,6 +21,10 @@ class RyRule : public QObject
 public:
         RyRule();
         RyRule(const RyRule &rule);
+        virtual ~RyRule(){
+            qDebug()<<"~RyRule";
+        }
+
         explicit RyRule(QString name, int type, QString pattern, QString replacement, bool enable = true, bool remote = false);
 
         RyRule operator =(const RyRule &rule);

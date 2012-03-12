@@ -1,14 +1,12 @@
 #include "ryproxyserver.h"
 
-extern RyProxyServer *_globalServer;
-
-//Q_GLOBAL_STATIC(RyProxyServer,ryProxyServer)
+Q_GLOBAL_STATIC(RyProxyServer,ryProxyServer)
 RyProxyServer* RyProxyServer::instance(){
-    return _globalServer;
+    return ryProxyServer();
 }
 
-RyProxyServer::RyProxyServer(QObject *parent) :
-    QTcpServer(parent){
+RyProxyServer::RyProxyServer() :
+    QTcpServer(qApp){
     //qDebug()<<"server initialing";
     _lastPipeId = 0;
     _lastConnectionId = 0;
