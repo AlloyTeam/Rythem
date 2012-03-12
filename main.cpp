@@ -19,10 +19,17 @@
 
 
 
-QFile outFile;
 
+QString appPath = "";
 void myMessageHandler(QtMsgType type, const char *msg)
 {
+    if(appPath == ""){
+        appPath =  qApp->applicationDirPath();
+    }
+    QString fileName = appPath+QString("/log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
+    QFile outFile;
+    outFile.setFileName(fileName);
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
         QString txt;
         switch (type) {
         case QtDebugMsg:
@@ -40,9 +47,10 @@ void myMessageHandler(QtMsgType type, const char *msg)
         }
         QTextStream ts(&outFile);
         ts << txt << endl;
+        outFile.close();
 }
 
-//#define DEBUGTOFILE
+#define DEBUGTOFILE
 
 int main(int argc, char *argv[])
 {
@@ -51,13 +59,9 @@ int main(int argc, char *argv[])
 
 
 #ifdef DEBUGTOFILE
-    QString fileName = qApp->applicationDirPath()+QString("/log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
-    outFile.setFileName(fileName);
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
     qInstallMsgHandler(myMessageHandler);
 #endif
-    int ret;
-    {
+
 	//new rule manager test----------------------------------------------------
     //qDebug()<<qApp->applicationDirPath();
     RyRuleManager *manager = RyRuleManager::instance();
@@ -83,9 +87,7 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     RyProxyServer* server = RyProxyServer::instance();
-    QThread thread;
-    server->moveToThread(&thread);
-    qDebug()<<"@@@";
+
 
     server->connect(server,SIGNAL(pipeBegin(RyPipeData_ptr)),&w,SLOT(onNewPipe(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
@@ -107,11 +109,6 @@ int main(int argc, char *argv[])
     //    status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
     //w.statusBar()->showMessage(status);
 
-    ret = a.exec();
-    }
+    return a.exec();
 
-#ifdef DEBUGTOFILE
-    outFile.close();
-#endif
-    return ret;
 }

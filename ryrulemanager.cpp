@@ -2,9 +2,12 @@
 #include "ryrulegroup.h"
 #include <QtScript>
 
-Q_GLOBAL_STATIC(RyRuleManager, ruleManager)
+RyRuleManager* RyRuleManager::_instance = 0;
 RyRuleManager *RyRuleManager::instance(){
-    return ruleManager();
+    if(!_instance){
+        _instance = new RyRuleManager();
+    }
+    return _instance;
 }
 
 

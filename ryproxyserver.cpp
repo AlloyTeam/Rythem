@@ -1,8 +1,11 @@
 #include "ryproxyserver.h"
 
-Q_GLOBAL_STATIC(RyProxyServer,ryProxyServer)
+RyProxyServer* RyProxyServer::_instance = 0;
 RyProxyServer* RyProxyServer::instance(){
-    return ryProxyServer();
+    if(!_instance){
+        _instance = new RyProxyServer();
+    }
+    return _instance;
 }
 
 RyProxyServer::RyProxyServer() :
@@ -15,9 +18,9 @@ RyProxyServer::RyProxyServer() :
 }
 RyProxyServer::~RyProxyServer(){
     isStoping = true;
-    this->blockSignals(true);
+    //this->blockSignals(true);
     qDebug()<<"~RyProxyServer begin";
-    //close();
+    close();
     qDebug()<<"~RyProxyServer done";
 }
 

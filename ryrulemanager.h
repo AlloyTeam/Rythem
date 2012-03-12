@@ -59,6 +59,7 @@ private:
     void parseConfigContent(QList<RyRuleGroup *> *result, QString json, bool remote = false);
     void findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<RyRuleGroup *> &list) const;
 
+    static RyRuleManager *_instance;
 };
 
 #endif // RYRULEMANAGER_H

@@ -132,8 +132,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    RyProxyServer* server = RyProxyServer::instance();
-    server->close();
+    //RyProxyServer* server = RyProxyServer::instance();
+    //server->close();
     delete jsBridge;
     delete ui;
 }
