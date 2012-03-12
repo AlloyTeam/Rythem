@@ -379,6 +379,7 @@ RyRuleManager::~RyRuleManager(){
         QSharedPointer<RyRuleProject> rp = rpIt.next();
         rp.clear();
     }
+    _projectFileNameToProjectMap.clear();
 }
 
 void RyRuleManager::loadLocalConfig(const QString& configFileName){
@@ -446,24 +447,34 @@ void RyRuleManager::addRemoteProjectFromLocal(const QString &localAddress,
 
 
 }
-void RyRuleManager::addGroupToLocalProject(const QScriptValue& value){
+void RyRuleManager::addGroupToLocalProject(const QString& content){
     // add to project default_local_project
     QString projectName = "default_local_project.txt";
     QString defaultProjectFullFileName = qApp->applicationDirPath()+"/"+projectName;
     if(_projectFileNameToProjectMap.contains(defaultProjectFullFileName)){
+        QScriptEngine engine;
+        QScriptValue value = engine.evaluate("("+content+")");
         qDebug()<<"default project exists";
         QSharedPointer<RyRuleProject> project = _projectFileNameToProjectMap.value(defaultProjectFullFileName);
         project->addRuleGroup(value,true);
     }else{
         qDebug()<<"default project not exists";
-        QScriptValue project;
+        QFile f(defaultProjectFullFileName);
+        f.open(QIODevice::WriteOnly | QIODevice::Text);
+        QByteArray ba;
+        ba.append(QString("{'groups':[")+content+"]}");
+        qDebug()<<QString(ba);
+        f.write(ba);
+        f.close();
+        QScriptEngine engine;
+        QScriptValue project = engine.globalObject();
         project.setProperty("localAddress",QScriptValue(defaultProjectFullFileName));
-        project.setProperty("groups",value);
+        qDebug()<<defaultProjectFullFileName;
         addRuleProject(project);
     }
 }
 
-void RyRuleManager::addGroupToLocalProject(const QString& filePath){
+void RyRuleManager::addLocalProject(const QString& filePath){
     /*
     QFile file(filePath);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){

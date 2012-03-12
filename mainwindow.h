@@ -33,12 +33,10 @@ class RyJsBridge:public QObject{
     public slots:
         void doAction(int action,const QString msg){
             qDebug()<<"doAction "<<QString::number(action)<< msg;
-            QScriptEngine engine;
-            QScriptValue v = engine.evaluate("("+msg+")");
             RyRuleManager *manager = RyRuleManager::instance();
             switch(action){
             case 0://add group
-                manager->addGroupToLocalProject(v);//暂时只允许添加到本地project
+                manager->addGroupToLocalProject(msg);//暂时只允许添加到本地project
                 break;
             case 1://add rule
             case 2://update group

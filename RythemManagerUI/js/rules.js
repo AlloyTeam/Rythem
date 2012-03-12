@@ -472,7 +472,7 @@ function updateConfigs(){
           groups.push(group);
 
           if(window.App){
-              window.App.doAction(0,JSON.stringify(configs));
+              window.App.doAction(0,JSON.stringify(c));
           }
           return true;
       }

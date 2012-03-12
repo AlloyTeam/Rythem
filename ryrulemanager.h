@@ -133,6 +133,7 @@ public:
         QFile f(_localAddress);
         if(f.open(QIODevice::WriteOnly | QIODevice::Text)){
             f.write( QByteArray().append(toJson()));
+            qDebug()<<"save to file";
             f.close();
         }else{
             qDebug()<<"cache remote rule failure"<<_localAddress;
@@ -328,10 +329,10 @@ public:
                       bool isRemote=false,
                       const QString& host="");
     void addRuleProject(const QScriptValue& value);
-    void addGroupToLocalProject(const QScriptValue& value);//新增
+    void addGroupToLocalProject(const QString& content);//新增
     //本地project
     //可提升为远程project(需提供upload接口)
-    void addGroupToLocalProject(const QString& filePath);
+    void addLocalProject(const QString& filePath);
     //直接向远程获取project
     void addRemoteProject(const QString& url);
     //本地缓存的远程project
