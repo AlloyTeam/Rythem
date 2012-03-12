@@ -24,14 +24,6 @@ public:
     RyRule(quint64 id,quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable=true);
     QString toJSON(bool format=false)const;
 
-    RyRule(const RyRule& other){
-
-    }
-    RyRule& operator=(const RyRule& )
-    {
-        qDebug()<<"operator=";
-        return *this;
-    }
     int type();
     QString pattern();
     QString replace();
@@ -154,27 +146,25 @@ public:
                 // and local content invalid
                 // get from remote
                 _isValid = addRemoteRuleGroups();
-                qDebug()<<"_isValid"<<(_isValid?"yes":"no");
             }else{
                 qDebug()<<"no local content && remote addresss is empty";
                 _isValid = false;
             }
         }
-        qDebug()<<"_isValid 2"<<(_isValid?"yes":"no");
     }
     bool addRemoteRuleGroups(){
-        qDebug()<<"getting remote rule"<<_remoteAddress;
+        //qDebug()<<"getting remote rule"<<_remoteAddress;
         QTimer timeout;
         QNetworkAccessManager manager;
         QNetworkReply* reply;
         QEventLoop loop;
-        //timeout.singleShot(2000,&loop,SLOT(quit()));//2秒内不返回内容就判断为失败
+        timeout.singleShot(3000,&loop,SLOT(quit()));//3秒内不返回内容就判断为失败
         QNetworkProxyFactory::setUseSystemConfiguration(true);
         manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
         reply = manager.get(QNetworkRequest(QUrl(_remoteAddress)));
         loop.exec();
         QString content = reply->readAll();
-        qDebug()<<"remote content:"<<content;
+        //qDebug()<<"remote content:"<<content;
         return addRuleGroups(content);
     }
     bool addLocalRuleGroups(){
@@ -206,10 +196,10 @@ public:
                 }
                 RyRuleGroup *g = new RyRuleGroup(gIt.value());
                 QSharedPointer<RyRuleGroup> group(g);
-                qDebug()<<"group added:"<<g->toJSON();
+                //qDebug()<<"group added:"<<g->toJSON();
                 _groups.append(group);
             }
-            qDebug()<<"got project!";
+            //qDebug()<<"got project!";
             return true;
         }
     }
@@ -226,26 +216,34 @@ public:
             QString remoteAddressEscaped = _remoteAddress;
             remoteAddressEscaped.replace("\\","\\\\");
             remoteAddressEscaped.replace("'","\\'");
-            ret+="'remoteAddress':'"+remoteAddressEscaped+"'";
-            ret+="'pwd':'"+_pwd+"'";
+            ret+=",'remoteAddress':'"+remoteAddressEscaped+"'";
+            ret+=",'pwd':'"+_pwd+"'";
             QString ownerEscaped = _owner;
             ownerEscaped.replace("\\","\\\\");
             ownerEscaped.replace("'","\\'");
-            ret+="'owner':'"+ownerEscaped+"'";
+            ret+=",'owner':'"+ownerEscaped+"'";
+
+            QStringList groupStrList;
+            for(int i=0;i<_groups.length();++i){
+               QSharedPointer<RyRuleGroup> g = _groups.at(i);
+               groupStrList<<g->toJSON();
+            }
+
+            ret+=",'groups':["+groupStrList.join(",")+"]";
         }
         ret+="}";
+        return ret;
     }
     bool isValid()const{
-        qDebug()<<"isValid() "<<(_isValid?"yes":"no");
         return _isValid;
     }
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url){
         QList<QSharedPointer<RyRule> > ret;
         QListIterator<QSharedPointer<RyRuleGroup> > it(_groups);
-        qDebug()<<"project::getMatchRules: "<<url<<_groups.length();
+        //qDebug()<<"project::getMatchRules: "<<url<<_groups.length();
         while(it.hasNext()){
             QSharedPointer<RyRuleGroup> g = it.next();
-            qDebug()<<"project::getMatchRules: "<<url<<g->toJSON();
+            //qDebug()<<"project::getMatchRules: "<<url<<g->toJSON();
             QList<QSharedPointer<RyRule> > gMatched = g->getMatchRules(url);
             ret.append(gMatched);
         }
@@ -314,6 +312,7 @@ public:
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
     //返回header body
     QPair<QByteArray,QByteArray> getReplaceContent(QSharedPointer<RyRule> rule,const QString& url="");
+    QString toJson()const;
 private:
 
     RyRuleManager();

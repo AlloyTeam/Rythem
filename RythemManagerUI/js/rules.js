@@ -661,6 +661,13 @@ function updateConfigs(){
 			var rawConfig = window.App.getConfigs();
 			rawConfig = rawConfig.replace(/&quot;/g,"\'");
 			rawConfig = eval('(' + rawConfig + ')');
+            var tmp = {'groups':[]};// for new RuleManager
+            for(var i in rawConfig){
+                if(rawConfig.hasOwnProperty(i)){
+                    Array.prototype.push.apply(tmp.groups,rawConfig[i].groups);
+                }
+            }
+            rawConfig = tmp;
 			createGroups(rawConfig.groups);
 		}
 		else{

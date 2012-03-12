@@ -49,7 +49,7 @@ RyRule::RyRule(quint64 groupId,const QScriptValue& rule){
          rule.property("rule").property("pattern").toString(),
         rule.property("rule").property("replace").toString(),
          (rule.property("enable").toInt32() == 1));
-            qDebug()<<"RyRule "<<this->toJSON();
+           // qDebug()<<"RyRule "<<this->toJSON();
 }
 
 RyRule::RyRule(quint64 groupId,int type, const QString &pattern, const QString &replace,bool enable){
@@ -62,14 +62,14 @@ QString RyRule::toJSON(bool format)const{
     if(format){
         //TODO
     }
-    qDebug()<<_pattern<<_replace<<QString::number(_type);
+    //qDebug()<<_pattern<<_replace<<QString::number(_type);
     QString thePattern = _pattern;
     QString theReplace = _replace;
     thePattern.replace("\\","\\\\");
     thePattern.replace("'","\\'");
     theReplace.replace("\\","\\\\");
     theReplace.replace("'","\\'");
-    QString ret="{'type':"+QString::number(_type)+",'pattern':'"+thePattern+"', 'replace':'"+theReplace+"' }";
+    QString ret="{'id':"+QString::number(_ruleId)+",'type':"+QString::number(_type)+",'rule':{'pattern':'"+thePattern+"', 'replace':'"+theReplace+"'} }";
     return ret;
 }
 int RyRule::type(){
@@ -145,7 +145,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(){
                 .arg(status)
                 .arg(mimeType)
                 .arg(contentLength));
-        qDebug()<<" header  = "<<header;
+        //qDebug()<<" header  = "<<header;
         break;
     case RyRule::LOCAL_FILES_REPLACE:
         if(file.open(QFile::ReadOnly)){
@@ -164,7 +164,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(){
                 mergeContentHasError = true;
             }
         }else{
-            qDebug()<<"file cannot open";
+            qDebug()<<"file cannot open ";
             mergeContentHasError = true;
         }
         file.close();
@@ -269,7 +269,6 @@ RyRuleGroup::RyRuleGroup(const QScriptValue &group){
     if(! rules.isValid()){
     }else{
         _groupName = name;
-        qDebug()<<name;
         enabled = enable;
         addRules(rules);
     }
@@ -291,7 +290,6 @@ void RyRuleGroup::addRules(const QScriptValue& rules){
     QScriptValueIterator it(rules);
     while(it.hasNext()){
         it.next();
-        qDebug()<<it.value().toString();
         if(it.flags() & QScriptValue::SkipInEnumeration){
             continue;
         }
@@ -348,8 +346,12 @@ QString RyRuleGroup::toJSON(bool format)const{
        QSharedPointer<RyRule> rule = _rules.at(i);
        rulesStrList<<rule->toJSON();
     }
-
-    QString ret="["+rulesStrList.join(",")+"]";
+    QString nameEscaped = _groupName;
+    nameEscaped = nameEscaped.replace("\\","\\\\'");
+    nameEscaped = nameEscaped.replace("'","\\'");
+    QString ret="{'id':"+QString::number(_groupId)+",'name':'"+nameEscaped+
+            "',"+"'enable':"+QString::number(enabled?1:0)+
+            ",'rules':[" +rulesStrList.join(",")+"]}";
     return ret;
 }
 
@@ -407,13 +409,9 @@ void RyRuleManager::setupConfig(const QString& configContent){
 void RyRuleManager::addRuleProject(const QScriptValue &project){
     RyRuleProject *rp = new RyRuleProject(project);
     bool isProjectValid = rp->isValid();
-    qDebug()<<isProjectValid;
-    bool test = isProjectValid;
-    qDebug()<<test;
     if(!isProjectValid){
         qDebug()<<"invalid project";
     }else{
-        qDebug()<<"valid project";
         _projects.append(QSharedPointer<RyRuleProject>(rp));
     }
 }
@@ -484,4 +482,17 @@ QList<QSharedPointer<RyRule> > RyRuleManager::getMatchRules(const QString& url){
 QPair<QByteArray,QByteArray> RyRuleManager::getReplaceContent(QSharedPointer<RyRule> rule,const QString& url){
     RyRuleReplaceContent rc(rule,url);
     return rc.getReplaceContent();
+}
+
+QString RyRuleManager::toJson()const{
+    QString str="[";
+    QStringList projectsList;
+    QListIterator<QSharedPointer<RyRuleProject> > it(_projects);
+    while(it.hasNext()){
+        QSharedPointer<RyRuleProject> p = it.next();
+        projectsList<<p->toJson();
+    }
+    str += projectsList.join(",");
+    str += "]";
+    return str;
 }
