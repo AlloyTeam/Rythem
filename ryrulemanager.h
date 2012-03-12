@@ -127,12 +127,23 @@ public:
     ~RyRuleProject(){
         //TODO save
         qDebug()<<"~RyRuleProject";
+        saveToFile();
+    }
+    void saveToFile(){
+        QFile f(_localAddress);
+        if(f.open(QIODevice::WriteOnly | QIODevice::Text)){
+            f.write( QByteArray().append(toJson()));
+            f.close();
+        }else{
+            qDebug()<<"cache remote rule failure"<<_localAddress;
+        }
     }
 
     void init(QString localAddress,
               QString remoteAddress="",
               QString pwd="",
               QString owner=""){
+        _needReCombineJson = true;
         _isValid = false;
         _localAddress = localAddress;
         _remoteAddress = remoteAddress;
@@ -146,6 +157,10 @@ public:
                 // and local content invalid
                 // get from remote
                 _isValid = addRemoteRuleGroups();
+                if(_isValid){//如果成功，写回本地文件缓存
+                    _needReCombineJson = false;
+                    saveToFile();
+                }
             }else{
                 qDebug()<<"no local content && remote addresss is empty";
                 _isValid = false;
@@ -164,6 +179,7 @@ public:
         reply = manager.get(QNetworkRequest(QUrl(_remoteAddress)));
         loop.exec();
         QString content = reply->readAll();
+        _jsonCache = content;
         //qDebug()<<"remote content:"<<content;
         return addRuleGroups(content);
     }
@@ -194,45 +210,61 @@ public:
                 if(gIt.flags() & QScriptValue::SkipInEnumeration){
                     continue;
                 }
-                RyRuleGroup *g = new RyRuleGroup(gIt.value());
-                QSharedPointer<RyRuleGroup> group(g);
-                //qDebug()<<"group added:"<<g->toJSON();
-                _groups.append(group);
+                QScriptValue g = gIt.value();
+                addRuleGroup(g);
             }
             //qDebug()<<"got project!";
             return true;
         }
     }
-
-    QString toJson(bool format=false)const{
-        if(format){
-            //TODO
+    void addRuleGroup(const QScriptValue& group,bool updateLocalFile=false){
+        RyRuleGroup *g = new RyRuleGroup(group);
+        QSharedPointer<RyRuleGroup> groupPtr(g);
+        //qDebug()<<"group added:"<<g->toJSON();
+        _groups.append(groupPtr);
+        if(updateLocalFile){
+            _needReCombineJson = true;
         }
-        QString localAddressEscaped = _localAddress;
-        localAddressEscaped.replace("\\","\\\\");
-        localAddressEscaped.replace("'","\\'");
-        QString ret = "{'localAddress':'"+localAddressEscaped+"'";
-        if(!_remoteAddress.isEmpty()){
-            QString remoteAddressEscaped = _remoteAddress;
-            remoteAddressEscaped.replace("\\","\\\\");
-            remoteAddressEscaped.replace("'","\\'");
-            ret+=",'remoteAddress':'"+remoteAddressEscaped+"'";
-            ret+=",'pwd':'"+_pwd+"'";
-            QString ownerEscaped = _owner;
-            ownerEscaped.replace("\\","\\\\");
-            ownerEscaped.replace("'","\\'");
-            ret+=",'owner':'"+ownerEscaped+"'";
+    }
 
-            QStringList groupStrList;
-            for(int i=0;i<_groups.length();++i){
-               QSharedPointer<RyRuleGroup> g = _groups.at(i);
-               groupStrList<<g->toJSON();
+    QString localAddress()const{
+        return _localAddress;
+    }
+    QString toJson(bool format=false){
+        if(!_needReCombineJson){
+            return _jsonCache;
+        }else{
+            if(format){
+                //TODO
             }
+            QString localAddressEscaped = _localAddress;
+            localAddressEscaped.replace("\\","\\\\");
+            localAddressEscaped.replace("'","\\'");
+            QString ret = "{'localAddress':'"+localAddressEscaped+"'";
+            if(!_remoteAddress.isEmpty()){
+                QString remoteAddressEscaped = _remoteAddress;
+                remoteAddressEscaped.replace("\\","\\\\");
+                remoteAddressEscaped.replace("'","\\'");
+                ret+=",'remoteAddress':'"+remoteAddressEscaped+"'";
+                ret+=",'pwd':'"+_pwd+"'";
+                QString ownerEscaped = _owner;
+                ownerEscaped.replace("\\","\\\\");
+                ownerEscaped.replace("'","\\'");
+                ret+=",'owner':'"+ownerEscaped+"'";
 
-            ret+=",'groups':["+groupStrList.join(",")+"]";
+                QStringList groupStrList;
+                for(int i=0;i<_groups.length();++i){
+                   QSharedPointer<RyRuleGroup> g = _groups.at(i);
+                   groupStrList<<g->toJSON();
+                }
+
+                ret+=",'groups':["+groupStrList.join(",")+"]";
+            }
+            ret+="}";
+            _jsonCache = ret;
+            _needReCombineJson = false;
         }
-        ret+="}";
-        return ret;
+        return _jsonCache;
     }
     bool isValid()const{
         return _isValid;
@@ -257,6 +289,9 @@ private:
     QString _owner;
     QList<QSharedPointer<RyRuleGroup> > _groups;
     bool _isValid;
+
+    QString _jsonCache;
+    bool _needReCombineJson;
 };
 
 class RyRuleManager:public QObject{
@@ -293,9 +328,10 @@ public:
                       bool isRemote=false,
                       const QString& host="");
     void addRuleProject(const QScriptValue& value);
+    void addGroupToLocalProject(const QScriptValue& value);//新增
     //本地project
     //可提升为远程project(需提供upload接口)
-    void addLocalProject(const QString& filePath);
+    void addGroupToLocalProject(const QString& filePath);
     //直接向远程获取project
     void addRemoteProject(const QString& url);
     //本地缓存的远程project
@@ -321,6 +357,7 @@ private:
 
     QMap<quint64,quint64> _ruleToGroupMap;
     QMap<quint64,quint64> _groupToProjectMap;
+    QMap<QString,QSharedPointer<RyRuleProject> > _projectFileNameToProjectMap;
 
     static QMutex _singletonMutex;
     static RyRuleManager* _instancePtr;

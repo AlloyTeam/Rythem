@@ -412,14 +412,16 @@ void RyRuleManager::addRuleProject(const QScriptValue &project){
     if(!isProjectValid){
         qDebug()<<"invalid project";
     }else{
-        _projects.append(QSharedPointer<RyRuleProject>(rp));
+        QSharedPointer<RyRuleProject> rpPtr(rp);
+        _projectFileNameToProjectMap[rp->localAddress()] = rpPtr;
+        _projects.append(rpPtr);
     }
 }
 
 void RyRuleManager::addRuleProject(const QString& groupJSONData){
     QScriptEngine engine;
     QScriptValue value = engine.evaluate("(" + groupJSONData + ")");
-    QScriptValueIterator groupsIt(value.property("groups"));
+    addRuleProject(value);
 }
 void RyRuleManager::addRuleProject(const QString &groupJSONData, const QString &address, bool isRemote, const QString &host){
 
@@ -444,8 +446,24 @@ void RyRuleManager::addRemoteProjectFromLocal(const QString &localAddress,
 
 
 }
+void RyRuleManager::addGroupToLocalProject(const QScriptValue& value){
+    // add to project default_local_project
+    QString projectName = "default_local_project.txt";
+    QString defaultProjectFullFileName = qApp->applicationDirPath()+"/"+projectName;
+    if(_projectFileNameToProjectMap.contains(defaultProjectFullFileName)){
+        qDebug()<<"default project exists";
+        QSharedPointer<RyRuleProject> project = _projectFileNameToProjectMap.value(defaultProjectFullFileName);
+        project->addRuleGroup(value,true);
+    }else{
+        qDebug()<<"default project not exists";
+        QScriptValue project;
+        project.setProperty("localAddress",QScriptValue(defaultProjectFullFileName));
+        project.setProperty("groups",value);
+        addRuleProject(project);
+    }
+}
 
-void RyRuleManager::addLocalProject(const QString& filePath){
+void RyRuleManager::addGroupToLocalProject(const QString& filePath){
     /*
     QFile file(filePath);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){

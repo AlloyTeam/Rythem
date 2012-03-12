@@ -10,6 +10,7 @@ function unescapeFromHtml(html){
 }
 var oldConfigs;
 function updateConfigs(){
+          return;
 	var s = JSON.stringify(configs);
 	var changed = (s != oldConfigs);
 	if(changed){
@@ -461,6 +462,21 @@ function updateConfigs(){
             addGroup(configs[i].name, configs[i], true);
         }
     }
+      function addNewGroup(groupName){
+          var c = {"name":groupName, "enable":true, "rules":[]};
+          configs.push(c);
+
+          //create the group element
+          var group = new RuleGroup(groupName, c);
+          groupsContainer.appendChild(group.getEl());
+          groups.push(group);
+
+          if(window.App){
+              window.App.doAction(0,JSON.stringify(configs));
+          }
+          return true;
+      }
+
     function addGroup(groupName, groupConfig, ignoreConflict){
         var existed = getGroupIndex(groupName) != -1;
         if(!ignoreConflict && existed){
@@ -637,7 +653,7 @@ function updateConfigs(){
         });
         addGroupPanel.confirmBtn.addEventListener('click', function(e){
             var groupName = addGroupPanel.nameField.value;
-            if(groupName.length && addGroup(groupName)){
+            if(groupName.length && addNewGroup(groupName)){
                 hidePanel(addGroupPanel);
             }
         });
