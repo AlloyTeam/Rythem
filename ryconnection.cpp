@@ -548,16 +548,17 @@ void RyConnection::doRequestToNetwork(){
     }
 
     RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
-    QList<RyRule *> matchResult;
-    manager->getMatchRules(&matchResult, _sendingPipeData->fullUrl); //2ms
+    QList<QSharedPointer<RyRule> > matchResult;
+    matchResult = manager->getMatchRules(_sendingPipeData->fullUrl);
     for(int i=0,l=matchResult.size();i<l;++i){
-        RyRule *rule = matchResult.at(i);
+        QSharedPointer<RyRule> rule = matchResult.at(i);
         qDebug()<<"rule found"<<rule->toJSON();
-        if(rule->type() == COMPLEX_ADDRESS_REPLACE ||
-                rule->type() ==SIMPLE_ADDRESS_REPLACE){
-            host = _sendingPipeData->replacedHost;
+        if(rule->type() == RyRule::COMPLEX_ADDRESS_REPLACE ||
+                rule->type() == RyRule::SIMPLE_ADDRESS_REPLACE){
+            host = rule->replace();
+            _sendingPipeData->replacedHost = host;
         }else{
-            QPair<QByteArray,QByteArray> headerAndBody = rule->replace(_sendingPipeData);
+            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
             bool isOk;
             QByteArray ba = headerAndBody.first;
             _sendingPipeData->parseResponse(&ba,&isOk);

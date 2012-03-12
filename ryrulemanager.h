@@ -2,64 +2,330 @@
 #define RYRULEMANAGER_H
 
 #include <QtCore>
-#include <QHttp>
-#include "ryrule.h"
-#include "ryrulecomplexaddress.h"
-#include "ryrulesimpleaddress.h"
-#include "ryruleremotecontent.h"
-#include "ryrulelocalfile.h"
-#include "ryrulelocalfiles.h"
-#include "ryrulelocaldir.h"
-#include "ryrulegroup.h"
-#include "ryconnection.h"
-#include "rypipedata.h"
+#include <QPair>
+#include <QScriptengine>
+#include <QScriptValue>
+#include <QScriptValueIterator>
+#include <QtNetwork>
+#include <QNetworkAccessManager>
 
-
-class RyRuleManager : public QObject
-{
-	Q_OBJECT
+class RyRule{
 public:
-        static RyRuleManager* instance();
-        explicit RyRuleManager(QString localFile = "", QString host = "", QString address = "", QString path = "");
-		~RyRuleManager();
-	void setLocalConfig(QString localFile, bool reload = false);
-	void setRemoteConfig(QString host, QString addr, QString path, bool reload = false);
-	QString remoteConfigURL();
+    enum RuleType{
+        COMPLEX_ADDRESS_REPLACE = 1,
+        SIMPLE_ADDRESS_REPLACE = 2,
+        REMOTE_CONTENT_REPLACE = 3,
+        LOCAL_FILE_REPLACE = 4,
+        LOCAL_FILES_REPLACE = 5,
+        LOCAL_DIR_REPLACE = 6
+    };
+    RyRule(quint64 groupId,const QScriptValue& rule);
+    RyRule(quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable = true);
+    RyRule(quint64 id,quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable=true);
+    QString toJSON(bool format=false)const;
 
-        bool setLocalConfigContent(QString content,bool dontSave=false);
+    RyRule(const RyRule& other){
 
-	void loadLocalConfig();
-	void loadRemoteConfig();
-	void loadConfig();
-	void saveLocalConfigChanges() const;
+    }
+    RyRule& operator=(const RyRule& )
+    {
+        qDebug()<<"operator=";
+        return *this;
+    }
+    int type();
+    QString pattern();
+    QString replace();
 
-    void addRuleGroup(RyRuleGroup *value, int index = -1);
-	QString configusToJSON(int tabCount = 0, bool localOnly = false) const;
+    quint64 ruleId()const{
+        return _ruleId;
+    }
+    quint64 groupId()const{
+        return _groupId;
+    }
+    bool enabled;
 
-	void getMatchRules(QList<RyRule *> *result, const QString &url, const QString &groupName = "") const;
-        void replace(RyPipeData_ptr connectionData) const;
-        void replace(RyPipeData_ptr connectionData, const QList<RyRule *> *rules) const;
+    static quint64 getNextRuleId();
+    static QString getMimeType(const QString& key,const QString& defaultMimeType="text/plain");
 
-	QString localConfigFile;
-	QString remoteHost;
-	QString remoteAddress;
-	QString remotePath;
-    QList<RyRuleGroup *> localGroups;
-    QList<RyRuleGroup *> remoteGroups;
-	
-signals:
-	void localConfigLoaded();
-	void remoteConfigLoaded();
-	
-public slots:
-	void onRemoteConfigLoaded(int id, bool error);
 
 private:
-	QHttp remoteConfigLoader;
-    void parseConfigContent(QList<RyRuleGroup *> *result, QString json, bool remote = false);
-    void findMatchInGroups(QList<RyRule *> *result, const QString &url, const QString &groupName, const QList<RyRuleGroup *> &list) const;
+    void init(quint64 id,quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable=true){
+        _ruleId = id;
+        _groupId = groupId;
+        _type = type;
+        _pattern = pattern;
+        _replace = replace;
+        enabled = enable;
+    }
 
-    static RyRuleManager *_instance;
+    quint64 _ruleId;
+    quint64 _groupId;
+    int _type;
+    QString _pattern;
+    QString _replace;
+
+    static quint64 _nextRuleId;
+    static QMutex mutex;
+    static QMap<QString,QString> _mimeTypeMap;
+};
+
+
+
+class RyRuleReplaceContent{
+public:
+    RyRuleReplaceContent(QSharedPointer<RyRule> rule, const QString& url="");
+    QPair<QByteArray,QByteArray> getReplaceContent(const QString& url);
+    QPair<QByteArray,QByteArray> getReplaceContent();
+    void setUrl(const QString&);
+    void setRule(QSharedPointer<RyRule>);
+private:
+    QString _url;
+    QSharedPointer<RyRule> _rule;
+};
+
+class RyRuleGroup{
+public:
+    RyRuleGroup(const QScriptValue& group);
+    /*
+    RyRuleGroup(const QString& groupName,bool isOwner=false);
+    RyRuleGroup(quint64 groupId,const QString& groupName,bool isOwner=false);
+    */
+    QString toJSON(bool format=false)const;
+    void addRules(const QString& rules);
+    void addRules(const QScriptValue& rules);
+    void addRule(QSharedPointer<RyRule> rule);
+    void addRle(int type,QString pattern,QString replace);
+    void addRle(quint64 ruleId,int type,QString pattern,QString replace);
+    QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
+    bool enabled;
+    bool isRemote;
+    QString address;
+    QString remoteHost;
+
+    static quint64 getNextGroupId();
+private:
+    quint64 _groupId;
+    QString _groupName;
+    bool _isOwner;
+    QString _ownerPassword;
+    bool _isRemote;
+
+    QList< QSharedPointer<RyRule> > _rules;
+
+    static quint64 _nextGroupId;
+    static QMutex mutex;
+};
+
+class RyRuleProject{
+public:
+    RyRuleProject(const QScriptValue& project){
+        QString localAddress = project.property("localAddress").toString();
+        QString remoteAddress = project.property("remoteAddress").toString();
+        QString owner = project.property("owner").toString();
+        QString pwd = project.property("pwd").toString();
+        init(localAddress,remoteAddress,pwd,owner);
+    }
+
+    RyRuleProject(QString localAddress,
+                  QString remoteAddress="",
+                  QString pwd="",
+                  QString owner=""){
+        init(localAddress,remoteAddress,pwd,owner);
+    }
+    ~RyRuleProject(){
+        //TODO save
+        qDebug()<<"~RyRuleProject";
+    }
+
+    void init(QString localAddress,
+              QString remoteAddress="",
+              QString pwd="",
+              QString owner=""){
+        _isValid = false;
+        _localAddress = localAddress;
+        _remoteAddress = remoteAddress;
+        _pwd= pwd;
+        _owner=owner;
+
+        _isValid = addLocalRuleGroups();
+        if(!_isValid){
+            if(!_remoteAddress.isEmpty()){
+                //remote group
+                // and local content invalid
+                // get from remote
+                _isValid = addRemoteRuleGroups();
+                qDebug()<<"_isValid"<<(_isValid?"yes":"no");
+            }else{
+                qDebug()<<"no local content && remote addresss is empty";
+                _isValid = false;
+            }
+        }
+        qDebug()<<"_isValid 2"<<(_isValid?"yes":"no");
+    }
+    bool addRemoteRuleGroups(){
+        qDebug()<<"getting remote rule"<<_remoteAddress;
+        QTimer timeout;
+        QNetworkAccessManager manager;
+        QNetworkReply* reply;
+        QEventLoop loop;
+        //timeout.singleShot(2000,&loop,SLOT(quit()));//2秒内不返回内容就判断为失败
+        QNetworkProxyFactory::setUseSystemConfiguration(true);
+        manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
+        reply = manager.get(QNetworkRequest(QUrl(_remoteAddress)));
+        loop.exec();
+        QString content = reply->readAll();
+        qDebug()<<"remote content:"<<content;
+        return addRuleGroups(content);
+    }
+    bool addLocalRuleGroups(){
+        QFile f(_localAddress);
+        if(f.open(QIODevice::ReadOnly | QIODevice::Text)){
+            QString content = f.readAll();
+            return addRuleGroups(content);
+        }else{
+            qDebug()<<"cannot open file"<<_localAddress;
+            return false;
+        }
+    }
+    bool addRuleGroups(const QString& content){
+        QScriptEngine engine;
+        QScriptValue value = engine.evaluate("("+content+")");
+        if(engine.hasUncaughtException()){
+            qDebug()<<"invalid group data"<<content;
+            return false;
+        }else{
+            if(!value.property("groups").isValid()){
+                qDebug()<<"invalid group data"<<content;
+                return false;
+            }
+            QScriptValueIterator gIt(value.property("groups"));
+            while(gIt.hasNext()){
+                gIt.next();
+                if(gIt.flags() & QScriptValue::SkipInEnumeration){
+                    continue;
+                }
+                RyRuleGroup *g = new RyRuleGroup(gIt.value());
+                QSharedPointer<RyRuleGroup> group(g);
+                qDebug()<<"group added:"<<g->toJSON();
+                _groups.append(group);
+            }
+            qDebug()<<"got project!";
+            return true;
+        }
+    }
+
+    QString toJson(bool format=false)const{
+        if(format){
+            //TODO
+        }
+        QString localAddressEscaped = _localAddress;
+        localAddressEscaped.replace("\\","\\\\");
+        localAddressEscaped.replace("'","\\'");
+        QString ret = "{'localAddress':'"+localAddressEscaped+"'";
+        if(!_remoteAddress.isEmpty()){
+            QString remoteAddressEscaped = _remoteAddress;
+            remoteAddressEscaped.replace("\\","\\\\");
+            remoteAddressEscaped.replace("'","\\'");
+            ret+="'remoteAddress':'"+remoteAddressEscaped+"'";
+            ret+="'pwd':'"+_pwd+"'";
+            QString ownerEscaped = _owner;
+            ownerEscaped.replace("\\","\\\\");
+            ownerEscaped.replace("'","\\'");
+            ret+="'owner':'"+ownerEscaped+"'";
+        }
+        ret+="}";
+    }
+    bool isValid()const{
+        qDebug()<<"isValid() "<<(_isValid?"yes":"no");
+        return _isValid;
+    }
+    QList<QSharedPointer<RyRule> > getMatchRules(const QString& url){
+        QList<QSharedPointer<RyRule> > ret;
+        QListIterator<QSharedPointer<RyRuleGroup> > it(_groups);
+        qDebug()<<"project::getMatchRules: "<<url<<_groups.length();
+        while(it.hasNext()){
+            QSharedPointer<RyRuleGroup> g = it.next();
+            qDebug()<<"project::getMatchRules: "<<url<<g->toJSON();
+            QList<QSharedPointer<RyRule> > gMatched = g->getMatchRules(url);
+            ret.append(gMatched);
+        }
+        return ret;
+    }
+
+private:
+    QString _localAddress;
+    QString _remoteAddress;
+    QString _pwd;
+    QString _owner;
+    QList<QSharedPointer<RyRuleGroup> > _groups;
+    bool _isValid;
+};
+
+class RyRuleManager:public QObject{
+    Q_OBJECT
+public:
+    ~RyRuleManager();
+    static RyRuleManager* instance();
+    /*
+    config formate:
+    [
+    {
+        "localAddress":"prject_test.txt",
+    },
+    {
+        "localAddress":"project_remote.txt",
+        "remoteAddress":"http://iptton.sinaapp.com/project_test.txt",
+        "pwd":"098f6bcd4621d373cade4e832627b4f6",
+        "owner":"ippan"
+    },
+    {
+        "localAddress":"project_file_not_exists",
+        "remoteAddress":"http://iptton.sinaapp.com/project_test.txt"
+    }
+
+    ]
+    */
+    void loadLocalConfig(const QString& configFileName);
+    void setupConfig(const QString& configContent);
+    void setupConfig(const QScriptValue& value);
+
+    void addRuleProject(const QString& groupJSONData);
+    void addRuleProject(const QString& groupJSONData,
+                      const QString& address,
+                      bool isRemote=false,
+                      const QString& host="");
+    void addRuleProject(const QScriptValue& value);
+    //本地project
+    //可提升为远程project(需提供upload接口)
+    void addLocalProject(const QString& filePath);
+    //直接向远程获取project
+    void addRemoteProject(const QString& url);
+    //本地缓存的远程project
+    //当本地解析失败或用户手动update时可更新
+    void addRemoteProjectFromLocal(const QString& localAddress,
+                                   const QString& remoteAddress,
+                                   const QString& pwd="",
+                                   const QString& owner="");
+
+    void updateRule(QSharedPointer<RyRule> rule);
+    void updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup);
+
+    //由于可能同时命中host及远程替换两种rule，此处需返回List
+    QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
+    //返回header body
+    QPair<QByteArray,QByteArray> getReplaceContent(QSharedPointer<RyRule> rule,const QString& url="");
+private:
+
+    RyRuleManager();
+    // save file system (config and every project local file);
+    QList<QSharedPointer<RyRuleProject> > _projects;
+
+    QMap<quint64,quint64> _ruleToGroupMap;
+    QMap<quint64,quint64> _groupToProjectMap;
+
+    static QMutex _singletonMutex;
+    static RyRuleManager* _instancePtr;
+
 };
 
 #endif // RYRULEMANAGER_H

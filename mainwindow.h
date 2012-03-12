@@ -43,7 +43,7 @@ class RyJsBridge:public QObject{
         }
         QString getConfigs(){
             RyRuleManager *manager = RyRuleManager::instance();
-            QString s = manager->configusToJSON();
+            QString s = "";//manager->toJSON();
             s.remove('\r');
             s.remove('\n');
             s.remove('\t');
@@ -54,7 +54,7 @@ class RyJsBridge:public QObject{
             RyRuleManager *manager = RyRuleManager::instance();
 			qDebug() << "[JSBridge] update" << json;
 			qDebug() << "-------------------------";
-			manager->setLocalConfigContent(json, true);
+            //manager->setLocalConfigContent(json, true);
         }
 
    signals:

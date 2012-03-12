@@ -9,8 +9,7 @@
 #include <QUrl>
 
 #include "ryrulemanager.h"
-#include "ryrulegroup.h"
-#include "ryrule.h"
+
 
 #include "ryproxyserver.h"
 #include "rypipedata.h"
@@ -50,7 +49,7 @@ void myMessageHandler(QtMsgType type, const char *msg)
         outFile.close();
 }
 
-#define DEBUGTOFILE
+//#define DEBUGTOFILE
 
 int main(int argc, char *argv[])
 {
@@ -66,11 +65,10 @@ int main(int argc, char *argv[])
     //qDebug()<<qApp->applicationDirPath();
     RyRuleManager *manager = RyRuleManager::instance();
 #ifdef Q_WS_WIN32
-    manager->localConfigFile = qApp->applicationDirPath()+"/configs.txt";
+    manager->loadLocalConfig(qApp->applicationDirPath()+"/rythem_config.json");
 #else
-    manager->localConfigFile = qApp->applicationDirPath()+"/../../../../Rythem/configs.txt";
+    manager->loadLocalConfig(qApp->applicationDirPath()+"/../../../../Rythem/rythem_config.json");
 #endif
-    manager->loadConfig(); //2ms
     //QList<RyRule *> matchResult;
     //manager->getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms
     //qDebug() << matchResult;

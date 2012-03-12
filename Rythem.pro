@@ -23,20 +23,12 @@ SOURCES += main.cpp\
     qirulesettingsdialog.cpp\
     httpdecoder.cpp \
     json.cpp \
-    ryrulecomplexaddress.cpp \
     ryproxyserver.cpp \
     rypipedata.cpp \
     ryconnection.cpp \
     composer.cpp \
-    rypipetableview.cpp \
-    ryrulegroup.cpp \
-    ryrule.cpp \
-    ryrulemanager.cpp \
-    ryrulelocalfiles.cpp \
-    ryrulesimpleaddress.cpp \
-    ryruleremotecontent.cpp \
-    ryrulelocalfile.cpp \
-    ryrulelocaldir.cpp \
+    rypipetableview.cpp\
+    ryrulemanager.cpp\
     waterfallwindow.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
@@ -59,14 +51,6 @@ HEADERS  += mainwindow.h \
     composer.h \
     rypipetableview.h \
     ryrulemanager.h \
-    ryrulegroup.h \
-    ryrulelocaldir.h \
-    ryrule.h \
-    ryrulesimpleaddress.h \
-    ryruleremotecontent.h \
-    ryrulelocalfiles.h \
-    ryrulelocalfile.h \
-    ryrulecomplexaddress.h \
     waterfallwindow.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
