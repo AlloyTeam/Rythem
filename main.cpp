@@ -65,9 +65,9 @@ int main(int argc, char *argv[])
     //qDebug()<<qApp->applicationDirPath();
     RyRuleManager *manager = RyRuleManager::instance();
 #ifdef Q_WS_WIN32
-    manager->loadLocalConfig(qApp->applicationDirPath()+"/rythem_config.json");
+    manager->loadLocalConfig(qApp->applicationDirPath()+"/rythem_config.txt");
 #else
-    manager->loadLocalConfig(qApp->applicationDirPath()+"/../../../../Rythem/rythem_config.json");
+    manager->loadLocalConfig(qApp->applicationDirPath()+"/../../../../Rythem/rythem_config.txt");
 #endif
     //QList<RyRule *> matchResult;
     //manager->getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms

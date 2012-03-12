@@ -373,16 +373,32 @@ RyRuleManager::~RyRuleManager(){
     qDebug()<<"~rulemanager";
     //save config
 
+    if(_configFileName.isEmpty()){
+        _configFileName = qApp->applicationDirPath()+"/rythem_config.txt";
+    }
+    QFile f(_configFileName);
+    bool canFileOpen = f.open(QIODevice::WriteOnly | QIODevice::Text);
+    QStringList configStr;
+
     //save all projects
     QListIterator<QSharedPointer<RyRuleProject> > rpIt(_projects);
     while(rpIt.hasNext()){
         QSharedPointer<RyRuleProject> rp = rpIt.next();
+        configStr<<rp->toConfigJson();
         rp.clear();
+    }
+    if(canFileOpen){
+        QString str = "["+configStr.join(",")+"]";
+        QByteArray ba;
+        ba.append(str);
+        f.write(ba);
+        f.close();
     }
     _projectFileNameToProjectMap.clear();
 }
 
 void RyRuleManager::loadLocalConfig(const QString& configFileName){
+    _configFileName = configFileName;
     QFile file(configFileName);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
         qDebug()<<"opened file "<<configFileName;

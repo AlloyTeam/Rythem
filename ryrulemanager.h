@@ -132,7 +132,15 @@ public:
     void saveToFile(){
         QFile f(_localAddress);
         if(f.open(QIODevice::WriteOnly | QIODevice::Text)){
-            f.write( QByteArray().append(toJson()));
+            QString str="{'groups':[";
+            QStringList groupStrList;
+            for(int i=0;i<_groups.length();++i){
+               QSharedPointer<RyRuleGroup> g = _groups.at(i);
+               groupStrList<<g->toJSON();
+            }
+
+            str+=groupStrList.join(",")+"]}";
+            f.write( QByteArray().append(str));
             qDebug()<<"save to file";
             f.close();
         }else{
@@ -232,6 +240,21 @@ public:
         return _localAddress;
     }
     QString toJson(bool format=false){
+        if(format){
+            //TODO
+        }
+        QString str="{'groups':[";
+        QStringList groupStrList;
+        for(int i=0;i<_groups.length();++i){
+           QSharedPointer<RyRuleGroup> g = _groups.at(i);
+           groupStrList<<g->toJSON();
+        }
+
+        str+=groupStrList.join(",")+"]}";
+        return str;
+    }
+
+    QString toConfigJson(bool format=false){
         if(!_needReCombineJson){
             return _jsonCache;
         }else{
@@ -252,14 +275,6 @@ public:
                 ownerEscaped.replace("\\","\\\\");
                 ownerEscaped.replace("'","\\'");
                 ret+=",'owner':'"+ownerEscaped+"'";
-
-                QStringList groupStrList;
-                for(int i=0;i<_groups.length();++i){
-                   QSharedPointer<RyRuleGroup> g = _groups.at(i);
-                   groupStrList<<g->toJSON();
-                }
-
-                ret+=",'groups':["+groupStrList.join(",")+"]";
             }
             ret+="}";
             _jsonCache = ret;
@@ -352,6 +367,7 @@ public:
     QString toJson()const;
 private:
 
+    QString _configFileName;
     RyRuleManager();
     // save file system (config and every project local file);
     QList<QSharedPointer<RyRuleProject> > _projects;
