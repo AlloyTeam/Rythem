@@ -1,6 +1,5 @@
+"use strict";
 ;(function(){
-
-
 function escapeToHtml(str){
     return str.replace(/&/g,"&amp;").replace(/\s/g,"&nbsp;").replace(/\>/g,"&gt;").replace(/</g,"/&lt;");
 }
@@ -351,6 +350,7 @@ function updateConfigs(){
         onAddRuleButtonClick: function(e){
             e.preventDefault();
             currentGroupName = this.__groupName;
+			currentGroupId = this.__groupId;
             showAddRulePanel();
         },
         onRemoveGroupButtonClick: function(e){
@@ -395,6 +395,7 @@ function updateConfigs(){
 	var addRemoteGroupBtn;
     var panelMask, addGroupPanel, addRulePanel;
     var currentGroupName;
+	var currentGroupId;
     var groupsContainer;
 
     var groups = [];
@@ -560,8 +561,8 @@ function updateConfigs(){
 			}
         }
     }
-    function addRule(groupName, type, pattern, replace){
-        var i = getGroupIndex(groupName);
+	function addNewRule(groupId,type,pattern,replace){
+        var i = getGroupIndex(groupId);
         if(i != -1){
             var group = groups[i];
             var c = {
@@ -572,14 +573,23 @@ function updateConfigs(){
                     "replace": replace
                 }
             };
+			if(window.App){
+				var newRule = window.App.doAction(1,JSON.stringify(c),groupId);
+				if(newRule==""){
+					alert("add rule failed");
+					return true;
+				}
+				newRule = eval('('+newRule+')');
+				c.id = newRule.id;
+			}
             group.addRule(c);
             configs[i].rules.push(c);
 			updateConfigs();
         }
         else{
             alert('group ' + groupName + ' does not exist!');
-        }
-    }
+        }		
+	}
     function removeRule(groupName, index){
         var i = getGroupIndex(groupName);
         if(i != -1){
@@ -702,19 +712,16 @@ function updateConfigs(){
             var type = Number(addRulePanel.typeField.value);
             var pattern = addRulePanel.patternField.value;
             var replace = addRulePanel.replaceField.value;
-            if(currentGroupName && pattern.length && replace.length){
-                addRule(currentGroupName, type, pattern, replace);
+            if(pattern.length && replace.length){
+                addNewRule(currentGroupId, type, pattern, replace);
                 hidePanel(addRulePanel);
             }
         });
         addRulePanel.cancelBtn.addEventListener('click', function(e){
             hidePanel(addRulePanel);
         });
-
 		if(window.App){
 			window.App.ruleChanged.connect(window.callbackFromApp);
-			
-		
 			var rawConfig = window.App.getConfigs();
 			rawConfig = rawConfig.replace(/&quot;/g,"\'");
 			rawConfig = eval('(' + rawConfig + ')');

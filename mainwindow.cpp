@@ -38,6 +38,8 @@
 #include <QMovie>
 #include <QPixmap>
 
+#include "pachandler.h"
+
 QByteArray gzipDecompress(QByteArray data){
     if (data.size() <= 4) {
         qWarning("gUncompress: Input data is truncated");
@@ -105,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setSortingEnabled(true);
 
     jsBridge = new RyJsBridge();
-
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     addJsObject();
     connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
     ui->webView->load(QUrl("http://127.0.0.1:8889/manager/RythemManagerUI/rules.html"));
@@ -197,17 +199,17 @@ void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
     }
 
     //TODO..
-    QMovie *movie = ui->label->movie();
-    if(movie){
-        delete movie;
-    }
+    //QMovie *movie = ui->label->movie();
+    //if(movie){
+    //    delete movie;
+    //}
     if(data->getResponseHeader("Content-Type").toLower().indexOf("image")!=-1){
         ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorImageView);
         if(!decrypedData.isEmpty()){
             if(data->getResponseHeader("Content-Type").toLower().indexOf("gif")!=-1){
-                QBuffer *data = new QBuffer(&decrypedData);
-                QMovie *movie = new QMovie(data);
-                ui->label->setMovie(movie);
+                //QBuffer *data = new QBuffer(&decrypedData);
+                //QMovie *movie = new QMovie(data);
+                //ui->label->setMovie(movie);
                 //TODO start and delete movie..
             }else{
                 QPixmap pixmap;
@@ -285,7 +287,6 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *){
 void MainWindow::toggleProxy(){
     if(isUsingCapture){
         isUsingCapture = false;
-
         proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
         if(previousProxyInfo.enable != 0){
             proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
@@ -311,6 +312,7 @@ void MainWindow::toggleProxy(){
         ///qDebug()<<previousProxyInfo.isUsingPac;
         //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
 
+        initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
         QString proxyServer="127.0.0.1:8889";
         if(previousProxyInfo.enable){
             if(previousProxyInfo.proxyString.indexOf(";")!=-1){
@@ -345,7 +347,6 @@ void MainWindow::toggleProxy(){
 void MainWindow::toggleCapture(){
     captureAct->setChecked(!isUsingCapture);
 #ifdef Q_WS_WIN32
-    RyWinHttp::init();
     QtConcurrent::run(this,&MainWindow::toggleProxy);
     //qDebug()<<previousProxyInfo.isUsingPac;
 #endif

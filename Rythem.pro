@@ -15,7 +15,7 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     qiddlerpipetablemodel.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
-    rywinhttp.cpp \
+#    rywinhttp.cpp \
     bytearray.cpp \
     websocketserver.cpp \
     websocketclient.cpp \
@@ -29,14 +29,16 @@ SOURCES += main.cpp\
     composer.cpp \
     rypipetableview.cpp\
     ryrulemanager.cpp\
-    waterfallwindow.cpp
+    waterfallwindow.cpp \
+    pachandler.h \
+    pachandler.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
     qnetworkproxyfactoryexendforpac.h \
-    rywinhttp.h \
+#    rywinhttp.h \
     rypipedata.h \
     bytearray.h \
     websocketserver.h \
@@ -64,9 +66,9 @@ win32:HEADERS += zlib/zutil.h \
     zlib/deflate.h \
     zlib/crc32.h
 
-mac:HEADERS -= rywinhttp.h
+#mac:HEADERS -= rywinhttp.h
 
-mac:SOURCES -= rywinhttp.cpp
+#mac:SOURCES -= rywinhttp.cpp
 
 FORMS    += mainwindow.ui \
     rule_config.ui \
@@ -77,7 +79,7 @@ mac:CONFIG += app_bundle
 
 
 
-win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
+#win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation -lz
 
 RESOURCES += \

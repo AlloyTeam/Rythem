@@ -202,16 +202,19 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(){
             fileName = fileName.left(fileName.indexOf("#"));
         }
     #ifdef Q_OS_WIN
-        if(replace.indexOf("\\")==replace.length()-1){
+        if(replace.endsWith("\\")){
             replace.remove(replace.length()-1,1);
         }
     #else
-        if(replace.indexOf("/")==replace.length()-1){
+        if(replace.endsWith("/")){
             replace.remove(replace.length()-1,1);
         }
     #endif
         if(fileName=="/" || fileName.isEmpty()){
             fileName = "/index.html";
+        }
+        if(!fileName.startsWith("/")){
+            fileName.prepend("/");
         }
         fileName.prepend(replace);
         //qDebug()<<fileName;
@@ -299,24 +302,28 @@ void RyRuleGroup::addRules(const QScriptValue& rules){
             continue;
         }
         QScriptValue v = it.value();
-        RyRule *rule = new RyRule(_groupId,v);
-        QSharedPointer<RyRule> p(rule);
-        _rules.append(p);
+        addRule(v);
     }
 }
+QSharedPointer<RyRule> RyRuleGroup::addRule(const QScriptValue &value){
+    RyRule *rule = new RyRule(_groupId,value);
+    QSharedPointer<RyRule> p(rule);
+    return addRule(p);
+}
 
-void RyRuleGroup::addRule(QSharedPointer<RyRule> rule){
+QSharedPointer<RyRule> RyRuleGroup::addRule(QSharedPointer<RyRule> rule){
     _rules.append(rule);
+    return rule;
 }
 
-void RyRuleGroup::addRle(int type,QString pattern,QString replace){
+QSharedPointer<RyRule> RyRuleGroup::addRule(int type,QString pattern,QString replace){
     QSharedPointer<RyRule> tmp(new RyRule(_groupId,type,pattern,replace));
-    addRule(tmp);
+    return addRule(tmp);
 }
 
-void RyRuleGroup::addRle(quint64 ruleId,int type,QString pattern,QString replace){
+QSharedPointer<RyRule> RyRuleGroup::addRule(quint64 ruleId,int type,QString pattern,QString replace){
     QSharedPointer<RyRule> tmp(new RyRule(ruleId,_groupId,type,pattern,replace));
-    addRule(tmp);
+    return addRule(tmp);
 }
 QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
     //qDebug()<<"getMatchRule:"<<url<<_rules.length();
@@ -350,6 +357,8 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
                     }
                 }
             }
+        }else if(type == RyRule::LOCAL_DIR_REPLACE){
+            isMatch = (url.indexOf(pattern) != -1);
         }else{
             QRegExp rx(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
             isMatch = rx.exactMatch(url);
@@ -552,6 +561,18 @@ const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QS
         return QSharedPointer<RyRuleGroup>();
     }
 }
+const QSharedPointer<RyRule> RyRuleManager::addRuleToGroup(const QString& msg,quint64 groupId){
+    if(_groupToProjectMap.contains(groupId)){
+        QSharedPointer<RyRuleProject> p = _groupToProjectMap[groupId];
+        QSharedPointer<RyRuleGroup>  g = p->groupById(groupId);
+        QScriptEngine engine;
+        QScriptValue v = engine.evaluate("("+msg+")");
+        return g->addRule(v);
+
+    }else{
+        return QSharedPointer<RyRule>();
+    }
+}
 
 const QSharedPointer<RyRuleProject> RyRuleManager::addLocalProject(const QString& filePath){
     /*
@@ -585,7 +606,7 @@ QList<QSharedPointer<RyRule> > RyRuleManager::getMatchRules(const QString& url){
         QSharedPointer<RyRuleProject> p = it.next();
         ret.append(p->getMatchRules(url));
     }
-    qDebug()<<"match rule length = "<<QString::number(ret.length());
+    //qDebug()<<"match rule length = "<<QString::number(ret.length());
     return ret;
 }
 

@@ -31,11 +31,12 @@ class RyJsBridge:public QObject{
         }
 
     public slots:
-        QString doAction(int action,const QString msg){
+        QString doAction(int action,const QString msg,quint64 groupId=0){
             qDebug()<<"doAction "<<QString::number(action)<< msg;
             RyRuleManager *manager = RyRuleManager::instance();
             QSharedPointer<RyRuleProject> pro;
             QSharedPointer<RyRuleGroup> group;
+            QSharedPointer<RyRule> rule;
             switch(action){
             case 0://add local group
                 group = manager->addGroupToLocalProject(msg);//暂时只允许添加到本地project
@@ -46,7 +47,10 @@ class RyJsBridge:public QObject{
                 }
                 break;
             case 1://add rule to group
-                //manager->addRuleToGroup(msg);
+                rule = manager->addRuleToGroup(msg,groupId);
+                if(!rule.isNull()){
+                    return QString::number(rule->ruleId());
+                }
                 break;
             case 2://add remote project
                 pro = manager->addRemoteProject(msg);
@@ -83,7 +87,6 @@ class RyJsBridge:public QObject{
             s.remove('\n');
             s.remove('\t');
             s.replace("\\","\\\\");
-            qDebug()<<s;
 			return s;
         }
         bool updateConfigs(QString json){
@@ -91,6 +94,7 @@ class RyJsBridge:public QObject{
 			qDebug() << "[JSBridge] update" << json;
 			qDebug() << "-------------------------";
             //manager->setLocalConfigContent(json, true);
+            return true;
         }
 
    signals:

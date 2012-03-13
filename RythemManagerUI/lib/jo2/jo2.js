@@ -46,7 +46,7 @@
 	 * @param {Function} Superclass optional superclass to inherit from
 	 * @return {Function} class object
 	 */
-	jo2.extends = function(members, Superclass){
+	jo2.extend = function(members, Superclass){
 		//initialize the constructor
 		var constructor = function(){
 			var fn = members.initialize || Superclass || new Function();

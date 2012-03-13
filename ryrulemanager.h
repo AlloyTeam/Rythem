@@ -87,9 +87,10 @@ public:
     QString toJSON(bool format=false)const;
     void addRules(const QString& rules);
     void addRules(const QScriptValue& rules);
-    void addRule(QSharedPointer<RyRule> rule);
-    void addRle(int type,QString pattern,QString replace);
-    void addRle(quint64 ruleId,int type,QString pattern,QString replace);
+    QSharedPointer<RyRule> addRule(const QScriptValue& value);
+    QSharedPointer<RyRule> addRule(QSharedPointer<RyRule> rule);
+    QSharedPointer<RyRule> addRule(int type,QString pattern,QString replace);
+    QSharedPointer<RyRule> addRule(quint64 ruleId,int type,QString pattern,QString replace);
     quint64 groupId()const;
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
     bool enabled;
@@ -143,7 +144,7 @@ public:
             }
 
             str+=groupStrList.join(",")+"]}";
-            f.write( QByteArray().append(str));
+            f.write( QByteArray().append(str.toUtf8()));
             qDebug()<<"save to file";
             f.close();
         }else{
@@ -201,8 +202,8 @@ public:
     bool addLocalRuleGroups(){
         QFile f(_localAddress);
         if(f.open(QIODevice::ReadOnly | QIODevice::Text)){
-            QString content = f.readAll();
-            return addRuleGroups(content);
+            QByteArray content = f.readAll();
+            return addRuleGroups(QString::fromUtf8(content.data()));
         }else{
             qDebug()<<"cannot open file:"<<_localAddress;
             return false;
@@ -317,6 +318,16 @@ public:
     const QList<QSharedPointer<RyRuleGroup> > groups()const{
         return _groups;
     }
+    QSharedPointer<RyRuleGroup> groupById(quint64 groupId)const{
+        QListIterator<QSharedPointer<RyRuleGroup> > it(_groups);
+        while(it.hasNext()){
+            QSharedPointer<RyRuleGroup> g = it.next();
+            if(g->groupId() == groupId){
+                return g;
+            }
+        }
+        return QSharedPointer<RyRuleGroup>();
+    }
 
 private:
     QString _localAddress;
@@ -369,7 +380,7 @@ public:
                       const QString& host="");
     const QSharedPointer<RyRuleProject> addRuleProject(const QScriptValue& value);
     const QSharedPointer<RyRuleGroup> addGroupToLocalProject(const QString& content);//新增
-    const QSharedPointer<RyRuleGroup> addRuleToGroup(const QString& msg);
+    const QSharedPointer<RyRule> addRuleToGroup(const QString& msg,quint64 groupId);
     //本地project
     //可提升为远程project(需提供upload接口)
     const QSharedPointer<RyRuleProject> addLocalProject(const QString& filePath);
