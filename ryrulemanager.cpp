@@ -332,6 +332,24 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
             isMatch = false;//TODO
         }else if(type == RyRule::REMOTE_CONTENT_REPLACE){
             isMatch = (url.indexOf(pattern)!=-1);
+        }else if(type == RyRule::SIMPLE_ADDRESS_REPLACE){
+            int n = url.indexOf(pattern);
+            isMatch = false;
+            if(n!=-1){
+                int protocolLength = 0;
+                if(url.startsWith("http://")){
+                    protocolLength = 7;
+                }else if(url.startsWith("https://")){
+                    protocolLength = 8;
+                }
+
+                if(n == protocolLength){
+                    if(url.length() == protocolLength+pattern.length() ||
+                            url.at(protocolLength+pattern.length()) == '/'){
+                        isMatch = true;
+                    }
+                }
+            }
         }else{
             QRegExp rx(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
             isMatch = rx.exactMatch(url);
@@ -379,7 +397,7 @@ RyRuleManager::~RyRuleManager(){
     //save config
 
     if(_configFileName.isEmpty()){
-        _configFileName = qApp->applicationDirPath()+"/rythem_config.txt";
+        _configFileName = appPath+"/rythem_config.txt";
     }
     QFile f(_configFileName);
     bool canFileOpen = f.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -389,7 +407,7 @@ RyRuleManager::~RyRuleManager(){
     QListIterator<QSharedPointer<RyRuleProject> > rpIt(_projects);
     while(rpIt.hasNext()){
         QSharedPointer<RyRuleProject> rp = rpIt.next();
-        qDebug()<<"saving to config"<<rp->toConfigJson();
+        //qDebug()<<"saving to config"<<rp->toConfigJson();
         configStr<<rp->toConfigJson();
         rp.clear();
     }
@@ -408,7 +426,7 @@ void RyRuleManager::loadLocalConfig(const QString& configFileName){
     _configFileName = configFileName;
     QFile file(configFileName);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        qDebug()<<"opened file "<<configFileName;
+        qDebug()<<"opened rythem config file "<<configFileName;
         QString content = file.readAll();
         file.close();
         setupConfig(content);
@@ -465,7 +483,7 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QScriptV
 }
 
 const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QString& groupJSONData){
-    qDebug()<<groupJSONData;
+    //qDebug()<<groupJSONData;
     QScriptEngine engine;
     QScriptValue value = engine.evaluate("(" + groupJSONData + ")");
     return addRuleProject(value);
@@ -474,12 +492,12 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QString 
     return QSharedPointer<RyRuleProject>();
 }
 
-const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProject(const QString& url,bool fromView){
+const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProject(const QString& url,bool){
     QString urlEscaped = url;
     urlEscaped.replace("\\","\\\\");
     urlEscaped.replace("\'","\\'");
     int i=1;
-    QString localAddress = qApp->applicationDirPath()+"/remoteRuleCache_";
+    QString localAddress = appPath+"/remoteRuleCache_";
     while(true){
         if(i==0){//不可能出现的情况(当远程rule个数越过int最大值时才会出现
             break;
@@ -505,26 +523,26 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProjectFromLocal(con
 const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QString& content){
     // add to project default_local_project
     QString projectName = "default_local_project.txt";
-    QString defaultProjectFullFileName = qApp->applicationDirPath()+"/"+projectName;
+    QString defaultProjectFullFileName = appPath+"/"+projectName;
     if(_projectFileNameToProjectMap.contains(defaultProjectFullFileName)){
         QScriptEngine engine;
         QScriptValue value = engine.evaluate("("+content+")");
-        qDebug()<<"default project exists";
+        //qDebug()<<"default project exists";
         QSharedPointer<RyRuleProject> project = _projectFileNameToProjectMap.value(defaultProjectFullFileName);
         return project->addRuleGroup(value,true);
     }else{
-        qDebug()<<"default project not exists";
+        //qDebug()<<"default project not exists";
         QFile f(defaultProjectFullFileName);
         f.open(QIODevice::WriteOnly | QIODevice::Text);
         QByteArray ba;
         ba.append(QString("{'groups':[")+content+"]}");
-        qDebug()<<QString(ba);
+        //qDebug()<<QString(ba);
         f.write(ba);
         f.close();
         QScriptEngine engine;
         QScriptValue project = engine.globalObject();
         project.setProperty("localAddress",QScriptValue(defaultProjectFullFileName));
-        qDebug()<<defaultProjectFullFileName;
+        //qDebug()<<defaultProjectFullFileName;
         QSharedPointer<RyRuleProject> p = addRuleProject(project);
         //TODO
         QList<QSharedPointer<RyRuleGroup> > groups = p->groups();
@@ -566,8 +584,8 @@ QList<QSharedPointer<RyRule> > RyRuleManager::getMatchRules(const QString& url){
     while(it.hasNext()){
         QSharedPointer<RyRuleProject> p = it.next();
         ret.append(p->getMatchRules(url));
-
     }
+    qDebug()<<"match rule length = "<<QString::number(ret.length());
     return ret;
 }
 

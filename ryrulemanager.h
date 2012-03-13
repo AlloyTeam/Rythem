@@ -9,6 +9,8 @@
 #include <QtNetwork>
 #include <QNetworkAccessManager>
 
+extern QString appPath;
+
 class RyRule{
 public:
     enum RuleType{
@@ -188,9 +190,12 @@ public:
         manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
         reply = manager.get(QNetworkRequest(QUrl(_remoteAddress)));
         loop.exec();
+        QTextCodec* oldCodec = QTextCodec::codecForCStrings();
+        QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf-8"));
         QString content = reply->readAll();
+         QTextCodec::setCodecForCStrings(oldCodec);
         _jsonCache = content;
-        //qDebug()<<"remote content:"<<content;
+        qDebug()<<"remote content:"<<content;
         return addRuleGroups(content);
     }
     bool addLocalRuleGroups(){
@@ -199,7 +204,7 @@ public:
             QString content = f.readAll();
             return addRuleGroups(content);
         }else{
-            qDebug()<<"cannot open file"<<_localAddress;
+            qDebug()<<"cannot open file:"<<_localAddress;
             return false;
         }
     }
@@ -209,9 +214,7 @@ public:
         while(gIt.hasNext()){
             QSharedPointer<RyRuleGroup> g = gIt.next();
             if(g->groupId() == groupId){
-                qDebug()<<"befor remove "<<_groups.length();
                 _groups.removeOne(g);
-                qDebug()<<"after remove "<<_groups.length();
                 break;
             }
         }
@@ -244,7 +247,7 @@ public:
     QSharedPointer<RyRuleGroup> addRuleGroup(const QScriptValue& group,bool updateLocalFile=false){
         RyRuleGroup *g = new RyRuleGroup(group);
         QSharedPointer<RyRuleGroup> groupPtr(g);
-        qDebug()<<"group added:"<<g->toJSON();
+        //qDebug()<<"group added:"<<g->toJSON();
         _groups.append(groupPtr);
         return groupPtr;
     }

@@ -22,9 +22,6 @@
 QString appPath = "";
 void myMessageHandler(QtMsgType type, const char *msg)
 {
-    if(appPath == ""){
-        appPath =  qApp->applicationDirPath();
-    }
     QString fileName = appPath+QString("/log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
     QFile outFile;
     outFile.setFileName(fileName);
@@ -54,7 +51,7 @@ void myMessageHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-
+    appPath =  qApp->applicationDirPath();
 
 
 #ifdef DEBUGTOFILE
@@ -62,12 +59,12 @@ int main(int argc, char *argv[])
 #endif
 
 	//new rule manager test----------------------------------------------------
-    //qDebug()<<qApp->applicationDirPath();
+    //qDebug()<<appPath;
     RyRuleManager *manager = RyRuleManager::instance();
 #ifdef Q_WS_WIN32
-    manager->loadLocalConfig(qApp->applicationDirPath()+"/rythem_config.txt");
+    manager->loadLocalConfig(appPath+"/rythem_config.txt");
 #else
-    manager->loadLocalConfig(qApp->applicationDirPath()+"/../../../../Rythem/rythem_config.txt");
+    manager->loadLocalConfig(appPath+"/../../../../Rythem/rythem_config.txt");
 #endif
     //QList<RyRule *> matchResult;
     //manager->getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms
