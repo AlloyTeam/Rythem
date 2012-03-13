@@ -226,14 +226,15 @@ public:
             return true;
         }
     }
-    void addRuleGroup(const QScriptValue& group,bool updateLocalFile=false){
+    QSharedPointer<RyRuleGroup> addRuleGroup(const QScriptValue& group,bool updateLocalFile=false){
         RyRuleGroup *g = new RyRuleGroup(group);
         QSharedPointer<RyRuleGroup> groupPtr(g);
         //qDebug()<<"group added:"<<g->toJSON();
         _groups.append(groupPtr);
         if(updateLocalFile){
-            _needReCombineJson = true;
+            _needReCombineJson = false;//TODO
         }
+        return groupPtr;
     }
 
     QString localAddress()const{
@@ -255,6 +256,7 @@ public:
     }
 
     QString toConfigJson(bool format=false){
+        _needReCombineJson = true;//TODO
         if(!_needReCombineJson){
             return _jsonCache;
         }else{
@@ -338,27 +340,28 @@ public:
     void setupConfig(const QString& configContent);
     void setupConfig(const QScriptValue& value);
 
-    void addRuleProject(const QString& groupJSONData);
-    void addRuleProject(const QString& groupJSONData,
+    QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData);
+    QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData,
                       const QString& address,
                       bool isRemote=false,
                       const QString& host="");
-    void addRuleProject(const QScriptValue& value);
-    void addGroupToLocalProject(const QString& content);//新增
+    QSharedPointer<RyRuleProject> addRuleProject(const QScriptValue& value);
+    QSharedPointer<RyRuleGroup> addGroupToLocalProject(const QString& content);//新增
+    QSharedPointer<RyRuleGroup> addRuleToGroup(const QString& msg);
     //本地project
     //可提升为远程project(需提供upload接口)
-    void addLocalProject(const QString& filePath);
+    QSharedPointer<RyRuleProject> addLocalProject(const QString& filePath);
     //直接向远程获取project
-    void addRemoteProject(const QString& url);
+    QSharedPointer<RyRuleProject> addRemoteProject(const QString& url,bool fromView=false);
     //本地缓存的远程project
     //当本地解析失败或用户手动update时可更新
-    void addRemoteProjectFromLocal(const QString& localAddress,
+    QSharedPointer<RyRuleProject> addRemoteProjectFromLocal(const QString& localAddress,
                                    const QString& remoteAddress,
                                    const QString& pwd="",
                                    const QString& owner="");
 
-    void updateRule(QSharedPointer<RyRule> rule);
-    void updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup);
+    QSharedPointer<RyRule> updateRule(QSharedPointer<RyRule> rule);
+    QSharedPointer<RyRuleGroup> updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup);
 
     //由于可能同时命中host及远程替换两种rule，此处需返回List
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);

@@ -34,15 +34,25 @@ class RyJsBridge:public QObject{
         void doAction(int action,const QString msg){
             qDebug()<<"doAction "<<QString::number(action)<< msg;
             RyRuleManager *manager = RyRuleManager::instance();
+            QSharedPointer<RyRuleProject> pro;
             switch(action){
-            case 0://add group
+            case 0://add local group
                 manager->addGroupToLocalProject(msg);//暂时只允许添加到本地project
+                emit ruleChanged(0,"success");
                 break;
-            case 1://add rule
-            case 2://update group
-            case 3://update rule
-            case 4://delete group
-            case 5://delete rule
+            case 1://add rule to group
+                //manager->addRuleToGroup(msg);
+                break;
+            case 2://add remote project
+                pro = manager->addRemoteProject(msg);
+                if(!pro.isNull()){
+                    emit ruleChanged(2,pro->toJson());
+                }
+                break;
+            case 3://update group
+            case 4://update rule
+            case 5://delete group
+            case 6://delete rule
                 break;
             }
         }
@@ -73,7 +83,7 @@ class RyJsBridge:public QObject{
         }
 
    signals:
-        void ruleChanged(QString json);
+        void ruleChanged(int action,QString json);
 };
 
 class MainWindow : public QMainWindow

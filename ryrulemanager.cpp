@@ -384,6 +384,7 @@ RyRuleManager::~RyRuleManager(){
     QListIterator<QSharedPointer<RyRuleProject> > rpIt(_projects);
     while(rpIt.hasNext()){
         QSharedPointer<RyRuleProject> rp = rpIt.next();
+        qDebug()<<"saving to config"<<rp->toConfigJson();
         configStr<<rp->toConfigJson();
         rp.clear();
     }
@@ -423,47 +424,59 @@ void RyRuleManager::setupConfig(const QString& configContent){
         addRuleProject(project);
     }
 }
-void RyRuleManager::addRuleProject(const QScriptValue &project){
+QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QScriptValue &project){
     RyRuleProject *rp = new RyRuleProject(project);
     bool isProjectValid = rp->isValid();
     if(!isProjectValid){
         qDebug()<<"invalid project";
+        return QSharedPointer<RyRuleProject>();
     }else{
         QSharedPointer<RyRuleProject> rpPtr(rp);
         _projectFileNameToProjectMap[rp->localAddress()] = rpPtr;
         _projects.append(rpPtr);
+        return rpPtr;
     }
 }
 
-void RyRuleManager::addRuleProject(const QString& groupJSONData){
+QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QString& groupJSONData){
+    qDebug()<<groupJSONData;
     QScriptEngine engine;
     QScriptValue value = engine.evaluate("(" + groupJSONData + ")");
-    addRuleProject(value);
+    return addRuleProject(value);
 }
-void RyRuleManager::addRuleProject(const QString &groupJSONData, const QString &address, bool isRemote, const QString &host){
-
-}
-
-void RyRuleManager::addRemoteProject(const QString& url){
-    /*
-    QNetworkAccessManager manager;
-    QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
-    QEventLoop loop;
-    connect(&manager,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
-    loop.exec();
-    QString content = reply->readAll();
-    addRuleGroups(content,url,true);
-    */
+QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QString &groupJSONData, const QString &address, bool isRemote, const QString &host){
+    return QSharedPointer<RyRuleProject>();
 }
 
-void RyRuleManager::addRemoteProjectFromLocal(const QString &localAddress,
+QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProject(const QString& url,bool fromView){
+    QString urlEscaped = url;
+    urlEscaped.replace("\\","\\\\");
+    urlEscaped.replace("\'","\\'");
+    int i=1;
+    QString localAddress = qApp->applicationDirPath()+"/remoteRuleCache_";
+    while(true){
+        if(i==0){//不可能出现的情况(当远程rule个数越过int最大值时才会出现
+            break;
+        }
+        if(!QFile::exists(localAddress+QString::number(i)+".txt")){
+            localAddress += QString::number(i)+".txt";
+            break;
+        }
+        i++;
+    }
+    localAddress.replace("\\","\\\\");
+    localAddress.replace("\'","\\'");
+    return addRuleProject("{'localAddress':'"+localAddress+"','remoteAddress':'"+urlEscaped+"'}");
+}
+
+QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProjectFromLocal(const QString &localAddress,
                                               const QString &remoteAddress,
                                               const QString &pwd,
                                               const QString &owner){
-
+    return QSharedPointer<RyRuleProject>();
 
 }
-void RyRuleManager::addGroupToLocalProject(const QString& content){
+QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QString& content){
     // add to project default_local_project
     QString projectName = "default_local_project.txt";
     QString defaultProjectFullFileName = qApp->applicationDirPath()+"/"+projectName;
@@ -472,7 +485,7 @@ void RyRuleManager::addGroupToLocalProject(const QString& content){
         QScriptValue value = engine.evaluate("("+content+")");
         qDebug()<<"default project exists";
         QSharedPointer<RyRuleProject> project = _projectFileNameToProjectMap.value(defaultProjectFullFileName);
-        project->addRuleGroup(value,true);
+        return project->addRuleGroup(value,true);
     }else{
         qDebug()<<"default project not exists";
         QFile f(defaultProjectFullFileName);
@@ -486,11 +499,13 @@ void RyRuleManager::addGroupToLocalProject(const QString& content){
         QScriptValue project = engine.globalObject();
         project.setProperty("localAddress",QScriptValue(defaultProjectFullFileName));
         qDebug()<<defaultProjectFullFileName;
-        addRuleProject(project);
+        QSharedPointer<RyRuleProject> p = addRuleProject(project);
+        //TODO
+            return QSharedPointer<RyRuleGroup>();
     }
 }
 
-void RyRuleManager::addLocalProject(const QString& filePath){
+QSharedPointer<RyRuleProject> RyRuleManager::addLocalProject(const QString& filePath){
     /*
     QFile file(filePath);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -501,14 +516,17 @@ void RyRuleManager::addLocalProject(const QString& filePath){
         qWarning() << "[RuleManager] local config file open fail";
     }
     */
+    return QSharedPointer<RyRuleProject>();
 }
 
-void RyRuleManager::updateRule(QSharedPointer<RyRule> rule){
+QSharedPointer<RyRule> RyRuleManager::updateRule(QSharedPointer<RyRule> rule){
     qDebug()<<"updateRule";//TODO
+    return rule;
 }
 
-void RyRuleManager::updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup){
+QSharedPointer<RyRuleGroup> RyRuleManager::updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup){
     qDebug()<<"updateRuleGroup";//TODO
+    return ruleGroup;
 }
 
 //由于可能同时命中host及远程替换两种rule，此处需返回List

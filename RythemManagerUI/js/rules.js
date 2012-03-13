@@ -390,7 +390,8 @@ function updateConfigs(){
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var addGroupBtn;
+    var addLocalGroupBtn;
+	var addRemoteGroupBtn;
     var panelMask, addGroupPanel, addRulePanel;
     var currentGroupName;
     var groupsContainer;
@@ -462,18 +463,24 @@ function updateConfigs(){
             addGroup(configs[i].name, configs[i], true);
         }
     }
-      function addNewGroup(groupName){
-          var c = {"name":groupName, "enable":true, "rules":[]};
-          configs.push(c);
+      function addNewGroup(groupName,type){
+		if(type == "remote"){
+			if(window.App){
+				window.App.doAction(2,groupName);
+			}
+		}else{
+		  var c = {"name":groupName, "enable":true, "rules":[]};
+		  configs.push(c);
 
-          //create the group element
-          var group = new RuleGroup(groupName, c);
-          groupsContainer.appendChild(group.getEl());
-          groups.push(group);
+		  //create the group element
+		  var group = new RuleGroup(groupName, c);
+		  groupsContainer.appendChild(group.getEl());
+		  groups.push(group);
 
-          if(window.App){
-              window.App.doAction(0,JSON.stringify(c));
-          }
+		  if(window.App){
+			  window.App.doAction(0,JSON.stringify(c));
+		  }
+		}
           return true;
       }
 
@@ -573,9 +580,10 @@ function updateConfigs(){
         panelMask.classList.add('hidden');
         panel.classList.add('hidden');
     }
-    function showAddGroupPanel(){
-        addGroupPanel.nameField.value = '';
-        showPanel(addGroupPanel);
+    function showAddGroupPanel(type){
+		addGroupPanel.nameField.value = '';
+		addGroupPanel.type = type;
+		showPanel(addGroupPanel);
     }
     function showAddRulePanel(){
         addRulePanel.patternField.value = '';
@@ -602,7 +610,10 @@ function updateConfigs(){
     function init(){
 
         //get ui components
-        addGroupBtn 	= document.getElementById('addGroupBtn');
+        addLocalGroupBtn 	= document.getElementById('addLocalGroupBtn');
+		
+        addRemoteGroupBtn 	= document.getElementById('addRemoteGroupBtn');
+		
         panelMask 		= document.getElementById('panelMask');
         addGroupPanel 	= document.getElementById('addGroupPanel');
         addRulePanel 	= document.getElementById('addRulePanel');
@@ -620,8 +631,11 @@ function updateConfigs(){
         addRulePanel.selectDirBtn  = addRulePanel.querySelector('.button.selectDir');
 
         //bind some events
-        addGroupBtn.addEventListener('click', function(e){
-            showAddGroupPanel();
+        addLocalGroupBtn.addEventListener('click', function(e){
+            showAddGroupPanel("local");
+        });
+		addRemoteGroupBtn.addEventListener('click', function(e){
+            showAddGroupPanel("remote");
         });
 
         addRulePanel.selectFileBtn.addEventListener('click', function(e){
@@ -653,7 +667,7 @@ function updateConfigs(){
         });
         addGroupPanel.confirmBtn.addEventListener('click', function(e){
             var groupName = addGroupPanel.nameField.value;
-            if(groupName.length && addNewGroup(groupName)){
+            if(groupName.length && addNewGroup(groupName,addGroupPanel.type)){
                 hidePanel(addGroupPanel);
             }
         });
@@ -674,6 +688,9 @@ function updateConfigs(){
         });
 
 		if(window.App){
+			window.App.ruleChanged.connect(window.callbackFromApp);
+			
+		
 			var rawConfig = window.App.getConfigs();
 			rawConfig = rawConfig.replace(/&quot;/g,"\'");
 			rawConfig = eval('(' + rawConfig + ')');
@@ -694,6 +711,9 @@ function updateConfigs(){
     window.refreshRulesCallback = function(groupsConfigs){
         createGroups(groupsConfigs || []);
     }
+	window.callbackFromApp = function(action,data){
+		alert(action+data);
+	}
 
     document.addEventListener('DOMContentLoaded', init);
 
