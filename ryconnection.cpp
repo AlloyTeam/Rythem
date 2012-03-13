@@ -2,7 +2,9 @@
 #include "ryproxyserver.h"
 
 #include <QApplication>
-#include "pachandler.h"
+#ifdef WIN32
+#include "rywinhttp.h"
+#endif
 
 #include "ryrulemanager.h"
 
@@ -673,13 +675,33 @@ void RyConnection::doRequestToNetwork(){
         //        <<responseState
         //        <<_responseSocket->readAll();
         _responseState = ConnectionStateConnecting;
-        QNetworkProxy proxy = queryProxy(_sendingPipeData->fullUrl);
-        if(proxy.hostName() == RyProxyServer::instance()->serverAddress().toString()
-                && proxy.port() == RyProxyServer::instance()->serverPort()){
+
+
+#ifdef Q_OS_WIN
+        // TODO add mac pac support
+        QList<QNetworkProxy> proxylist = RyWinHttp::queryProxy(QNetworkProxyQuery(QUrl(_sendingPipeData->fullUrl)));
+        for(int i=0,l=proxylist.length();i<l;++i){
+            QNetworkProxy p = proxylist.at(i);
+            if(p.hostName() == RyProxyServer::instance()->serverAddress().toString()
+                    && p.port() == RyProxyServer::instance()->serverPort()){
+                qWarning()<<"warining: proxy is your self!";
+                continue;
+            }
+            _responseSocket->setProxy(p);
+            //qDebug()<<"proxy="<<p.hostName()<<p.port();
+        }
+ #endif
+        /*
+        QPair<QString,int> serverAndPort = queryProxy(_sendingPipeData->fullUrl);
+        if(serverAndPort.first == RyProxyServer::instance()->serverAddress().toString()
+                && serverAndPort.second == RyProxyServer::instance()->serverPort()){
             qWarning()<<"warining: proxy is your self!";
         }else{
-            _responseSocket->setProxy(proxy);
+            if(!serverAndPort.first.isEmpty()){
+                _responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,serverAndPort.first,serverAndPort.second));
+            }
         }
+        */
         _responseSocket->connectToHost(host,port);
     }else{
         //qDebug()<<"responseSocket opened"

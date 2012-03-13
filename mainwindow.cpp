@@ -15,8 +15,8 @@
 
 #ifdef Q_WS_WIN32
 #include "wininet.h"
-#include "rywinhttp.h"
 #include "winnetwk.h"
+#include "rywinhttp.h"
 #endif
 #ifdef Q_WS_MAC
 #include <CoreFoundation/CoreFoundation.h>
@@ -38,7 +38,7 @@
 #include <QMovie>
 #include <QPixmap>
 
-#include "pachandler.h"
+
 
 QByteArray gzipDecompress(QByteArray data){
     if (data.size() <= 4) {
@@ -312,7 +312,8 @@ void MainWindow::toggleProxy(){
         ///qDebug()<<previousProxyInfo.isUsingPac;
         //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
 
-        initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
+
+        //initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
         QString proxyServer="127.0.0.1:8889";
         if(previousProxyInfo.enable){
             if(previousProxyInfo.proxyString.indexOf(";")!=-1){
@@ -347,6 +348,7 @@ void MainWindow::toggleProxy(){
 void MainWindow::toggleCapture(){
     captureAct->setChecked(!isUsingCapture);
 #ifdef Q_WS_WIN32
+    RyWinHttp::init();
     QtConcurrent::run(this,&MainWindow::toggleProxy);
     //qDebug()<<previousProxyInfo.isUsingPac;
 #endif
