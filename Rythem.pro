@@ -29,8 +29,7 @@ SOURCES += main.cpp\
     composer.cpp \
     rypipetableview.cpp\
     ryrulemanager.cpp\
-    waterfallwindow.cpp \
-    proxyautoconfig.cpp
+    waterfallwindow.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -52,7 +51,6 @@ HEADERS  += mainwindow.h \
     composer.h \
     rypipetableview.h \
     ryrulemanager.h \
-    proxyautoconfig.h \
     waterfallwindow.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
