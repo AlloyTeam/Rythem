@@ -466,7 +466,21 @@ function updateConfigs(){
       function addNewGroup(groupName,type){
 		if(type == "remote"){
 			if(window.App){
-				window.App.doAction(2,groupName);
+				var newGroups = window.App.doAction(2,groupName);
+				if(newGroups!=""){
+					try{
+						var groupsObj = eval('('+newGroups+')');
+						if(!groupsObj['groups']){
+							return true;
+						}
+						for(var i=0;i<groupsObj['groups'].length;++i){
+							addGroup(groupsObj['groups'][i].name,groupsObj['groups'][i],true);
+						}
+					}catch(e){
+						return true;
+					}
+				}
+				return true;
 			}
 		}else{
 		  var c = {"name":groupName, "enable":true, "rules":[]};
@@ -485,8 +499,9 @@ function updateConfigs(){
       }
 
     function addGroup(groupName, groupConfig, ignoreConflict){
+	
         var existed = getGroupIndex(groupName) != -1;
-        if(!ignoreConflict && existed){
+        if(false && !ignoreConflict && existed){
             alert('you already have a group named ' + groupName);
             return false;
         }
@@ -712,7 +727,8 @@ function updateConfigs(){
         createGroups(groupsConfigs || []);
     }
 	window.callbackFromApp = function(action,data){
-		alert(action+data);
+		switch(action){
+		}
 	}
 
     document.addEventListener('DOMContentLoaded', init);

@@ -299,6 +299,9 @@ public:
         }
         return ret;
     }
+    const QList<QSharedPointer<RyRuleGroup> > groups()const{
+        return _groups;
+    }
 
 private:
     QString _localAddress;
@@ -340,28 +343,28 @@ public:
     void setupConfig(const QString& configContent);
     void setupConfig(const QScriptValue& value);
 
-    QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData);
-    QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData,
+    const QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData);
+    const QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData,
                       const QString& address,
                       bool isRemote=false,
                       const QString& host="");
-    QSharedPointer<RyRuleProject> addRuleProject(const QScriptValue& value);
-    QSharedPointer<RyRuleGroup> addGroupToLocalProject(const QString& content);//新增
-    QSharedPointer<RyRuleGroup> addRuleToGroup(const QString& msg);
+    const QSharedPointer<RyRuleProject> addRuleProject(const QScriptValue& value);
+    const QSharedPointer<RyRuleGroup> addGroupToLocalProject(const QString& content);//新增
+    const QSharedPointer<RyRuleGroup> addRuleToGroup(const QString& msg);
     //本地project
     //可提升为远程project(需提供upload接口)
-    QSharedPointer<RyRuleProject> addLocalProject(const QString& filePath);
+    const QSharedPointer<RyRuleProject> addLocalProject(const QString& filePath);
     //直接向远程获取project
-    QSharedPointer<RyRuleProject> addRemoteProject(const QString& url,bool fromView=false);
+    const QSharedPointer<RyRuleProject> addRemoteProject(const QString& url,bool fromView=false);
     //本地缓存的远程project
     //当本地解析失败或用户手动update时可更新
-    QSharedPointer<RyRuleProject> addRemoteProjectFromLocal(const QString& localAddress,
+    const QSharedPointer<RyRuleProject> addRemoteProjectFromLocal(const QString& localAddress,
                                    const QString& remoteAddress,
                                    const QString& pwd="",
                                    const QString& owner="");
 
-    QSharedPointer<RyRule> updateRule(QSharedPointer<RyRule> rule);
-    QSharedPointer<RyRuleGroup> updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup);
+    const QSharedPointer<RyRule> updateRule(QSharedPointer<RyRule> rule);
+    const QSharedPointer<RyRuleGroup> updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup);
 
     //由于可能同时命中host及远程替换两种rule，此处需返回List
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);

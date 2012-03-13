@@ -31,7 +31,7 @@ class RyJsBridge:public QObject{
         }
 
     public slots:
-        void doAction(int action,const QString msg){
+        QString doAction(int action,const QString msg){
             qDebug()<<"doAction "<<QString::number(action)<< msg;
             RyRuleManager *manager = RyRuleManager::instance();
             QSharedPointer<RyRuleProject> pro;
@@ -47,6 +47,7 @@ class RyJsBridge:public QObject{
                 pro = manager->addRemoteProject(msg);
                 if(!pro.isNull()){
                     emit ruleChanged(2,pro->toJson());
+                    return pro->toJson();
                 }
                 break;
             case 3://update group
@@ -55,6 +56,7 @@ class RyJsBridge:public QObject{
             case 6://delete rule
                 break;
             }
+            return "";
         }
         QString getFile(){
             return QFileDialog::getOpenFileName();
