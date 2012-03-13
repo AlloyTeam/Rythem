@@ -30,6 +30,16 @@ public:
     QString pattern();
     QString replace();
 
+    void update(const QScriptValue& value){
+        qDebug()<<"before"<<this->toJSON();
+
+        this->_type = value.property("type").toInt32();
+        this->enabled = value.property("enable").toBool();
+        this->_pattern = value.property("rule").property("pattern").toString();
+        this->_replace = value.property("rule").property("replace").toString();
+        qDebug()<<"after"<<this->toJSON();
+    }
+
     quint64 ruleId()const{
         return _ruleId;
     }
@@ -43,13 +53,14 @@ public:
 
 
 private:
-    void init(quint64 id,quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable=true){
+    void init(quint64 id,quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable){
         _ruleId = id;
         _groupId = groupId;
         _type = type;
         _pattern = pattern;
         _replace = replace;
         enabled = enable;
+        //qDebug()<<enabled;
     }
 
     quint64 _ruleId;
@@ -91,6 +102,8 @@ public:
     QSharedPointer<RyRule> addRule(QSharedPointer<RyRule> rule);
     QSharedPointer<RyRule> addRule(int type,QString pattern,QString replace);
     QSharedPointer<RyRule> addRule(quint64 ruleId,int type,QString pattern,QString replace);
+    QSharedPointer<RyRule> updateRule(const QString& ruleJson);
+
     quint64 groupId()const;
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
     bool enabled;
@@ -393,7 +406,9 @@ public:
                                    const QString& pwd="",
                                    const QString& owner="");
 
+    const QSharedPointer<RyRule> updateRule(const QString& ruleJson,quint64 groupId);
     const QSharedPointer<RyRule> updateRule(QSharedPointer<RyRule> rule);
+    const QSharedPointer<RyRuleGroup> updateRuleGroup(const QString& groupJson,quint64 groupId);
     const QSharedPointer<RyRuleGroup> updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup);
 
     //由于可能同时命中host及远程替换两种rule，此处需返回List

@@ -32,7 +32,7 @@ class RyJsBridge:public QObject{
 
     public slots:
         QString doAction(int action,const QString msg,quint64 groupId=0){
-            qDebug()<<"doAction "<<QString::number(action)<< msg;
+            qDebug()<<"doAction "<<QString::number(action)<< msg<<"groupId"<<QString::number(groupId);
             RyRuleManager *manager = RyRuleManager::instance();
             QSharedPointer<RyRuleProject> pro;
             QSharedPointer<RyRuleGroup> group;
@@ -63,6 +63,8 @@ class RyJsBridge:public QObject{
 
                 break;
             case 4://update rule
+                manager->updateRule(msg,groupId);
+                break;
             case 5://delete group
                 manager->removeGroup(msg.toULongLong());
                 break;

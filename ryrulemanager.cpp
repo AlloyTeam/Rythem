@@ -69,7 +69,7 @@ QString RyRule::toJSON(bool format)const{
     thePattern.replace("'","\\'");
     theReplace.replace("\\","\\\\");
     theReplace.replace("'","\\'");
-    QString ret="{'id':"+QString::number(_ruleId)+",'type':"+QString::number(_type)+",'rule':{'pattern':'"+thePattern+"', 'replace':'"+theReplace+"'} }";
+    QString ret="{'enable':"+QString::number(enabled?1:0)+",'id':"+QString::number(_ruleId)+",'type':"+QString::number(_type)+",'rule':{'pattern':'"+thePattern+"', 'replace':'"+theReplace+"'} }";
     return ret;
 }
 int RyRule::type(){
@@ -325,12 +325,39 @@ QSharedPointer<RyRule> RyRuleGroup::addRule(quint64 ruleId,int type,QString patt
     QSharedPointer<RyRule> tmp(new RyRule(ruleId,_groupId,type,pattern,replace));
     return addRule(tmp);
 }
-QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
-    //qDebug()<<"getMatchRule:"<<url<<_rules.length();
-    QList<QSharedPointer<RyRule> > ret;
+
+QSharedPointer<RyRule> RyRuleGroup::updateRule(const QString& ruleJson){
+    QScriptEngine engine;
+    QScriptValue value = engine.evaluate("("+ruleJson+")");
+    quint64 ruleId = value.property("id").toInt32();
+    QSharedPointer<RyRule> ret;
     QListIterator<QSharedPointer<RyRule> > it(_rules);
     while(it.hasNext()){
         QSharedPointer<RyRule> rule = it.next();
+        if(rule->ruleId() == ruleId){
+            qDebug()<<"found Rule";
+            ret = rule;
+            break;
+        }
+    }
+    if(!ret.isNull()){
+        ret->update(value);
+    }
+    return ret;
+}
+
+QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
+    //qDebug()<<"getMatchRule:"<<url<<_rules.length();
+    QList<QSharedPointer<RyRule> > ret;
+    if(!this->enabled){
+        return ret;
+    }
+    QListIterator<QSharedPointer<RyRule> > it(_rules);
+    while(it.hasNext()){
+        QSharedPointer<RyRule> rule = it.next();
+        if(!rule->enabled){
+            continue;
+        }
         int type = rule->type();
         QString pattern = rule->pattern();
 
@@ -536,11 +563,11 @@ const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QS
     if(_projectFileNameToProjectMap.contains(defaultProjectFullFileName)){
         QScriptEngine engine;
         QScriptValue value = engine.evaluate("("+content+")");
-        //qDebug()<<"default project exists";
+        qDebug()<<"default project exists";
         QSharedPointer<RyRuleProject> project = _projectFileNameToProjectMap.value(defaultProjectFullFileName);
         return project->addRuleGroup(value,true);
     }else{
-        //qDebug()<<"default project not exists";
+        qDebug()<<"default project not exists";
         QFile f(defaultProjectFullFileName);
         f.open(QIODevice::WriteOnly | QIODevice::Text);
         QByteArray ba;
@@ -588,11 +615,24 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addLocalProject(const QString
     return QSharedPointer<RyRuleProject>();
 }
 
+const QSharedPointer<RyRule> RyRuleManager::updateRule(const QString& ruleJson,quint64 groupId){
+    if(_groupToProjectMap.contains(groupId)){
+        QSharedPointer<RyRuleProject> p = _groupToProjectMap[groupId];
+        if(!p.isNull()){
+            return p->groupById(groupId)->updateRule(ruleJson);
+        }
+    }
+    return QSharedPointer<RyRule>();
+}
+
 const QSharedPointer<RyRule> RyRuleManager::updateRule(QSharedPointer<RyRule> rule){
     qDebug()<<"updateRule";//TODO
     return rule;
 }
+const QSharedPointer<RyRuleGroup> RyRuleManager::updateRuleGroup(const QString& groupJson,quint64 groupId){
 
+    return QSharedPointer<RyRuleGroup>();
+}
 const QSharedPointer<RyRuleGroup> RyRuleManager::updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup){
     qDebug()<<"updateRuleGroup";//TODO
     return ruleGroup;

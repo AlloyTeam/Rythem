@@ -75,7 +75,7 @@ function updateConfigs(){
         el.delegate('.editable', 	'keydown', 	function(e, el){ me.onFieldsEditing(e, el); });
         el.delegate('.selectFile', 	'click', 	function(e, el){ me.onSelectFile(e, el);});
         el.delegate('.selectDir', 	'click', 	function(e, el){ me.onSelectDir(e, el);});
-
+		ruleConfig.enable = (ruleConfig.enable!=0)
         this.setEnable(ruleConfig.enable);
     }
     Rule.prototype = {
@@ -103,7 +103,6 @@ function updateConfigs(){
             if(!excludeCheckbox){
                 this.__checkbox.disabled = !enable;
             }
-			updateConfigs();
         },
         /**
          * 获取dom元素
@@ -159,8 +158,9 @@ function updateConfigs(){
         onCheckboxChange: function(e){
             var enabled = this.__checkbox.checked;
             this.setEnable(enabled, true);
-			
-			updateConfigs();
+			if(window.App){
+				window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
+			}
         },
         /**
          * 双击匹配/替换值时编辑对应值
@@ -185,7 +185,10 @@ function updateConfigs(){
 				}else if(this.__replaceField == e.srcElement){
 					this.__config.rule.replace = unescapeFromHtml(e.srcElement.innerHTML);
 				}
-				updateConfigs();
+				console.info(this.__config);
+				if(window.App){
+					window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
+				}
             }
         },
 		onSelectFile: function(e,fieldEl){
@@ -195,7 +198,9 @@ function updateConfigs(){
             }
 			this.__replaceField.innerHTML = escapeToHtml(s);
 			this.__config.rule.replace = s;
-			updateConfigs();
+			if(window.App){
+				window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
+			}
 		},
 		onSelectDir: function(e,fieldEl){
             var s = window.App.getDir();
@@ -204,7 +209,9 @@ function updateConfigs(){
             }
 			this.__replaceField.innerHTML = escapeToHtml(s);
 			this.__config.rule.replace = s;
-			updateConfigs();
+			if(window.App){
+				window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
+			}
         },
         updateButtonState:function(type){
             if(type === 4 || type === 5){
@@ -258,7 +265,7 @@ function updateConfigs(){
         if(groupConfig.rules.length){
             this.expand();
         }
-		this.setEnable(groupConfig.enable);
+		this.setEnable(groupConfig.enable,true);
 
         checkbox.addEventListener('change', function(e){ me.onCheckboxChange(e); });
 
@@ -283,8 +290,9 @@ function updateConfigs(){
          * @param {Object} ruleConfig
          */
         addRule: function(ruleConfig){
+			ruleConfig.groupId = this.__groupId
             var r = new Rule(ruleConfig);
-            r.setEnable(this.getEnable());
+            //r.setEnable(this.getEnable());
             this.__rulesEl.appendChild(r.getEl());
             this.__rules.push(r);
             this.expand();
@@ -324,7 +332,7 @@ function updateConfigs(){
         getEnable: function(){
             return this.__config.enable;
         },
-        setEnable: function(enable){
+        setEnable: function(enable,ignoreChildren){
             this.__config.enable = enable;
             if(enable){
                 this.__el.classList.remove('disabled');
@@ -333,10 +341,11 @@ function updateConfigs(){
                 this.__el.classList.add('disabled');
             }
             this.__checkbox.checked = enable;
-			for(var i=0; i<this.__rules.length; i++){
-    	        this.__rules[i].setEnable(enable);
-        	}
-			updateConfigs();
+			if(!ignoreChildren){
+				for(var i=0; i<this.__rules.length; i++){
+					this.__rules[i].setEnable(enable);
+				}
+			}
         },
         getConfig: function(){
             return this.__config;
@@ -410,7 +419,7 @@ function updateConfigs(){
 	            "rules": [{
 	                "name": "simple address example",
 	                "type": 2,
-	                "enable": true,
+	                "enable": false,
 	                "rule": {
 	                    "pattern": "http://abc.com",
 	                    "replace": "172.168.0.1"
