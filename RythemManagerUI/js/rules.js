@@ -249,6 +249,7 @@ function updateConfigs(){
 
         var checkbox 	= el.querySelector('summary > input.groupEnableCB');
         this.__groupName = groupName;
+		this.__groupId = groupConfig.id;
         this.__config = groupConfig;
         this.__el = el;
         this.__checkbox = checkbox;
@@ -354,7 +355,7 @@ function updateConfigs(){
         },
         onRemoveGroupButtonClick: function(e){
             e.preventDefault();
-            removeGroup(this.__groupName);
+            removeGroup(this.__groupId);
         },
         onRuleRemoveButtonClick: function(e, el){
             var ruleNode = el.parentNode;
@@ -402,6 +403,7 @@ function updateConfigs(){
 	    "version": 1.0,
 	    "groups": [
 	        {
+				"id":1,
 	            "name": "group1",
 	            "enable": true,
 	            "rules": [{
@@ -463,10 +465,10 @@ function updateConfigs(){
             addGroup(configs[i].name, configs[i], true);
         }
     }
-      function addNewGroup(groupName,type){
+      function addNewGroup(groupNameOrRemoteUrl,type){
 		if(type == "remote"){
 			if(window.App){
-				var newGroups = window.App.doAction(2,groupName);
+				var newGroups = window.App.doAction(2,groupNameOrRemoteUrl);
 				if(newGroups!=""){
 					try{
 						var groupsObj = eval('('+newGroups+')');
@@ -483,25 +485,30 @@ function updateConfigs(){
 				return true;
 			}
 		}else{
-		  var c = {"name":groupName, "enable":true, "rules":[]};
+		  var c = {"name":groupNameOrRemoteUrl, "enable":true, "rules":[]};
 		  configs.push(c);
 
 		  //create the group element
-		  var group = new RuleGroup(groupName, c);
-		  groupsContainer.appendChild(group.getEl());
-		  groups.push(group);
 
 		  if(window.App){
-			  window.App.doAction(0,JSON.stringify(c));
-		  }
+			  var newGroup = window.App.doAction(0,JSON.stringify(c));
+			  if(newGroup == ""){
+				alert("add group failed");
+				return true;
+			  }
+			  var newGroup = eval('('+newGroup+')');
+			  c.id=newGroup.id;
+		  }		  
+		  var group = new RuleGroup(groupNameOrRemoteUrl, c);
+		  groupsContainer.appendChild(group.getEl());
+		  groups.push(group);
 		}
           return true;
       }
 
     function addGroup(groupName, groupConfig, ignoreConflict){
-	
-        var existed = getGroupIndex(groupName) != -1;
-        if(false && !ignoreConflict && existed){
+        var existed = getGroupIndex(groupConfig.id) != -1;
+        if(!ignoreConflict && existed){
             alert('you already have a group named ' + groupName);
             return false;
         }
@@ -521,9 +528,9 @@ function updateConfigs(){
             return true;
         }
     }
-    function getGroupIndex(groupName){
+    function getGroupIndex(groupId){
         for(var i=0; i<configs.length; i++){
-            if(configs[i].name == groupName){
+            if(configs[i].id == groupId){
                 return i;
             }
         }
@@ -541,14 +548,16 @@ function updateConfigs(){
             return true;
         }
     }
-    function removeGroup(groupName){
-        var i = getGroupIndex(groupName);
+    function removeGroup(groupId){
+        var i = getGroupIndex(groupId);
         if(i != -1){
             var group = groups[i];
             groupsContainer.removeChild(group.getEl());
             groups.splice(i, 1);
             configs.splice(i, 1);
-			updateConfigs();
+			if(window.App){
+				window.App.doAction(5,groupId);
+			}
         }
     }
     function addRule(groupName, type, pattern, replace){

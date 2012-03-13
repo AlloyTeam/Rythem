@@ -88,6 +88,7 @@ public:
     void addRule(QSharedPointer<RyRule> rule);
     void addRle(int type,QString pattern,QString replace);
     void addRle(quint64 ruleId,int type,QString pattern,QString replace);
+    quint64 groupId()const;
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
     bool enabled;
     bool isRemote;
@@ -202,6 +203,20 @@ public:
             return false;
         }
     }
+    void removeRuleGroup(quint64 groupId){
+        //TODO
+        QListIterator<QSharedPointer<RyRuleGroup> > gIt(_groups);
+        while(gIt.hasNext()){
+            QSharedPointer<RyRuleGroup> g = gIt.next();
+            if(g->groupId() == groupId){
+                qDebug()<<"befor remove "<<_groups.length();
+                _groups.removeOne(g);
+                qDebug()<<"after remove "<<_groups.length();
+                break;
+            }
+        }
+    }
+
     bool addRuleGroups(const QString& content){
         QScriptEngine engine;
         QScriptValue value = engine.evaluate("("+content+")");
@@ -229,11 +244,8 @@ public:
     QSharedPointer<RyRuleGroup> addRuleGroup(const QScriptValue& group,bool updateLocalFile=false){
         RyRuleGroup *g = new RyRuleGroup(group);
         QSharedPointer<RyRuleGroup> groupPtr(g);
-        //qDebug()<<"group added:"<<g->toJSON();
+        qDebug()<<"group added:"<<g->toJSON();
         _groups.append(groupPtr);
-        if(updateLocalFile){
-            _needReCombineJson = false;//TODO
-        }
         return groupPtr;
     }
 
@@ -343,6 +355,10 @@ public:
     void setupConfig(const QString& configContent);
     void setupConfig(const QScriptValue& value);
 
+
+    void removeGroup(quint64 groupId);
+    void removeRule(quint64 ruleId);
+
     const QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData);
     const QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData,
                       const QString& address,
@@ -378,8 +394,7 @@ private:
     // save file system (config and every project local file);
     QList<QSharedPointer<RyRuleProject> > _projects;
 
-    QMap<quint64,quint64> _ruleToGroupMap;
-    QMap<quint64,quint64> _groupToProjectMap;
+    QMap<quint64,QSharedPointer<RyRuleProject> > _groupToProjectMap;
     QMap<QString,QSharedPointer<RyRuleProject> > _projectFileNameToProjectMap;
 
     static QMutex _singletonMutex;

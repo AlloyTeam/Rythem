@@ -35,10 +35,15 @@ class RyJsBridge:public QObject{
             qDebug()<<"doAction "<<QString::number(action)<< msg;
             RyRuleManager *manager = RyRuleManager::instance();
             QSharedPointer<RyRuleProject> pro;
+            QSharedPointer<RyRuleGroup> group;
             switch(action){
             case 0://add local group
-                manager->addGroupToLocalProject(msg);//暂时只允许添加到本地project
-                emit ruleChanged(0,"success");
+                group = manager->addGroupToLocalProject(msg);//暂时只允许添加到本地project
+                //emit ruleChanged(0,"success");
+                if(!group.isNull()){
+                    qDebug()<<group->toJSON();
+                    return group->toJSON();
+                }
                 break;
             case 1://add rule to group
                 //manager->addRuleToGroup(msg);
@@ -51,8 +56,12 @@ class RyJsBridge:public QObject{
                 }
                 break;
             case 3://update group
+
+                break;
             case 4://update rule
             case 5://delete group
+                manager->removeGroup(msg.toULongLong());
+                break;
             case 6://delete rule
                 break;
             }

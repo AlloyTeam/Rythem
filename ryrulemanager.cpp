@@ -273,6 +273,11 @@ RyRuleGroup::RyRuleGroup(const QScriptValue &group){
         addRules(rules);
     }
 }
+
+quint64 RyRuleGroup::groupId()const{
+    return _groupId;
+}
+
 /*
 RyRuleGroup::RyRuleGroup(const QString &groupName, bool isOwner){
     RyRuleGroup(RyRuleGroup::getNextGroupId(),groupName,isOwner);
@@ -396,6 +401,7 @@ RyRuleManager::~RyRuleManager(){
         f.close();
     }
     _projectFileNameToProjectMap.clear();
+    _groupToProjectMap.clear();
 }
 
 void RyRuleManager::loadLocalConfig(const QString& configFileName){
@@ -424,6 +430,20 @@ void RyRuleManager::setupConfig(const QString& configContent){
         addRuleProject(project);
     }
 }
+
+
+void RyRuleManager::removeGroup(quint64 groupId){
+    if(_groupToProjectMap.contains(groupId)){
+        QSharedPointer<RyRuleProject> p =
+                _groupToProjectMap.take(groupId);
+        p->removeRuleGroup(groupId);
+    }
+}
+
+void RyRuleManager::removeRule(quint64 ruleId){
+    //TODO
+}
+
 const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QScriptValue &project){
     RyRuleProject *rp = new RyRuleProject(project);
     bool isProjectValid = rp->isValid();
@@ -433,6 +453,12 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QScriptV
     }else{
         QSharedPointer<RyRuleProject> rpPtr(rp);
         _projectFileNameToProjectMap[rp->localAddress()] = rpPtr;
+        const QList<QSharedPointer<RyRuleGroup> > groups = rpPtr->groups();
+        QListIterator<QSharedPointer<RyRuleGroup> > it(groups);
+        while(it.hasNext()){
+            QSharedPointer<RyRuleGroup> group = it.next();
+            _groupToProjectMap[group->groupId()]=rpPtr;
+        }
         _projects.append(rpPtr);
         return rpPtr;
     }
