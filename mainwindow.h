@@ -65,10 +65,11 @@ class RyJsBridge:public QObject{
             case 4://update rule
                 manager->updateRule(msg,groupId);
                 break;
-            case 5://delete group
+            case 5://remove group
                 manager->removeGroup(msg.toULongLong());
                 break;
-            case 6://delete rule
+            case 6://remove rule  (6,ruleId,groupId)
+                manager->removeRule(msg.toULongLong(),groupId);
                 break;
             }
             return "";

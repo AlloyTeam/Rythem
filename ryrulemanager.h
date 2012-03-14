@@ -103,6 +103,7 @@ public:
     QSharedPointer<RyRule> addRule(int type,QString pattern,QString replace);
     QSharedPointer<RyRule> addRule(quint64 ruleId,int type,QString pattern,QString replace);
     QSharedPointer<RyRule> updateRule(const QString& ruleJson);
+    void removeRule(quint64 ruleId);
 
     quint64 groupId()const;
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
@@ -384,7 +385,7 @@ public:
 
 
     void removeGroup(quint64 groupId);
-    void removeRule(quint64 ruleId);
+    void removeRule(quint64 ruleId,quint64 groupId);
 
     const QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData);
     const QSharedPointer<RyRuleProject> addRuleProject(const QString& groupJSONData,

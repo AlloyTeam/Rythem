@@ -345,6 +345,16 @@ QSharedPointer<RyRule> RyRuleGroup::updateRule(const QString& ruleJson){
     }
     return ret;
 }
+void RyRuleGroup::removeRule(quint64 ruleId){
+    int i=0,l=0;
+    for(l=_rules.length();i<l;++i){
+        QSharedPointer<RyRule> r = _rules.at(i);
+        if(r->ruleId() == ruleId){
+            _rules.takeAt(i);
+            break;
+        }
+    }
+}
 
 QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
     //qDebug()<<"getMatchRule:"<<url<<_rules.length();
@@ -494,8 +504,15 @@ void RyRuleManager::removeGroup(quint64 groupId){
     }
 }
 
-void RyRuleManager::removeRule(quint64 ruleId){
-    //TODO
+void RyRuleManager::removeRule(quint64 ruleId,quint64 groupId){
+    if(_groupToProjectMap.contains(groupId)){
+        QSharedPointer<RyRuleProject> p =
+                _groupToProjectMap[groupId];
+        QSharedPointer<RyRuleGroup> g = p->groupById(groupId);
+        if(!g.isNull()){
+            g->removeRule(ruleId);
+        }
+    }
 }
 
 const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QScriptValue &project){

@@ -290,6 +290,7 @@ function updateConfigs(){
          * @param {Object} ruleConfig
          */
         addRule: function(ruleConfig){
+            //console.info("addRule",ruleConfig);
 			ruleConfig.groupId = this.__groupId
             var r = new Rule(ruleConfig);
             //r.setEnable(this.getEnable());
@@ -370,7 +371,7 @@ function updateConfigs(){
             var ruleNode = el.parentNode;
             var index = this.__rulesEl.childNodes.indexOf(ruleNode);
             if(index != -1){
-                removeRule(this.__groupName, index);
+                removeRule(this.__groupId, index);
             }
         },
         onGroupTitleDoubleClick: function(e, titleEl){
@@ -413,10 +414,11 @@ function updateConfigs(){
 	    "version": 1.0,
 	    "groups": [
 	        {
-				"id":1,
+                "id":5,
 	            "name": "group1",
 	            "enable": true,
 	            "rules": [{
+                              "id":4,
 	                "name": "simple address example",
 	                "type": 2,
 	                "enable": false,
@@ -424,7 +426,7 @@ function updateConfigs(){
 	                    "pattern": "http://abc.com",
 	                    "replace": "172.168.0.1"
 	                }
-	            }, {
+                }, {
 	                "name": "remote content example",
 	                "type": 3,
 	                "enable": true,
@@ -433,6 +435,7 @@ function updateConfigs(){
 	                    "replace": "http://123.com/just_a_test/somedir/b.html"
 	                }
 	            }, {
+                              "id":3,
 	                "name": "local file example",
 	                "type": 4,
 	                "enable": true,
@@ -441,6 +444,7 @@ function updateConfigs(){
 	                    "replace": "files.qzmin"
 	                }
 	            }, {
+                    "id":2,
 	                "name": "local files example",
 	                "type": 5,
 	                "enable": true,
@@ -449,6 +453,7 @@ function updateConfigs(){
 	                    "replace": "C:/a.html.qzmin"
 	                }
 	            }, {
+                    "id":1,
 	                "name": "local directory example",
 	                "type": 6,
 	                "enable": true,
@@ -471,6 +476,7 @@ function updateConfigs(){
     function createGroups(configurations){
         cleanup();
         configs = configurations;
+          console.info(configs);
         for(var i=0; i<configs.length; i++){
             addGroup(configs[i].name, configs[i], true);
         }
@@ -599,13 +605,16 @@ function updateConfigs(){
             alert('group ' + groupName + ' does not exist!');
         }		
 	}
-    function removeRule(groupName, index){
-        var i = getGroupIndex(groupName);
+    function removeRule(groupId, index){
+        var i = getGroupIndex(groupId);
         if(i != -1){
             var group = groups[i];
             group.removeRuleAt(index);
-            configs[i].rules.splice(index, 1);
-			updateConfigs();
+            var rule = configs[i].rules.splice(index, 1)[0];
+            //console.info(rule);
+            if(window.App){
+                window.App.doAction(6,rule.id,rule.groupId);
+            }
         }
         else{
             alert('group ' + groupName + ' does not exist!');
