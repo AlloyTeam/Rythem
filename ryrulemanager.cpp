@@ -380,6 +380,7 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
         }
         int type = rule->type();
         QString pattern = rule->pattern();
+        bool isRegExp = rule->pattern().toLower().startsWith("regex:");
 
         bool isMatch = false;
         if(type == RyRule::COMPLEX_ADDRESS_REPLACE){
@@ -407,8 +408,13 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
         }else if(type == RyRule::LOCAL_DIR_REPLACE){
             isMatch = (url.indexOf(pattern) != -1);
         }else{
-            QRegExp rx(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
-            isMatch = rx.exactMatch(url);
+            if(isRegExp){
+                pattern  = pattern.mid(QString("regex:").length());
+                QRegExp rx(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
+                isMatch = rx.exactMatch(url);
+            }else{
+                isMatch = (pattern == url);
+            }
         }
         if(isMatch){
             ret.append(rule);
