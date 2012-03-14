@@ -345,6 +345,16 @@ QSharedPointer<RyRule> RyRuleGroup::updateRule(const QString& ruleJson){
     }
     return ret;
 }
+void RyRuleGroup::update(const QString &groupJson){
+    QScriptEngine engine;
+    QScriptValue value = engine.evaluate("("+groupJson+")");
+    QString name = value.property("name").toString();
+    bool enable = value.property("enable").toBool();
+    qDebug()<<"update group:"<<name;
+    this->_groupName = name;
+    this->enabled = enable;
+}
+
 void RyRuleGroup::removeRule(quint64 ruleId){
     int i=0,l=0;
     for(l=_rules.length();i<l;++i){
@@ -647,7 +657,16 @@ const QSharedPointer<RyRule> RyRuleManager::updateRule(QSharedPointer<RyRule> ru
     return rule;
 }
 const QSharedPointer<RyRuleGroup> RyRuleManager::updateRuleGroup(const QString& groupJson,quint64 groupId){
-
+    if(_groupToProjectMap.contains(groupId)){
+        QSharedPointer<RyRuleProject> p = _groupToProjectMap[groupId];
+        QSharedPointer<RyRuleGroup> g = p->groupById(groupId);
+        if(!g.isNull()){
+            g->update(groupJson);
+            return g;
+        }else{
+            qDebug()<<"cannot found group";
+        }
+    }
     return QSharedPointer<RyRuleGroup>();
 }
 const QSharedPointer<RyRuleGroup> RyRuleManager::updateRuleGroup(QSharedPointer<RyRuleGroup> ruleGroup){

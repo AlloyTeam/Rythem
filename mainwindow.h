@@ -60,7 +60,7 @@ class RyJsBridge:public QObject{
                 }
                 break;
             case 3://update group
-
+                manager->updateRuleGroup(msg,groupId);
                 break;
             case 4://update rule
                 manager->updateRule(msg,groupId);

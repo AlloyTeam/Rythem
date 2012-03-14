@@ -356,6 +356,13 @@ function updateConfigs(){
         },
         onCheckboxChange: function(e){
             this.setEnable(this.__checkbox.checked);
+              if(window.App){
+                  var o = {
+                      'name':this.__groupName,
+                      'enable':this.getEnable()
+                  };
+                  window.App.doAction(3,JSON.stringify(o),this.__groupId);
+              }
         },
         onAddRuleButtonClick: function(e){
             e.preventDefault();
@@ -384,12 +391,21 @@ function updateConfigs(){
                 stopEdit(titleEl);
 
                 var newGroupName = titleEl.textContent;
-                if(updateGroup(this.__groupName, this.getEnable(), newGroupName)){
+                if(updateGroup(this.__groupId, this.getEnable(), newGroupName)){
                     //update group info and configs
-                    if(currentGroupName == this.__groupName){
-                        currentGroupName = newGroupName;
-                    }
+                    //if(currentGroupName == this.__groupName){
+                    //    currentGroupName = newGroupName;
+                    //}
+                    currentGroupId = this.__groupId;
                     this.__groupName = newGroupName;
+                    //console.info(this);
+                    if(window.App){
+                        var o = {
+                            'name':newGroupName,
+                            'enable':this.getEnable()
+                        };
+                        window.App.doAction(3,JSON.stringify(o),this.__groupId);
+                    }
                 }
                 else{
                     alert('you already have a group named ' + newGroupName);
@@ -552,17 +568,17 @@ function updateConfigs(){
         }
         return -1;
     }
-    function updateGroup(groupName, enable, newName){
-        if(getGroupIndex(newName) != -1){
-            return false;
-        }
-        else{
-            var i = getGroupIndex(groupName);
+    function updateGroup(groupId, enable, newName){
+        //if(getGroupIndex(newName) != -1){
+        //    return false;
+        //}
+        //else{
+            var i = getGroupIndex(groupId);
             //rename group in configs
             configs[i].enable = enable;
             configs[i].name = newName;
             return true;
-        }
+        //}
     }
     function removeGroup(groupId){
         var i = getGroupIndex(groupId);
