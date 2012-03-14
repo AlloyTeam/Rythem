@@ -12,7 +12,8 @@ RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent
     :QObject(parent),
       _handle(socketHandle),
       _connectionId(connectionId),
-      _requestSocket(NULL){
+      _requestSocket(NULL),
+      _responseSocket(NULL){
 
     closed = false;
     _pipeTotal = 0;
@@ -32,6 +33,13 @@ RyConnection::~RyConnection(){
         _requestSocket->abort();
         delete _requestSocket;
         _requestSocket = NULL;
+    }
+    if(_responseSocket){
+        _responseSocket->disconnect(this);
+        _responseSocket->blockSignals(true);
+        _responseSocket->abort();
+        delete _responseSocket;
+        _responseSocket = NULL;
     }
     //qDebug()<<"~RyConnection end";
     //qDebug()<<"~RyConnection in main"
@@ -109,10 +117,16 @@ void RyConnection::onRequestClose(){
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
+
+        // 暂时不缓存socket
+        _responseSocket->abort();
+        delete _responseSocket;
+        /*
         RyProxyServer::instance()->cacheSocket(
                     _connectingHost,
                     _connectingPort,
                     _responseSocket);
+         */
     }
     _responseSocket = NULL;
 
@@ -126,10 +140,16 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError err){
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
+
+        // 暂时不缓存socket
+        _responseSocket->abort();
+        delete _responseSocket;
+        /*
         RyProxyServer::instance()->cacheSocket(
                     _connectingHost,
                     _connectingPort,
                     _responseSocket);
+        */
     }
     _responseSocket = NULL;
 
@@ -600,14 +620,19 @@ void RyConnection::doRequestToNetwork(){
             */
             // cache previous response socket and disconnect all signals/slots
             _responseSocket->disconnect(this);
+
+            /*
             RyProxyServer::instance()->cacheSocket(
                         _connectingHost,
                         _connectingPort,
                         _responseSocket);
 
-            //   get new socket
+            */
             _connectingHost = host;
             _connectingPort = port;
+
+            //   get new socket
+            /*
             QMetaObject::invokeMethod(
                                   RyProxyServer::instance(),
                                   "getSocket",
@@ -617,13 +642,15 @@ void RyConnection::doRequestToNetwork(){
                                   Q_ARG(quint16,port),
                                   Q_ARG(bool *,&_isSocketFromCache),
                                   Q_ARG(QThread*,QThread::currentThread()));
-            /*
+            */
+            // 暂时不缓存socket
             _responseSocket->abort();
             _responseSocket->blockSignals(true);
             delete _responseSocket;
             _responseSocket = NULL;
             _responseSocket = new QTcpSocket(this);
-            */
+
+
             connect(_responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadyRead()));
             connect(_responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
             connect(_responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),
@@ -638,6 +665,7 @@ void RyConnection::doRequestToNetwork(){
 
         _connectingHost = host;
         _connectingPort = port;
+        /*
         QMetaObject::invokeMethod(
                               RyProxyServer::instance(),
                               "getSocket",
@@ -647,6 +675,8 @@ void RyConnection::doRequestToNetwork(){
                               Q_ARG(quint16,port),
                               Q_ARG(bool *,&_isSocketFromCache),
                               Q_ARG(QThread*,QThread::currentThread()));
+        */
+        _responseSocket = new QTcpSocket(this);
 
         //_responseSocket = new QTcpSocket(this);
         connect(_responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadyRead()));
