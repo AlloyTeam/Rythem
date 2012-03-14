@@ -277,6 +277,7 @@ function updateConfigs(){
         if(groupConfig.rules.length){
             this.expand();
         }
+        this.setEnable(groupConfig.enable);
 
         checkbox.addEventListener('change', function(e){ me.onCheckboxChange(e); });
 
@@ -294,7 +295,6 @@ function updateConfigs(){
                 this.addRule(groupConfig.rules[i]);
             }
         }
-        this.setEnable(groupConfig.enable);
     }
     RuleGroup.prototype = {
         /**
@@ -305,7 +305,7 @@ function updateConfigs(){
             //console.info("addRule",ruleConfig);
 			ruleConfig.groupId = this.__groupId
             var r = new Rule(ruleConfig);
-            //r.setEnable(this.getEnable());
+            r.setLineEnable(this.getEnable());
             this.__rulesEl.appendChild(r.getEl());
             this.__rules.push(r);
             this.expand();
