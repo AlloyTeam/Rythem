@@ -40,8 +40,8 @@ function updateConfigs(){
                 <option value="5">Local Files(.qzmin)</option>\
                 <option value="6">Local Directory</option>\
             </select>\
-            <div class="pattern editable">' + escapeToHtml(ruleConfig.rule.pattern) + '</div>\
-            <div class="replace editable">' + escapeToHtml(ruleConfig.rule.replace) + '</div>\
+            <div class="pattern editable" contentEditable>' + escapeToHtml(ruleConfig.rule.pattern) + '</div>\
+            <div class="replace editable" contentEditable>' + escapeToHtml(ruleConfig.rule.replace) + '</div>\
 			<div class="button selectFile hidden">-F</div>\
 			<div class="button selectDir hidden">-D</div>\
             <div class="button remove">x</div> \
@@ -71,7 +71,8 @@ function updateConfigs(){
 
         select.addEventListener(	'change', 	function(e){ me.onTypeChange(e); });
         checkbox.addEventListener(	'change', 	function(e){ me.onCheckboxChange(e); });
-        el.delegate('.editable', 	'dblclick', function(e, el){ me.onFieldsDoubleClick(e, el); });
+        //el.delegate('.editable', 	'dblclick', function(e, el){ me.onFieldsDoubleClick(e, el); });
+        el.delegate('.editable', 	'focus', function(e, el){ me.onFieldsFocus(e, el); },true);
         el.delegate('.editable', 	'keydown', 	function(e, el){ me.onFieldsEditing(e, el); });
         el.delegate('.editable', 	'blur', 	function(e, el){ me.onFieldsBlur(e, el); },true);
         el.delegate('.selectFile', 	'click', 	function(e, el){ me.onSelectFile(e, el);});
@@ -183,6 +184,9 @@ function updateConfigs(){
         onFieldsDoubleClick: function(e, fieldEl){
             startEdit(fieldEl);
         },
+		onFieldsFocus: function(e, fieldEl){
+			startEdit(fieldEl);
+		},
         /**
          * 按下ENTER时结束编辑并更新相关数据
          * @param {Event} e
@@ -208,9 +212,9 @@ function updateConfigs(){
         },
         onFieldsBlur: function(e, fieldEl){
             //prevent browser create the <br> tag and stop editing
-            console.info("blur before(html):",e.srcElement.innerHTML);
-            e.srcElement.innerText = e.srcElement.innerText.replace(/^\s*|\s*$/g,"");
-            console.info("blur afeter(text)",e.srcElement.innerText);
+            //console.info("blur before(html):",e.srcElement.innerHTML);
+            e.srcElement.innerText = e.srcElement.innerText.replace(/^\s*|\s*$|\n|\r/g,"");
+            //console.info("blur afeter(text)",e.srcElement.innerText);
             if(this.__patternField == e.srcElement){
                 if(this.__config.rule.pattern == e.srcElement.innerText){
                     return;
@@ -221,8 +225,10 @@ function updateConfigs(){
                     return;
                 }
                 this.__config.rule.replace = e.srcElement.innerText;
+            }else{
+                return;
             }
-            console.info(this.__config);
+            //console.info(this.__config);
             if(window.App){
                 window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
             }
@@ -277,7 +283,7 @@ function updateConfigs(){
         el.innerHTML =
             '<summary class="hgroup">\
                 <input class="groupEnableCB" type="checkbox">\
-                <span class="groupTitle editable">' + groupName + '</span>\
+                <span class="groupTitle editable" contentEditable>' + groupName + '</span>\
                 <div class="button addRule">+</div>\
                 <div class="button removeGroup">x</div>\
             </summary>\
@@ -306,8 +312,10 @@ function updateConfigs(){
         checkbox.addEventListener('change', function(e){ me.onCheckboxChange(e); });
 
         el.delegate('.groupTitle', 			'click', 	function(e){ e.preventDefault(); });//prevent group open/collapse when click the group title
-        el.delegate('.groupTitle', 			'dblclick', function(e, el){ me.onGroupTitleDoubleClick(e, el); });//start editing group name
+        //el.delegate('.groupTitle', 			'dblclick', function(e, el){ me.onGroupTitleDoubleClick(e, el); });//start editing group name
+		el.delegate('.groupTitle', 			'focus', 	function(e, el){ me.onGroupTitleFocus(e, el); },true);//focus select all 
         el.delegate('.groupTitle', 			'keydown', 	function(e, el){ me.onGroupTitleEditing(e, el); });//edit group name
+        el.delegate('.groupTitle', 			'blur', 	function(e, el){ me.onGroupTitleBlur(e, el); },true);// group name blur check and update
         el.delegate('.button.removeGroup', 	'click', 	function(e){ me.onRemoveGroupButtonClick(e); });//remove this group
         el.delegate('.button.addRule', 		'click', 	function(e){ me.onAddRuleButtonClick(e); });//add rule to this group
         el.delegate('.button.remove', 		'click', 	function(e, el){ me.onRuleRemoveButtonClick(e, el); }, false, true);//remove rule from this group
@@ -423,29 +431,37 @@ function updateConfigs(){
                 //prevent browser create the <br> tag and stop editing
                 e.preventDefault();
                 stopEdit(titleEl);
-
-                var newGroupName = titleEl.textContent;
-                if(updateGroup(this.__groupId, this.getEnable(), newGroupName)){
-                    //update group info and configs
-                    //if(currentGroupName == this.__groupName){
-                    //    currentGroupName = newGroupName;
-                    //}
-                    currentGroupId = this.__groupId;
-                    this.__groupName = newGroupName;
-                    //console.info(this);
-                    if(window.App){
-                        var o = {
-                            'name':newGroupName,
-                            'enable':this.getEnable()
-                        };
-                        window.App.doAction(3,JSON.stringify(o),this.__groupId);
-                    }
-                }
-                else{
-                    alert('you already have a group named ' + newGroupName);
-                    titleEl.textContent = this.__groupName;
-                }
             }
+        },
+		onGroupTitleFocus: function(e, titleEl){
+			startEdit(titleEl);
+		},
+        onGroupTitleBlur: function(e, titleEl){
+          titleEl.innerText = titleEl.innerText.replace(/^\s*|\s*$|\n|\r/g,"");
+          var newGroupName = titleEl.innerText;
+          if(newGroupName == this.__groupName){
+              return;
+          }
+          if(updateGroup(this.__groupId, this.getEnable(), newGroupName)){
+              //update group info and configs
+              //if(currentGroupName == this.__groupName){
+              //    currentGroupName = newGroupName;
+              //}
+              currentGroupId = this.__groupId;
+              this.__groupName = newGroupName;
+              //console.info(this);
+              if(window.App){
+                  var o = {
+                      'name':newGroupName,
+                      'enable':this.getEnable()
+                  };
+                  window.App.doAction(3,JSON.stringify(o),this.__groupId);
+              }
+          }
+          else{
+              alert('you already have a group named ' + newGroupName);
+              titleEl.innerText = this.__groupName;
+          }
         }
     };
 
@@ -526,7 +542,7 @@ function updateConfigs(){
     function createGroups(configurations){
         cleanup();
         configs = configurations;
-          console.info(configs);
+        //console.info(configs);
         for(var i=0; i<configs.length; i++){
             addGroup(configs[i].name, configs[i], true);
         }
@@ -695,14 +711,13 @@ function updateConfigs(){
 
     //start/stop editing the contenteditable element
     function startEdit(el){
-        el.setAttribute('contenteditable', true);
-        el.focus();
+        //el.setAttribute('contenteditable', true);
+        //el.focus();
         var range = document.createRange();
         range.selectNodeContents(el);
         document.getSelection().addRange(range);
     }
     function stopEdit(el){
-        el.removeAttribute('contenteditable');
         el.blur();
     }
 
