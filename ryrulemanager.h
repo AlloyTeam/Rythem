@@ -254,9 +254,14 @@ public:
                     continue;
                 }
                 QScriptValue g = gIt.value();
-                addRuleGroup(g);
+                QSharedPointer<RyRuleGroup> g2 = addRuleGroup(g);
+                if(g2.isNull()){
+                    qDebug()<<"getGroup Failed";
+                }else{
+                    qDebug()<<"got group"<<g2->toJSON();
+                }
             }
-            //qDebug()<<"got project!";
+            qDebug()<<"got project!";
             return true;
         }
     }

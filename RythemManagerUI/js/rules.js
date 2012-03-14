@@ -73,6 +73,7 @@ function updateConfigs(){
         checkbox.addEventListener(	'change', 	function(e){ me.onCheckboxChange(e); });
         el.delegate('.editable', 	'dblclick', function(e, el){ me.onFieldsDoubleClick(e, el); });
         el.delegate('.editable', 	'keydown', 	function(e, el){ me.onFieldsEditing(e, el); });
+        el.delegate('.editable', 	'blur', 	function(e, el){ me.onFieldsBlur(e, el); },true);
         el.delegate('.selectFile', 	'click', 	function(e, el){ me.onSelectFile(e, el);});
         el.delegate('.selectDir', 	'click', 	function(e, el){ me.onSelectDir(e, el);});
 		ruleConfig.enable = (ruleConfig.enable!=0)
@@ -192,6 +193,7 @@ function updateConfigs(){
                 //prevent browser create the <br> tag and stop editing
                 e.preventDefault();
                 stopEdit(fieldEl);
+                /*
 				if(this.__patternField == e.srcElement){
 					this.__config.rule.pattern = unescapeFromHtml(e.srcElement.innerHTML);
 				}else if(this.__replaceField == e.srcElement){
@@ -201,6 +203,28 @@ function updateConfigs(){
 				if(window.App){
 					window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
 				}
+                */
+            }
+        },
+        onFieldsBlur: function(e, fieldEl){
+            //prevent browser create the <br> tag and stop editing
+            console.info("blur before(html):",e.srcElement.innerHTML);
+            e.srcElement.innerText = e.srcElement.innerText.replace(/^\s*|\s*$/g,"");
+            console.info("blur afeter(text)",e.srcElement.innerText);
+            if(this.__patternField == e.srcElement){
+                if(this.__config.rule.pattern == e.srcElement.innerText){
+                    return;
+                }
+                this.__config.rule.pattern = e.srcElement.innerText;
+            }else if(this.__replaceField == e.srcElement){
+                if(this.__config.rule.replace == e.srcElement.innerText){
+                    return;
+                }
+                this.__config.rule.replace = e.srcElement.innerText;
+            }
+            console.info(this.__config);
+            if(window.App){
+                window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
             }
         },
 		onSelectFile: function(e,fieldEl){
@@ -208,7 +232,7 @@ function updateConfigs(){
             if(s===""){
                return;
             }
-			this.__replaceField.innerHTML = escapeToHtml(s);
+            this.__replaceField.innerText = s;
 			this.__config.rule.replace = s;
 			if(window.App){
 				window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
@@ -219,7 +243,7 @@ function updateConfigs(){
             if(s===""){
                return;
             }
-			this.__replaceField.innerHTML = escapeToHtml(s);
+            this.__replaceField.innerText = s;
 			this.__config.rule.replace = s;
 			if(window.App){
 				window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);

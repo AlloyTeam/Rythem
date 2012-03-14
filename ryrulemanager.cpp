@@ -598,18 +598,21 @@ const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QS
         QFile f(defaultProjectFullFileName);
         f.open(QIODevice::WriteOnly | QIODevice::Text);
         QByteArray ba;
-        ba.append(QString("{'groups':[")+content+"]}");
+        ba.append(QString("{\"groups\":[")+content+"]}");
         //qDebug()<<QString(ba);
         f.write(ba);
         f.close();
         QScriptEngine engine;
         QScriptValue project = engine.globalObject();
         project.setProperty("localAddress",QScriptValue(defaultProjectFullFileName));
-        //qDebug()<<defaultProjectFullFileName;
+        //qDebug()<<project.property("localAddress").toString();
         QSharedPointer<RyRuleProject> p = addRuleProject(project);
+        //qDebug()<<"project = "<<p->toJson();
+
         //TODO
         QList<QSharedPointer<RyRuleGroup> > groups = p->groups();
-        if(groups.length()>1){
+        //qDebug()<<"length = "<<QString::number(groups.length());
+        if(groups.length()>0){
             return groups.at(0);
         }
         return QSharedPointer<RyRuleGroup>();
