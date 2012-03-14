@@ -104,6 +104,18 @@ function updateConfigs(){
                 this.__checkbox.disabled = !enable;
             }
         },
+        setLineEnable: function(enable){
+            this.__config.lineEnable = enable;
+            if(enable){
+                this.__el.classList.remove('disabled');
+            }
+            else{
+                this.__el.classList.add('disabled');
+            }
+            this.__typeSelect.disabled = !enable;
+            this.__checkbox.disabled = !enable
+        },
+
         /**
          * 获取dom元素
          * @return {HTMLDivElement}
@@ -344,7 +356,7 @@ function updateConfigs(){
             this.__checkbox.checked = enable;
 			if(!ignoreChildren){
 				for(var i=0; i<this.__rules.length; i++){
-					this.__rules[i].setEnable(enable);
+                    this.__rules[i].setLineEnable(enable);
 				}
 			}
         },
