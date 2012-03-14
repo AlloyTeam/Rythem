@@ -211,6 +211,7 @@ function updateConfigs(){
             }
         },
         onFieldsBlur: function(e, fieldEl){
+			
             //prevent browser create the <br> tag and stop editing
             //console.info("blur before(html):",e.srcElement.innerHTML);
             e.srcElement.innerText = e.srcElement.innerText.replace(/^\s*|\s*$|\n|\r/g,"");
