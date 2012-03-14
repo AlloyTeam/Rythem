@@ -277,7 +277,6 @@ function updateConfigs(){
         if(groupConfig.rules.length){
             this.expand();
         }
-		this.setEnable(groupConfig.enable,true);
 
         checkbox.addEventListener('change', function(e){ me.onCheckboxChange(e); });
 
@@ -295,6 +294,7 @@ function updateConfigs(){
                 this.addRule(groupConfig.rules[i]);
             }
         }
+        this.setEnable(groupConfig.enable);
     }
     RuleGroup.prototype = {
         /**
@@ -345,7 +345,7 @@ function updateConfigs(){
         getEnable: function(){
             return this.__config.enable;
         },
-        setEnable: function(enable,ignoreChildren){
+        setEnable: function(enable){
             this.__config.enable = enable;
             if(enable){
                 this.__el.classList.remove('disabled');
@@ -354,11 +354,9 @@ function updateConfigs(){
                 this.__el.classList.add('disabled');
             }
             this.__checkbox.checked = enable;
-			if(!ignoreChildren){
-				for(var i=0; i<this.__rules.length; i++){
-                    this.__rules[i].setLineEnable(enable);
-				}
-			}
+            for(var i=0; i<this.__rules.length; i++){
+                this.__rules[i].setLineEnable(enable);
+            }
         },
         getConfig: function(){
             return this.__config;
@@ -444,7 +442,7 @@ function updateConfigs(){
 	        {
                 "id":5,
 	            "name": "group1",
-	            "enable": true,
+                "enable": false,
 	            "rules": [{
                               "id":4,
 	                "name": "simple address example",
