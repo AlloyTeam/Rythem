@@ -71,6 +71,13 @@ class RyJsBridge:public QObject{
             case 6://remove rule  (6,ruleId,groupId)
                 manager->removeRule(msg.toULongLong(),groupId);
                 break;
+            case 7://import local config
+                pro = manager->addLocalProject(msg);
+                if(!pro.isNull()){
+                    emit ruleChanged(2,pro->toJson());
+                    return pro->toJson();
+                }
+                break;
             }
             return "";
         }

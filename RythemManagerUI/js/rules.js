@@ -471,6 +471,7 @@ function updateConfigs(){
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     var addLocalGroupBtn;
+    var importLocalGroupBtn;
 	var addRemoteGroupBtn;
     var panelMask, addGroupPanel, addRulePanel;
     var currentGroupName;
@@ -550,13 +551,15 @@ function updateConfigs(){
             addGroup(configs[i].name, configs[i], true);
         }
     }
-      function addNewGroup(groupNameOrRemoteUrl,type){
-		if(type == "remote"){
+    function addNewGroup(groupNameOrRemoteUrl,type){
+        var newGroups,groupsObj;
+        switch(type){
+        case "importRemote":
 			if(window.App){
-				var newGroups = window.App.doAction(2,groupNameOrRemoteUrl);
+                newGroups = window.App.doAction(2,groupNameOrRemoteUrl);
 				if(newGroups!=""){
 					try{
-						var groupsObj = eval('('+newGroups+')');
+                        groupsObj = eval('('+newGroups+')');
 						if(!groupsObj['groups']){
 							return true;
 						}
@@ -569,7 +572,27 @@ function updateConfigs(){
 				}
 				return true;
 			}
-		}else{
+            break;
+        case "importLocal":
+            if(window.App){
+                newGroups = window.App.doAction(7,groupNameOrRemoteUrl);
+                if(newGroups!=""){
+                    try{
+                        groupsObj = eval('('+newGroups+')');
+                        if(!groupsObj['groups']){
+                            return true;
+                        }
+                        for(var i=0;i<groupsObj['groups'].length;++i){
+                            addGroup(groupsObj['groups'][i].name,groupsObj['groups'][i],true);
+                        }
+                    }catch(e){
+                        return true;
+                    }
+                }
+                return true;
+            }
+            break;
+        default:
 		  var c = {"name":groupNameOrRemoteUrl, "enable":true, "rules":[]};
 		  configs.push(c);
 
@@ -584,11 +607,12 @@ function updateConfigs(){
 			  var newGroup = eval('('+newGroup+')');
 			  c.id=newGroup.id;
 		  }		  
-		  var group = new RuleGroup(groupNameOrRemoteUrl, c);
-		  groupsContainer.appendChild(group.getEl());
-		  groups.push(group);
-		}
+          var group = new RuleGroup(groupNameOrRemoteUrl, c);
+          groupsContainer.appendChild(group.getEl());
+          groups.push(group);
           return true;
+          break;
+        }
       }
 
     function addGroup(groupName, groupConfig, ignoreConflict){
@@ -704,6 +728,12 @@ function updateConfigs(){
     function showAddGroupPanel(type){
 		addGroupPanel.nameField.value = '';
 		addGroupPanel.type = type;
+        if(type == "importLocal"){
+            addGroupPanel.selectFileBtn.classList.remove('hidden');
+        }else{
+            addGroupPanel.selectFileBtn.classList.add('hidden');
+        }
+
 		showPanel(addGroupPanel);
     }
     function showAddRulePanel(){
@@ -731,7 +761,7 @@ function updateConfigs(){
 
         //get ui components
         addLocalGroupBtn 	= document.getElementById('addLocalGroupBtn');
-		
+        importLocalGroupBtn = document.getElementById('importLocalGroupBtn');
         addRemoteGroupBtn 	= document.getElementById('addRemoteGroupBtn');
 		
         panelMask 		= document.getElementById('panelMask');
@@ -741,6 +771,7 @@ function updateConfigs(){
 
         addGroupPanel.confirmBtn 	= addGroupPanel.querySelector('.button.confirm');
         addGroupPanel.cancelBtn 	= addGroupPanel.querySelector('.button.cancel');
+        addGroupPanel.selectFileBtn = addGroupPanel.querySelector('.button.selectFile');
         addGroupPanel.nameField		= document.getElementById('newGroupName');
         addRulePanel.confirmBtn 	= addRulePanel.querySelector('.button.confirm');
         addRulePanel.cancelBtn 		= addRulePanel.querySelector('.button.cancel');
@@ -754,8 +785,11 @@ function updateConfigs(){
         addLocalGroupBtn.addEventListener('click', function(e){
             showAddGroupPanel("local");
         });
+        importLocalGroupBtn.addEventListener('click',function(e){
+            showAddGroupPanel("importLocal");
+        })
 		addRemoteGroupBtn.addEventListener('click', function(e){
-            showAddGroupPanel("remote");
+            showAddGroupPanel("importRemote");
         });
 
         addRulePanel.selectFileBtn.addEventListener('click', function(e){
@@ -784,6 +818,16 @@ function updateConfigs(){
                 addRulePanel.selectFileBtn.classList.add("hidden");
                 addRulePanel.selectDirBtn.classList.add("hidden");
             }
+        });
+        addGroupPanel.selectFileBtn.addEventListener('click', function(e){
+             if(window.App){
+                 var fileName = window.App.getFile();
+                 if(fileName!=""){
+                    addGroupPanel.nameField.value = fileName;
+                 }
+             }else{
+                 addGroupPanel.nameField.value = "C:\\fakePath\\fake.file";
+             }
         });
         addGroupPanel.confirmBtn.addEventListener('click', function(e){
             var groupName = addGroupPanel.nameField.value;

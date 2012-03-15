@@ -723,7 +723,7 @@ const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QS
         QList<QSharedPointer<RyRuleGroup> > groups = p->groups();
         //qDebug()<<"length = "<<QString::number(groups.length());
         if(groups.length()>0){
-            return groups.at(0);
+            return groups.last();
         }
         return QSharedPointer<RyRuleGroup>();
     }
@@ -752,6 +752,12 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addLocalProject(const QString
         qWarning() << "[RuleManager] local config file open fail";
     }
     */
+    if(QFile::exists(filePath)){
+        QScriptEngine engine;
+        QScriptValue project = engine.globalObject();
+        project.setProperty("localAddress",QScriptValue(filePath));
+        return this->addRuleProject(project);
+    }
     return QSharedPointer<RyRuleProject>();
 }
 
