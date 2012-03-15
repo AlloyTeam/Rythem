@@ -24,7 +24,7 @@ public:
     RyRule(quint64 groupId,const QScriptValue& rule);
     RyRule(quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable = true);
     RyRule(quint64 id,quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable=true);
-    QString toJSON(bool format=false)const;
+    QString toJSON(bool format=false,int space=16)const;
 
     int type();
     QString pattern();
@@ -103,7 +103,7 @@ public:
     RyRuleGroup(const QString& groupName,bool isOwner=false);
     RyRuleGroup(quint64 groupId,const QString& groupName,bool isOwner=false);
     */
-    QString toJSON(bool format=false)const;
+    QString toJSON(bool format=false,int space = 12)const;
     void addRules(const QString& rules);
     void addRules(const QScriptValue& rules);
     QSharedPointer<RyRule> addRule(const QScriptValue& value);
@@ -153,20 +153,28 @@ public:
     }
     ~RyRuleProject(){
         //TODO save
+        if(_loop->isRunning()){
+            _loop->quit();
+        }
+        delete _loop;
+        _loop = NULL;
         qDebug()<<"~RyRuleProject";
         saveToFile();
+        _groups.clear();
     }
     void saveToFile(){
         QFile f(_localAddress);
         if(f.open(QIODevice::WriteOnly | QIODevice::Text)){
-            QString str="{'groups':[";
+            QString str="{\n"
+                        "    'groups':[\n";
             QStringList groupStrList;
             for(int i=0;i<_groups.length();++i){
                QSharedPointer<RyRuleGroup> g = _groups.at(i);
-               groupStrList<<g->toJSON();
+               groupStrList<<g->toJSON(true,8);
             }
 
-            str+=groupStrList.join(",")+"]}";
+            str+=groupStrList.join(",\n")+
+                         "\n    ]\n}";
             f.write( QByteArray().append(str.toUtf8()));
             qDebug()<<"save to file";
             f.close();
@@ -179,6 +187,7 @@ public:
               QString remoteAddress="",
               QString pwd="",
               QString owner=""){
+        _loop = new QEventLoop();
         _needReCombineJson = true;
         _isValid = false;
         _localAddress = localAddress;
@@ -205,15 +214,14 @@ public:
     }
     bool addRemoteRuleGroups(){
         //qDebug()<<"getting remote rule"<<_remoteAddress;
-        QTimer timeout;
+        //QTimer timeout;
         QNetworkAccessManager manager;
         QNetworkReply* reply;
-        QEventLoop loop;
-        timeout.singleShot(3000,&loop,SLOT(quit()));//3秒内不返回内容就判断为失败
+        //timeout.singleShot(3000,_loop,SLOT(quit()));//3秒内不返回内容就判断为失败
         QNetworkProxyFactory::setUseSystemConfiguration(true);
-        manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),&loop,SLOT(quit()));
+        manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),_loop,SLOT(quit()));
         reply = manager.get(QNetworkRequest(QUrl(_remoteAddress)));
-        loop.exec();
+        _loop->exec();
         QTextCodec* oldCodec = QTextCodec::codecForCStrings();
         QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf-8"));
         QString content = reply->readAll();
@@ -284,45 +292,74 @@ public:
     QString localAddress()const{
         return _localAddress;
     }
-    QString toJson(bool format=false){
+    QString toJson(bool format=false,int beforeSpace = 4){
+        QString space = "";
+        QString currentSpace;
+        int increasement = 0;
+        int currentSpaceLength = 0;
+        QString newLine="";
         if(format){
             //TODO
+            newLine = "\n";
+            space = " ";
+            currentSpaceLength = beforeSpace;
+            increasement = 4;
+            currentSpace = space.repeated(currentSpaceLength);
         }
-        QString str="{'groups':[";
+        QString str=currentSpace +"{" + newLine;
+        currentSpaceLength += increasement;//+
+        currentSpace = space.repeated(currentSpaceLength);
+        str += currentSpace+"'groups':["+newLine;
+        currentSpaceLength += increasement;//+
+        currentSpace += space.repeated(currentSpaceLength);
         QStringList groupStrList;
         for(int i=0;i<_groups.length();++i){
            QSharedPointer<RyRuleGroup> g = _groups.at(i);
-           groupStrList<<g->toJSON();
+           groupStrList<<g->toJSON(format,currentSpaceLength);
         }
-
-        str+=groupStrList.join(",")+"]}";
+        str+=groupStrList.join(QString(",")+newLine)+newLine;
+        currentSpaceLength -= increasement;//-
+        currentSpace = space.repeated(currentSpaceLength);
+        str+=currentSpace+"]/*END GROUPS*/"+newLine;
+        currentSpaceLength -= increasement;//-
+        currentSpace = space.repeated(currentSpaceLength);
+        str+=currentSpace+"}/*End Project*/";
         return str;
     }
 
-    QString toConfigJson(bool format=false){
+    QString toConfigJson(bool format=true){
         _needReCombineJson = true;//TODO
         if(!_needReCombineJson){
             return _jsonCache;
         }else{
+            QString newLine = "";
+            QString currentSpace = "";
+            int currentSpaceLenth = 0;
+            QString space = "";
             if(format){
                 //TODO
+                space = " ";
+                newLine = "\n";
+                currentSpaceLenth = 4;
+                currentSpace = space.repeated(currentSpaceLenth);
             }
             QString localAddressEscaped = _localAddress;
             localAddressEscaped.replace("\\","\\\\");
             localAddressEscaped.replace("'","\\'");
-            QString ret = "{'localAddress':'"+localAddressEscaped+"'";
+            QString ret = currentSpace+"{"+newLine+
+                    currentSpace+currentSpace+"'localAddress':'"+localAddressEscaped+"'";
             if(!_remoteAddress.isEmpty()){
                 QString remoteAddressEscaped = _remoteAddress;
                 remoteAddressEscaped.replace("\\","\\\\");
                 remoteAddressEscaped.replace("'","\\'");
-                ret+=",'remoteAddress':'"+remoteAddressEscaped+"'";
-                ret+=",'pwd':'"+_pwd+"'";
+                ret+=","+newLine+currentSpace+currentSpace+"'remoteAddress':'"+remoteAddressEscaped+"'";
+                ret+=","+newLine+currentSpace+currentSpace+"'pwd':'"+_pwd+"'";
                 QString ownerEscaped = _owner;
                 ownerEscaped.replace("\\","\\\\");
                 ownerEscaped.replace("'","\\'");
-                ret+=",'owner':'"+ownerEscaped+"'";
+                ret+=","+newLine+currentSpace+currentSpace+"'owner':'"+ownerEscaped+"'";
             }
-            ret+="}";
+            ret+=newLine+currentSpace+"}";
             _jsonCache = ret;
             _needReCombineJson = false;
         }
@@ -367,6 +404,7 @@ private:
 
     QString _jsonCache;
     bool _needReCombineJson;
+    QEventLoop *_loop;
 };
 
 class RyRuleManager:public QObject{
@@ -430,7 +468,7 @@ public:
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
     //返回header body
     QPair<QByteArray,QByteArray> getReplaceContent(QSharedPointer<RyRule> rule,const QString& url="");
-    QString toJson()const;
+    QString toJson(bool format=false)const;
 private:
 
     QString _configFileName;

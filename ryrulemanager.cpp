@@ -58,18 +58,47 @@ RyRule::RyRule(quint64 groupId,int type, const QString &pattern, const QString &
 RyRule::RyRule(quint64 id,quint64 groupId, int type, const QString &pattern, const QString &replace,bool enable){
     init(id,groupId,type,pattern,replace,enable);
 }
-QString RyRule::toJSON(bool format)const{
+QString RyRule::toJSON(bool format,int beforeSpace)const{
+    QString space=" ";
+    QString newLine = "\n";
+    QString currentSpace = "";
+    int currentSpaceLength = 0;
+    int increasement = 0;
     if(format){
-        //TODO
+        currentSpace = space.repeated(beforeSpace);
+        currentSpaceLength = beforeSpace;
+        increasement = 4;
+    }else{
+        newLine = "";
+        space = "";
     }
     //qDebug()<<_pattern<<_replace<<QString::number(_type);
+    QStringList retList;
     QString thePattern = _pattern;
     QString theReplace = _replace;
     thePattern.replace("\\","\\\\");
     thePattern.replace("'","\\'");
     theReplace.replace("\\","\\\\");
     theReplace.replace("'","\\'");
-    QString ret="{'enable':"+QString::number(enabled?1:0)+",'id':"+QString::number(_ruleId)+",'type':"+QString::number(_type)+",'rule':{'pattern':'"+thePattern+"', 'replace':'"+theReplace+"'} }";
+    QString ret;
+    retList << currentSpace+"{"+newLine;
+    currentSpaceLength += increasement;
+    currentSpace = space.repeated(currentSpaceLength);
+    retList << currentSpace +  "'enable':" + QString::number(enabled?1:0) + ","+newLine;
+    retList << currentSpace +  "'id':" + QString::number(_ruleId) + ","+newLine;
+    retList << currentSpace +  "'type':" + QString::number(_type) + ","+newLine;
+    retList << currentSpace +  "'rule':{" +newLine;
+    currentSpaceLength += increasement;
+    currentSpace = space.repeated(currentSpaceLength);
+    retList << currentSpace +      "'pattern':'"+thePattern+"',"+newLine;
+    retList << currentSpace +      "'replace':'"+theReplace+"',"+newLine;
+    currentSpaceLength -= increasement;
+    currentSpace = space.repeated(currentSpaceLength);
+    retList << currentSpace +  "}" +newLine;
+    currentSpaceLength -= increasement;
+    currentSpace = space.repeated(currentSpaceLength);
+    retList << currentSpace +  "}";
+    ret = retList.join("");
     return ret;
 }
 int RyRule::type(){
@@ -135,9 +164,9 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(){
     QPair<QByteArray,QByteArray> ret;
     QByteArray header,body;
 
-    QTimer timer;
+    //QTimer timer;
     QNetworkAccessManager manager;
-    timer.singleShot(20000,_loop,SLOT(quit()));
+    //timer.singleShot(20000,_loop,SLOT(quit()));
     manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),_loop,SLOT(quit()));
     QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(_rule->replace())));
     _loop->exec();
@@ -236,7 +265,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
     bool mergeContentHasError=false;
 
     bool fileCanOpen;
-
+    file.setFileName(replace);
     if(file.open(QFile::ReadOnly)){
         mimeTypeKey = fileInfo.suffix().toLower();
         mimeType = RyRule::getMimeType(mimeTypeKey,"application/javascript");
@@ -257,10 +286,10 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
         mergeContentHasError = true;
     }
     file.close();
-    if(mergeContentHasError){
-        status = "404 NOT FOUND";
-        body.append(QString("merge file with wrong format:").append(replace).append(mergeFileContent));
-    }else{
+    //if(mergeContentHasError){
+    //    status = "404 NOT FOUND";
+    //    body.append(QString("merge file with wrong format:").append(replace).append(mergeFileContent));
+    //}else{
         status = "200 OK";
         foreach(QVariant item,mergeValueMap["include"].toList()){
             //qDebug()<<item.toString();
@@ -273,7 +302,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
             }
             file.close();
         }
-    }
+    //}
     contentLength = body.size();
     header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
                        .arg(status)
@@ -337,11 +366,11 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(){
     mimeType = RyRule::getMimeType(QFileInfo(file).suffix().toLower(),"text/plain");
     file.close();
     contentLength = body.size();
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 charset=%4 \r\n\r\n")
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
                        .arg(status)
                        .arg(mimeType)
-                       .arg(contentLength)
-                       .arg(encode));
+                       .arg(encode)
+                       .arg(contentLength));
     ret.first = header;
     ret.second = body;
     return ret;
@@ -526,21 +555,50 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
     }
     return ret;
 }
-QString RyRuleGroup::toJSON(bool format)const{
+QString RyRuleGroup::toJSON(bool format,int beforeSpace)const{
+    QString space=" ";
+    QString newLine = "\n";
+    QString currentSpace = "";
+    int currentSpaceLength = 0;
+    int increasement = 0;
     if(format){
-        //TODO
-    }
-    QStringList rulesStrList;
-    for(int i=0;i<_rules.length();++i){
-       QSharedPointer<RyRule> rule = _rules.at(i);
-       rulesStrList<<rule->toJSON();
+        currentSpace = space.repeated(beforeSpace);
+        currentSpaceLength = beforeSpace;
+        increasement = 4;
+    }else{
+        newLine = "";
+        space = "";
     }
     QString nameEscaped = _groupName;
     nameEscaped = nameEscaped.replace("\\","\\\\'");
     nameEscaped = nameEscaped.replace("'","\\'");
-    QString ret="{'id':"+QString::number(_groupId)+",'name':'"+nameEscaped+
-            "',"+"'enable':"+QString::number(enabled?1:0)+
-            ",'rules':[" +rulesStrList.join(",")+"]}";
+    QStringList retList;
+    QString ret;
+    retList<< currentSpace+"{"+newLine;
+    currentSpaceLength += increasement;
+    currentSpace = space.repeated(currentSpaceLength);
+    retList << ( currentSpace+"'id':"+QString::number(_groupId)+","+newLine
+                +currentSpace+"'name':'"+nameEscaped+"',"+newLine
+                +currentSpace+"'enable':"+QString::number(enabled?1:0)+","+newLine
+                +currentSpace+"'rules':[" +newLine);
+
+    currentSpaceLength += increasement;
+    currentSpace=space.repeated(currentSpaceLength);
+
+    QStringList rulesStrList;
+    for(int i=0;i<_rules.length();++i){
+       QSharedPointer<RyRule> rule = _rules.at(i);
+       rulesStrList<<rule->toJSON(format,currentSpaceLength);
+    }
+    retList <<  rulesStrList.join(","+newLine) +newLine;
+
+    currentSpaceLength -= increasement;
+    currentSpace=space.repeated(currentSpaceLength);
+    retList <<  currentSpace+ "]"+newLine;
+    currentSpaceLength -= increasement;
+    currentSpace=space.repeated(currentSpaceLength);
+    retList << currentSpace+"}/*END OF GROUP--*/";
+    ret = retList.join("");
     return ret;
 }
 
@@ -574,11 +632,12 @@ RyRuleManager::~RyRuleManager(){
     while(rpIt.hasNext()){
         QSharedPointer<RyRuleProject> rp = rpIt.next();
         //qDebug()<<"saving to config"<<rp->toConfigJson();
-        configStr<<rp->toConfigJson();
+        configStr<<rp->toConfigJson(true);
         rp.clear();
     }
     if(canFileOpen){
-        QString str = "["+configStr.join(",")+"]";
+        QString newLine = "\n";
+        QString str = "["+newLine+configStr.join(","+newLine)+newLine+"]";
         QByteArray ba;
         ba.append(str);
         f.write(ba);
@@ -702,7 +761,9 @@ const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QS
         QScriptValue value = engine.evaluate("("+content+")");
         qDebug()<<"default project exists";
         QSharedPointer<RyRuleProject> project = _projectFileNameToProjectMap.value(defaultProjectFullFileName);
-        return project->addRuleGroup(value,true);
+        QSharedPointer<RyRuleGroup> group = project->addRuleGroup(value,true);
+        _groupToProjectMap[group->groupId()] = project;
+        return group;
     }else{
         qDebug()<<"default project not exists";
         QFile f(defaultProjectFullFileName);
@@ -723,7 +784,9 @@ const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QS
         QList<QSharedPointer<RyRuleGroup> > groups = p->groups();
         //qDebug()<<"length = "<<QString::number(groups.length());
         if(groups.length()>0){
-            return groups.last();
+            QSharedPointer<RyRuleGroup> group = groups.last();
+            _groupToProjectMap[group->groupId()] = p;
+            return group;
         }
         return QSharedPointer<RyRuleGroup>();
     }
@@ -737,6 +800,7 @@ const QSharedPointer<RyRule> RyRuleManager::addRuleToGroup(const QString& msg,qu
         return g->addRule(v);
 
     }else{
+        qDebug()<<"not such group";
         return QSharedPointer<RyRule>();
     }
 }
@@ -811,15 +875,19 @@ QPair<QByteArray,QByteArray> RyRuleManager::getReplaceContent(QSharedPointer<RyR
     return rc.getReplaceContent();
 }
 
-QString RyRuleManager::toJson()const{
-    QString str="[";
+QString RyRuleManager::toJson(bool format)const{
+    QString newLine = "";
+    if(format){
+        newLine = "\n";
+    }
+    QString str="["+newLine;
     QStringList projectsList;
     QListIterator<QSharedPointer<RyRuleProject> > it(_projects);
     while(it.hasNext()){
         QSharedPointer<RyRuleProject> p = it.next();
-        projectsList<<p->toJson();
+        projectsList<<p->toJson(format,4);
     }
-    str += projectsList.join(",");
+    str += projectsList.join(","+newLine)+newLine;
     str += "]";
     return str;
 }
