@@ -586,7 +586,7 @@ void RyConnection::doRequestToNetwork(){
                 _requestSocket->write(headerAndBody.first);
                 _requestSocket->flush();
                 onResponseHeaderFound();
-                qDebug()<<headerAndBody.second;
+                //qDebug()<<headerAndBody.second;
                 ba = headerAndBody.second;
                 _sendingPipeData->appendResponseBody(&ba);
                 _requestSocket->write(headerAndBody.second);

@@ -163,7 +163,9 @@ function updateConfigs(){
 			var type = Number(options[index].value);
             this.__config.type = type;
             this.updateButtonState(type);
-			updateConfigs();
+            if(window.App){
+                window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
+            }
         },
         /**
          * 勾选/取消勾选规则时触发
@@ -773,8 +775,8 @@ function updateConfigs(){
         addRulePanel.typeField.addEventListener("change",function(e){
             var type = Number(e.target.value);
             if(type === 4 || type === 5){
-                addRulePanel.selectDirBtn.classList.remove("hidden");
-                addRulePanel.selectFileBtn.classList.add("hidden");
+                addRulePanel.selectDirBtn.classList.add("hidden");
+                addRulePanel.selectFileBtn.classList.remove("hidden");
             }else if(type === 6){
                 addRulePanel.selectDirBtn.classList.remove("hidden");
                 addRulePanel.selectFileBtn.classList.add("hidden");
