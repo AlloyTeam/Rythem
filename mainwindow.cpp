@@ -349,7 +349,8 @@ void MainWindow::toggleCapture(){
     captureAct->setChecked(!isUsingCapture);
 #ifdef Q_WS_WIN32
     RyWinHttp::init();
-    QtConcurrent::run(this,&MainWindow::toggleProxy);
+    toggleProxy();
+    //QtConcurrent::run(this,&MainWindow::toggleProxy);
     //qDebug()<<previousProxyInfo.isUsingPac;
 #endif
 #ifdef Q_WS_MAC
@@ -411,6 +412,8 @@ void MainWindow::closeEvent(QCloseEvent *event){
         toggleCapture();
     }
     QMainWindow::closeEvent(event);
+    qDebug()<<"close event";
+    qApp->quit();
 }
 
 void MainWindow::addJsObject(){

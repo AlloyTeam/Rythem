@@ -294,7 +294,7 @@ public:
     }
     QString toJson(bool format=false,int beforeSpace = 4){
         QString space = "";
-        QString currentSpace;
+        QString currentSpace="";
         int increasement = 0;
         int currentSpaceLength = 0;
         QString newLine="";

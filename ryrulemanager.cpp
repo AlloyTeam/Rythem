@@ -271,25 +271,34 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
         mimeType = RyRule::getMimeType(mimeTypeKey,"application/javascript");
         mergeFileContent = file.readAll();
         mergeValueMap = engine.evaluate(mergeFileContent.prepend("(").append(")")).toVariant().toMap();
-        if(mergeValueMap.contains("encode")){
-            encode = mergeValueMap["encode"].toString();
-        }
-        //qDebug()<<mergeValueMap;
-        //qDebug()<<mergeFileContent;
-        mergeValueMap = mergeValueMap["projects"].toList().first().toMap();
         if(engine.hasUncaughtException() || mergeValueMap.isEmpty()){//wrong content
             qDebug() << "wrong qzmin format:" << replace << mergeFileContent;
             mergeContentHasError = true;
+        }else{
+            if(mergeValueMap.contains("encode")){
+                encode = mergeValueMap["encode"].toString();
+            }
+            //qDebug()<<mergeValueMap;
+            //qDebug()<<mergeFileContent;
+            if(mergeValueMap["projects"].toList().isEmpty() ){
+                mergeContentHasError = true;
+            }else{
+                mergeValueMap = mergeValueMap["projects"].toList().first().toMap();
+                if(mergeValueMap["include"].toList().isEmpty()){
+                    mergeContentHasError = true;
+                }
+            }
         }
     }else{
         qDebug()<<"file cannot open ";
         mergeContentHasError = true;
     }
     file.close();
-    //if(mergeContentHasError){
-    //    status = "404 NOT FOUND";
-    //    body.append(QString("merge file with wrong format:").append(replace).append(mergeFileContent));
-    //}else{
+    if(mergeContentHasError){
+        mimeType = "text/plain";
+        status = "404 NOT FOUND";
+        body.append(QString("merge file with wrong format:").append(replace).append(mergeFileContent));
+    }else{
         status = "200 OK";
         foreach(QVariant item,mergeValueMap["include"].toList()){
             //qDebug()<<item.toString();
@@ -302,7 +311,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
             }
             file.close();
         }
-    //}
+    }
     contentLength = body.size();
     header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
                        .arg(status)

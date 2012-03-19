@@ -51,6 +51,7 @@ void myMessageHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+    a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
 
