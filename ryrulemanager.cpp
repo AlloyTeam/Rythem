@@ -517,6 +517,7 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
     QListIterator<QSharedPointer<RyRule> > it(_rules);
     while(it.hasNext()){
         QSharedPointer<RyRule> rule = it.next();
+        //qDebug()<<"getMatchRule rule:"<<url<<rule->toJSON();
         if(!rule->enabled){
             continue;
         }
@@ -542,7 +543,8 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
 
                 if(n == protocolLength){
                     if(url.length() == protocolLength+pattern.length() ||
-                            url.at(protocolLength+pattern.length()) == '/'){
+                            url.at(protocolLength+pattern.length()) == '/' ||
+                            url.at(protocolLength+pattern.length()) == ':'){
                         isMatch = true;
                     }
                 }
@@ -652,8 +654,10 @@ RyRuleManager::~RyRuleManager(){
         f.write(ba);
         f.close();
     }
+    _projects.clear();
     _projectFileNameToProjectMap.clear();
     _groupToProjectMap.clear();
+    qDebug()<<"~rulemanager done";
 }
 
 void RyRuleManager::loadLocalConfig(const QString& configFileName){
@@ -874,7 +878,7 @@ QList<QSharedPointer<RyRule> > RyRuleManager::getMatchRules(const QString& url){
         QSharedPointer<RyRuleProject> p = it.next();
         ret.append(p->getMatchRules(url));
     }
-    //qDebug()<<"match rule length = "<<QString::number(ret.length());
+    qDebug()<<"match rule length = "<<QString::number(ret.length());
     return ret;
 }
 

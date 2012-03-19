@@ -45,6 +45,7 @@ RyConnection::~RyConnection(){
     //qDebug()<<"~RyConnection in main"
     //        << (QApplication::instance()->thread() == QThread::currentThread());
     //QThread::currentThread()->quit();
+    _pipeList.clear();
 }
 int RyConnection::handle()const{
     return _handle;
@@ -495,12 +496,46 @@ void RyConnection::doRequestToNetwork(){
     //qDebug()<<"doRequestToNetwork"<<_sendingPipeData->fullUrl<<host<<port;
     //qDebug()<<host<<port;
 
+    RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
+    QList<QSharedPointer<RyRule> > matchResult;
+    matchResult = manager->getMatchRules(_sendingPipeData->fullUrl);
+    for(int i=0,l=matchResult.size();i<l;++i){
+        QSharedPointer<RyRule> rule = matchResult.at(i);
+        qDebug()<<"rule found"<<rule->toJSON();
+        if(rule->type() == RyRule::COMPLEX_ADDRESS_REPLACE ||
+                rule->type() == RyRule::SIMPLE_ADDRESS_REPLACE){
+            host = rule->replace();
+            _sendingPipeData->replacedHost = host;
+        }else{
+            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
+            bool isOk;
+            QByteArray ba = headerAndBody.first;
+            _sendingPipeData->parseResponse(&ba,&isOk);
+            if(isOk){
+                _requestSocket->write(headerAndBody.first);
+                _requestSocket->flush();
+                onResponseHeaderFound();
+                //qDebug()<<headerAndBody.second;
+                ba = headerAndBody.second;
+                _sendingPipeData->appendResponseBody(&ba);
+                _requestSocket->write(headerAndBody.second);
+                _requestSocket->flush();
+                onResponsePackageFound();
+                return;
+            }else{
+                break;
+            }
+        }
+    }
+
+
     // check if is request to self
 
+    //qDebug()<<host<<QString::number(port);
     if(host == RyProxyServer::instance()->serverAddress().toString()
             && port == RyProxyServer::instance()->serverPort()){
         //TODO
-        //qDebug()<<"simple http"<<_sendingPipeData->path;
+        qDebug()<<"simple http"<<_sendingPipeData->path;
         QMap<QString,QString> contentTypeMapping;
         contentTypeMapping["jpg"] = "image/jpeg";
         contentTypeMapping["js"] = "application/javascript";
@@ -567,37 +602,6 @@ void RyConnection::doRequestToNetwork(){
         return;
     }
 
-    RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
-    QList<QSharedPointer<RyRule> > matchResult;
-    matchResult = manager->getMatchRules(_sendingPipeData->fullUrl);
-    for(int i=0,l=matchResult.size();i<l;++i){
-        QSharedPointer<RyRule> rule = matchResult.at(i);
-        qDebug()<<"rule found"<<rule->toJSON();
-        if(rule->type() == RyRule::COMPLEX_ADDRESS_REPLACE ||
-                rule->type() == RyRule::SIMPLE_ADDRESS_REPLACE){
-            host = rule->replace();
-            _sendingPipeData->replacedHost = host;
-        }else{
-            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
-            bool isOk;
-            QByteArray ba = headerAndBody.first;
-            _sendingPipeData->parseResponse(&ba,&isOk);
-            if(isOk){
-                _requestSocket->write(headerAndBody.first);
-                _requestSocket->flush();
-                onResponseHeaderFound();
-                //qDebug()<<headerAndBody.second;
-                ba = headerAndBody.second;
-                _sendingPipeData->appendResponseBody(&ba);
-                _requestSocket->write(headerAndBody.second);
-                _requestSocket->flush();
-                onResponsePackageFound();
-                return;
-            }else{
-                break;
-            }
-        }
-    }
 
     //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
     //qDebug()<<"to connect:"<<host<<port;
