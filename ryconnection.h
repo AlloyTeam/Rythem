@@ -58,7 +58,7 @@ class RyConnection:public QObject{
         //type defines
 
         //variables
-        QMutex pipeDataMutex;
+        QMutex *pipeDataMutex;
         QMutex pipeDataListMutex;
         QByteArray _requestBuffer;
         QByteArray _responseBuffer;

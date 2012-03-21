@@ -5,6 +5,8 @@
 #include <QSharedPointer>
 #include <QVariant>
 
+
+
 class RyPipeData : public QObject
 {
         Q_OBJECT
@@ -170,6 +172,8 @@ class RyPipeData : public QObject
 
 
 };
-typedef QSharedPointer<RyPipeData> RyPipeData_ptr;
 
 #endif // RYPIPEDATA_H
+
+typedef QSharedPointer<RyPipeData> RyPipeData_ptr;
+typedef QSharedPointer<RyPipeData::PerformanceDateTime> PerformanceDateTime_ptr;

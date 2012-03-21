@@ -17,7 +17,6 @@ RyProxyServer::RyProxyServer() :
     setMaxSocket(30);
 }
 RyProxyServer::~RyProxyServer(){
-    isStoping = true;
     //this->blockSignals(true);
     qDebug()<<"~RyProxyServer begin";
     close();
@@ -25,8 +24,10 @@ RyProxyServer::~RyProxyServer(){
 }
 
 void RyProxyServer::close(){
-    isStoping = true;
     QTcpServer::close();
+    QMutexLocker locker(&connectionOpMutex);
+    Q_UNUSED(locker)
+    isStoping = true;
     // close all sockets
     for(int i=0,l=_connections.length();i<l;++i){
         //qDebug()<<"delete connection"<<l<<i;
@@ -41,6 +42,7 @@ void RyProxyServer::close(){
         QTcpSocket *socket = _cachedSockets.values().takeFirst();
         socket->deleteLater();
     }
+    _connections.clear();
     this->blockSignals(true);
     qDebug()<<"proxy server closed..";
 }
@@ -130,9 +132,13 @@ RyConnection * RyProxyServer::_getConnection(int handle){
     //if(!_cacheConnections.contains(handle)){
     //qDebug()<<"_lastConnectionId"<<_lastConnectionId;
         _lastConnectionId++;
-        QThread *newThread = new QThread();
 
+        QMutexLocker locker(&connectionOpMutex);
+        QThread *newThread = new QThread();
         RyConnection *connection = new RyConnection(handle,_lastConnectionId);
+        _connections.append(connection);
+        _threads[connection] = newThread;
+        locker.unlock();
 
         connect(connection,SIGNAL(idleTimeout()),SLOT(onConnectionIdleTimeout()));
 
@@ -153,13 +159,12 @@ RyConnection * RyProxyServer::_getConnection(int handle){
         connect(connection,SIGNAL(pipeError(RyPipeData_ptr)),
                 SIGNAL(pipeError(RyPipeData_ptr)));
 
-        _connections.append(connection);
-        _threads[connection] = newThread;
 
         connection->moveToThread(newThread);
         connect(newThread,SIGNAL(started()),connection,SLOT(run()));
         connect(newThread,SIGNAL(finished()),SLOT(onThreadTerminated()));
         newThread->start();
+
         /*
         qDebug()<<"=== create connection cost:"
                <<time.msecsTo(QDateTime::currentDateTime())
@@ -211,5 +216,6 @@ void RyProxyServer::onConnectionClosed(){
     //_cacheConnections.remove(connection);
     QMetaObject::invokeMethod(thread,"quit");
     connection->deleteLater();
+
     //thread->deleteLater();
 }

@@ -91,6 +91,7 @@ private:
     QPair<QByteArray,QByteArray> getLocalMergeReplaceContent();
     QPair<QByteArray,QByteArray> getLocalDirReplaceContent();
 
+    QNetworkAccessManager manager;
     QString _url;
     QSharedPointer<RyRule> _rule;
     QEventLoop *_loop;

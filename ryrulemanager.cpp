@@ -2,7 +2,6 @@
 
 #include <QMutexLocker>
 #include <QScriptEngine>
-#include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QUrl>
 #include <QNetworkReply>
@@ -164,15 +163,18 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(){
     QPair<QByteArray,QByteArray> ret;
     QByteArray header,body;
 
-    //QTimer timer;
-    QNetworkAccessManager manager;
-    //timer.singleShot(20000,_loop,SLOT(quit()));
+    QTimer timer;
+    timer.singleShot(5000,_loop,SLOT(quit()));//5秒内
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
     manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),_loop,SLOT(quit()));
     QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(_rule->replace())));
     _loop->exec();
 
-    bool isRequestDone = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).isValid();
-    if(!isRequestDone){
+    qDebug()<<QString(reply->readAll());
+    bool isOk;
+    qDebug()<<QString::number( reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(&isOk));
+    //bool isRequestDone = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).isValid();
+    if(!isOk){
         body.append("<center>remote address unresponsable</center>");
         header.append(QString("HTTP/1.1 503 Serveice Unavailable\r\n"
                          "Server: Rythem \r\n"
@@ -234,11 +236,11 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(){
 
     header.append(QString("HTTP/1.1 %1 \r\n"
                      "Server: Rythem \r\n"
-                     "Content-Type: %2 charset=%3\r\n"
-                     "Content-Length: %4 \r\n\r\n")
+                     "Content-Type: %2 \r\n"
+                     "Content-Length: %3 \r\n\r\n")
             .arg(status)
             .arg(mimeType)
-            .arg(encode)
+            //.arg(encode)
             .arg(contentLength));
 
     ret.first = header;
@@ -313,10 +315,10 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
         }
     }
     contentLength = body.size();
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
                        .arg(status)
                        .arg(mimeType) // TODO
-                       .arg(encode)
+                       //.arg(encode)
                        .arg(contentLength));
 
     ret.first = header;
@@ -365,7 +367,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(){
     fileName.prepend(replace);
     //qDebug()<<fileName;
     file.setFileName(fileName);
-    if(file.open(QFile::ReadOnly | QIODevice::Text)){
+    if(file.open(QFile::ReadOnly)){
         status = "200 OK";
         body = file.readAll();
     }else{
@@ -375,10 +377,10 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(){
     mimeType = RyRule::getMimeType(QFileInfo(file).suffix().toLower(),"text/plain");
     file.close();
     contentLength = body.size();
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 charset=%3 \r\nContent-Length: %4 \r\n\r\n")
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
                        .arg(status)
                        .arg(mimeType)
-                       .arg(encode)
+                       //.arg(encode)
                        .arg(contentLength));
     ret.first = header;
     ret.second = body;
@@ -663,7 +665,7 @@ RyRuleManager::~RyRuleManager(){
 void RyRuleManager::loadLocalConfig(const QString& configFileName){
     _configFileName = configFileName;
     QFile file(configFileName);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
+    if(file.open(QIODevice::ReadOnly)){
         qDebug()<<"opened rythem config file "<<configFileName;
         QString content = file.readAll();
         file.close();
@@ -878,7 +880,7 @@ QList<QSharedPointer<RyRule> > RyRuleManager::getMatchRules(const QString& url){
         QSharedPointer<RyRuleProject> p = it.next();
         ret.append(p->getMatchRules(url));
     }
-    qDebug()<<"match rule length = "<<QString::number(ret.length());
+    //qDebug()<<"match rule length = "<<QString::number(ret.length());
     return ret;
 }
 

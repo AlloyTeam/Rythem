@@ -22,10 +22,19 @@ RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent
     //qDebug()<<"RyConnection"<<socketHandle;
     //setHandle(socketHandle);
 
+    pipeDataMutex = new QMutex( QMutex::Recursive );
+
     _receivingPerformance.clientConnected = QDateTime::currentMSecsSinceEpoch();
+    //qDebug()<<"RyConnection";
 }
 
 RyConnection::~RyConnection(){
+    if(_responseState!=ConnectionStatePackageFound &&
+            _responseState!=ConnectionStateInit){
+        qDebug()<<"response stile receving...";
+    }else{
+        //qDebug()<<"~RyConnection";
+    }
     //qDebug()<<"~RyConnection pipeTotal:"<<_pipeTotal<<"_connection id = "<<_connectionId;
     if(_requestSocket){
         _requestSocket->disconnect(this);
@@ -45,7 +54,8 @@ RyConnection::~RyConnection(){
     //qDebug()<<"~RyConnection in main"
     //        << (QApplication::instance()->thread() == QThread::currentThread());
     //QThread::currentThread()->quit();
-    _pipeList.clear();
+    //_pipeList.clear();
+    delete pipeDataMutex;
 }
 int RyConnection::handle()const{
     return _handle;
@@ -115,6 +125,7 @@ void RyConnection::onRequestReadyRead(){
     parseRequest();
 }
 void RyConnection::onRequestClose(){
+    //pipeDataMutex->tryLock();
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
@@ -135,8 +146,10 @@ void RyConnection::onRequestClose(){
     _responseState = ConnectionStateInit;
     emit connectionClose();
     closed = true;
+    //pipeDataMutex->unlock();
 }
 void RyConnection::onRequestError(QAbstractSocket::SocketError err){
+    //pipeDataMutex->tryLock();
     //qDebug()<<"request error";
     if(_responseSocket){
         _responseSocket->blockSignals(true);
@@ -185,16 +198,18 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError err){
             //}
 
         }
-        _sendingPipeData.clear();
+        //_sendingPipeData.clear();
     }
     _responseState = ConnectionStateInit;
 
     //TODO
     emit connectionClose();
     closed = true;
+    //pipeDataMutex->unlock();
 }
 
 void RyConnection::onResponseConnected(){
+    //pipeDataMutex->tryLock();
     if(_sendingPerformance.responseConnected==-1){
         _sendingPerformance.responseConnected = QDateTime::currentMSecsSinceEpoch();
     }
@@ -223,6 +238,7 @@ void RyConnection::onResponseConnected(){
         _responseSocket->write(_sendingPipeData->dataToSend());
         _responseSocket->flush();
     }
+    //pipeDataMutex->unlock();
 }
 void RyConnection::onResponseReadyRead(){
     if(_sendingPerformance.responseBegin == -1){
@@ -251,10 +267,13 @@ void RyConnection::onResponseReadyRead(){
 
 }
 void RyConnection::onResponseClose(){
+    //pipeDataMutex->tryLock();
     qDebug()<<"response close";
     closed = true;
+    //pipeDataMutex->unlock();
 }
 void RyConnection::onResponseError(QAbstractSocket::SocketError){
+    //pipeDataMutex->tryLock();
     //qDebug()<<"onResponseError"<<handle();
     if(_sendingPipeData){
         if(_sendingPipeData->responseHeaderRawData().isEmpty()){
@@ -299,6 +318,7 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
     }
     emit connectionClose();
     closed = true;
+    //pipeDataMutex->unlock();
     //qDebug()<<"onResponseError end"<<handle();
 }
 
@@ -321,6 +341,10 @@ void RyConnection::onRequestHeaderFound(){
 }
 
 void RyConnection::onRequestPackageFound(){
+    if(closed){
+        return;
+    }
+    //pipeDataMutex->tryLock();
     _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
     if(_receivingPipeData->method == "CONNECT"){
         _isConnectTunnel = true;
@@ -338,6 +362,7 @@ void RyConnection::onRequestPackageFound(){
     _lastSocketConnectedDateTime = _receivingPerformance.clientConnected;
     _receivingPerformance.reset();
     doRequestToNetwork();
+    //pipeDataMutex->unlock();
 }
 
 void RyConnection::onResponseHeaderFound(){
@@ -345,7 +370,12 @@ void RyConnection::onResponseHeaderFound(){
 }
 
 void RyConnection::onResponsePackageFound(){
+    if(closed){
+        return;
+    }
+    //pipeDataMutex->tryLock();
     _sendingPerformance.responseDone = QDateTime::currentMSecsSinceEpoch();
+    //qDebug()<<"isClosed?"<<(closed?"yes":"no")<<(_sendingPipeData.isNull()?" sending is null :yes":"no");
     _sendingPipeData->performances = _sendingPerformance;
     _responseState = ConnectionStatePackageFound;
     emit pipeComplete(_sendingPipeData);
@@ -358,6 +388,7 @@ void RyConnection::onResponsePackageFound(){
     _sendingPipeData.clear();
     _sendingPerformance.reset();
     doRequestToNetwork();
+    //pipeDataMutex->unlock();
 
 
 }
@@ -508,6 +539,8 @@ void RyConnection::doRequestToNetwork(){
             _sendingPipeData->replacedHost = host;
         }else{
             QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
+            //qDebug()<<headerAndBody.second;
+            //qDebug()<<headerAndBody.first;
             bool isOk;
             QByteArray ba = headerAndBody.first;
             _sendingPipeData->parseResponse(&ba,&isOk);
@@ -515,7 +548,6 @@ void RyConnection::doRequestToNetwork(){
                 _requestSocket->write(headerAndBody.first);
                 _requestSocket->flush();
                 onResponseHeaderFound();
-                //qDebug()<<headerAndBody.second;
                 ba = headerAndBody.second;
                 _sendingPipeData->appendResponseBody(&ba);
                 _requestSocket->write(headerAndBody.second);
