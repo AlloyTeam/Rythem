@@ -3,7 +3,7 @@
 
 #include "ryrule.h"
 
-namespace manager{
+namespace rule{
 
 class RyRuleGroup{
 public:

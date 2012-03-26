@@ -1,8 +1,9 @@
 #include "ryrulemanager.h"
+#include "ryrulereplacecontent.h"
 
 extern QString appPath;
 
-using namespace manager;
+using namespace rule;
 
 
 QMutex RyRuleManager::_singletonMutex;

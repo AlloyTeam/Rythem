@@ -293,7 +293,7 @@ int RyPipeData::getChunkSize(QByteArray* chunkedData){
 
     int chunkEndNewLineSize = 2; // if using \r\n
     int beginOfLength = 0;
-    int endOfLength;
+    int endOfLength = 0;
 
     if(theBody.startsWith("\r\n")){
         beginOfLength = 2;

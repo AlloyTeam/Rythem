@@ -8,7 +8,7 @@
 #include <QtCore>
 #include <QUrl>
 
-#include "ryrulemanager.h"
+#include "rule/ryrulemanager.h"
 
 
 #include "ryproxyserver.h"
@@ -16,7 +16,7 @@
 
 #include <QThread>
 
-
+using namespace rule;
 
 
 QString appPath = "";

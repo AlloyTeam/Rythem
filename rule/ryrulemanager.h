@@ -3,7 +3,7 @@
 
 #include "ryruleproject.h"
 
-namespace manager{
+namespace rule{
 
 class RyRuleManager:public QObject{
     Q_OBJECT

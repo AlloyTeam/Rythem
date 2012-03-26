@@ -8,7 +8,7 @@
 #include <QDebug>
 
 
-namespace manager{
+namespace rule{
 
 class RyRule{
 public:

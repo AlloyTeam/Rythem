@@ -12,10 +12,12 @@
 #include <QScriptEngine>
 #include <QScriptValue>
 
-#include "ryrulemanager.h"
+#include "rule/ryrulemanager.h"
 #include "ryproxyserver.h"
 
 #include <QScriptEngine>
+
+using namespace rule;
 
 namespace Ui {
     class MainWindow;
@@ -25,87 +27,13 @@ class QItemSelectionModel;
 class RyJsBridge:public QObject{
         Q_OBJECT
     public:
-        RyJsBridge():QObject(){
-
-
-        }
+        RyJsBridge();
 
     public slots:
-        QString doAction(int action,const QString msg,quint64 groupId=0){
-            qDebug()<<"doAction "<<QString::number(action)<< msg<<"groupId"<<QString::number(groupId);
-            RyRuleManager *manager = RyRuleManager::instance();
-            QSharedPointer<RyRuleProject> pro;
-            QSharedPointer<RyRuleGroup> group;
-            QSharedPointer<RyRule> rule;
-            switch(action){
-            case 0://add local group
-                group = manager->addGroupToLocalProject(msg);//暂时只允许添加到本地project
-                //emit ruleChanged(0,"success");
-                if(!group.isNull()){
-                    qDebug()<<group->toJSON();
-                    return group->toJSON();
-                }
-                break;
-            case 1://add rule to group
-                rule = manager->addRuleToGroup(msg,groupId);
-                if(!rule.isNull()){
-                    return QString::number(rule->ruleId());
-                }
-                break;
-            case 2://add remote project
-                pro = manager->addRemoteProject(msg);
-                if(!pro.isNull()){
-                    emit ruleChanged(2,pro->toJson());
-                    return pro->toJson();
-                }
-                break;
-            case 3://update group
-                manager->updateRuleGroup(msg,groupId);
-                break;
-            case 4://update rule
-                manager->updateRule(msg,groupId);
-                break;
-            case 5://remove group
-                manager->removeGroup(msg.toULongLong());
-                break;
-            case 6://remove rule  (6,ruleId,groupId)
-                manager->removeRule(msg.toULongLong(),groupId);
-                break;
-            case 7://import local config
-                pro = manager->addLocalProject(msg);
-                if(!pro.isNull()){
-                    emit ruleChanged(2,pro->toJson());
-                    return pro->toJson();
-                }
-                break;
-            }
-            return "";
-        }
-        QString getFile(){
-            return QFileDialog::getOpenFileName();
-        }
-        QString getDir(){
-            return QFileDialog::getExistingDirectory();
-        }
-        QString getRules(){
-            return "";
-        }
-        QString getConfigs(){
-            RyRuleManager *manager = RyRuleManager::instance();
-            QString s = manager->toJson();
-            s.remove('\r');
-            s.remove('\n');
-            s.remove('\t');
-            s.replace("\\","\\\\");
-			return s;
-        }
-        bool updateConfigs(QString json){
-            RyRuleManager *manager = RyRuleManager::instance();
-			qDebug() << "[JSBridge] update" << json;
-			qDebug() << "-------------------------";
-            //manager->setLocalConfigContent(json, true);
-            return true;
-        }
+        QString doAction(int action,const QString msg,quint64 groupId=0);
+        QString getFile();
+        QString getDir();
+        QString getConfigs();
 
    signals:
         void ruleChanged(int action,QString json);

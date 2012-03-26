@@ -1,6 +1,6 @@
 #include "ryrule.h"
 
-using namespace manager;
+using namespace rule;
 
 QMap<QString,QString> RyRule::_mimeTypeMap;
 quint64 RyRule::_nextRuleId = 0;

@@ -1,6 +1,6 @@
 #include "ryruleproject.h"
 
-using namespace manager;
+using namespace rule;
 
 RyRuleProject::RyRuleProject(const QScriptValue& project){
     QString localAddress = project.property("localAddress").toString();
@@ -147,6 +147,7 @@ bool RyRuleProject::addRuleGroups(const QString& content){
     }
 }
 QSharedPointer<RyRuleGroup> RyRuleProject::addRuleGroup(const QScriptValue& group,bool updateLocalFile){
+    Q_UNUSED(updateLocalFile)
     RyRuleGroup *g = new RyRuleGroup(group);
     QSharedPointer<RyRuleGroup> groupPtr(g);
     //qDebug()<<"group added:"<<g->toJSON();

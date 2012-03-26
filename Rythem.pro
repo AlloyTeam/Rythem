@@ -21,18 +21,17 @@ SOURCES += main.cpp\
     websocketclient.cpp \
     connectionmonitorwsserver.cpp \
     qirulesettingsdialog.cpp\
-    httpdecoder.cpp \
     ryproxyserver.cpp \
     rypipedata.cpp \
     ryconnection.cpp \
     composer.cpp \
     rypipetableview.cpp\
-    ryrulemanager.cpp\
     waterfallwindow.cpp \
-    manager/ryruleproject.cpp \
-    manager/ryrule.cpp \
-    manager/ryrulegroup.cpp \
-    manager/ryrulemanager.cpp
+    rule/ryruleproject.cpp \
+    rule/ryrule.cpp \
+    rule/ryrulegroup.cpp \
+    rule/ryrulemanager.cpp \
+    rule/ryrulereplacecontent.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -46,18 +45,17 @@ HEADERS  += mainwindow.h \
     websocketclient.h \
     connectionmonitorwsserver.h \
     qirulesettingsdialog.h \
-    httpdecoder.h \
     ryproxyserver.h \
     rypipedata.h \
     ryconnection.h \
     composer.h \
     rypipetableview.h \
-    ryrulemanager.h \
     waterfallwindow.h \
-    manager/ryruleproject.h \
-    manager/ryrule.h \
-    manager/ryrulegroup.h \
-    manager/ryrulemanager.h
+    rule/ryruleproject.h \
+    rule/ryrule.h \
+    rule/ryrulegroup.h \
+    rule/ryrulemanager.h \
+    rule/ryrulereplacecontent.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \

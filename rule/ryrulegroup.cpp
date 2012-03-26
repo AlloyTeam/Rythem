@@ -1,6 +1,6 @@
 #include "ryrulegroup.h"
 
-using namespace manager;
+using namespace rule;
 
 quint64 RyRuleGroup::_nextGroupId = 0;
 QMutex RyRuleGroup::mutex;
@@ -39,7 +39,7 @@ RyRuleGroup::RyRuleGroup(quint64 groupId, const QString &groupName, bool isOwner
 }
 */
 void RyRuleGroup::addRules(const QString& rules){
-
+    Q_UNUSED(rules)
 }
 void RyRuleGroup::addRules(const QScriptValue& rules){
     QScriptValueIterator it(rules);

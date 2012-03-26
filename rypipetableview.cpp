@@ -4,6 +4,6 @@
 RyPipeTableView::RyPipeTableView(QWidget *parent) :
     QTableView(parent){
 }
-void RyPipeTableView::mousePressEvent(QMouseEvent *event){
+void RyPipeTableView::mousePressEvent(QMouseEvent *){
     qDebug()<<"mouse press";
 }

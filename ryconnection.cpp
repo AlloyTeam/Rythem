@@ -6,7 +6,8 @@
 #include "rywinhttp.h"
 #endif
 
-#include "ryrulemanager.h"
+#include "rule/ryrulemanager.h"
+using namespace rule;
 
 RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent)
     :QObject(parent),
@@ -148,7 +149,7 @@ void RyConnection::onRequestClose(){
     closed = true;
     //pipeDataMutex->unlock();
 }
-void RyConnection::onRequestError(QAbstractSocket::SocketError err){
+void RyConnection::onRequestError(QAbstractSocket::SocketError){
     //pipeDataMutex->tryLock();
     //qDebug()<<"request error";
     if(_responseSocket){
