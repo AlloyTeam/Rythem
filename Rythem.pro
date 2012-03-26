@@ -28,7 +28,11 @@ SOURCES += main.cpp\
     composer.cpp \
     rypipetableview.cpp\
     ryrulemanager.cpp\
-    waterfallwindow.cpp
+    waterfallwindow.cpp \
+    manager/ryruleproject.cpp \
+    manager/ryrule.cpp \
+    manager/ryrulegroup.cpp \
+    manager/ryrulemanager.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -49,7 +53,11 @@ HEADERS  += mainwindow.h \
     composer.h \
     rypipetableview.h \
     ryrulemanager.h \
-    waterfallwindow.h
+    waterfallwindow.h \
+    manager/ryruleproject.h \
+    manager/ryrule.h \
+    manager/ryrulegroup.h \
+    manager/ryrulemanager.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
