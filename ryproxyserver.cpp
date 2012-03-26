@@ -59,10 +59,6 @@ quint64 RyProxyServer::nextPipeId(){
     return _lastPipeId++;
 }
 
-void RyProxyServer::run(){
-
-}
-
 
 void RyProxyServer::cacheSocket(QString address,quint16 port,QTcpSocket* socket){
     qDebug()<<"CACHE SOCKET cacheSocket"<<address<<port;
@@ -71,16 +67,11 @@ void RyProxyServer::cacheSocket(QString address,quint16 port,QTcpSocket* socket)
     QString key = QString("%1:%2").arg(address.toLower()).arg(port);
     QMutexLocker locker(&_socketsOpMutex);
     Q_UNUSED(locker)
-    //if(_cachedSockets.values().contains(socket)){
-    // 效率优化，不做这个不大需要的检查
-    //    qDebug()<<"already cache this!";
-    //}else{
-        _cachedSockets.insert(key ,socket);
-    //}
+    _cachedSockets.insert(key ,socket);
 }
 QTcpSocket* RyProxyServer::getSocket(QString address,quint16 port,bool* isFromCache,QThread* _desThread){
 
-    QDateTime time = QDateTime::currentDateTime();
+    //QDateTime time = QDateTime::currentDateTime();
     //qDebug()<<"getSocket "<<time.toMSecsSinceEpoch();
     if(isFromCache) *isFromCache = false;
     QTcpSocket *theSocket = NULL;
@@ -131,46 +122,46 @@ RyConnection * RyProxyServer::_getConnection(int handle){
     //          <<time.toMSecsSinceEpoch();
     //if(!_cacheConnections.contains(handle)){
     //qDebug()<<"_lastConnectionId"<<_lastConnectionId;
-        _lastConnectionId++;
+    _lastConnectionId++;
 
-        QMutexLocker locker(&connectionOpMutex);
-        QThread *newThread = new QThread();
-        RyConnection *connection = new RyConnection(handle,_lastConnectionId);
-        _connections.append(connection);
-        _threads[connection] = newThread;
-        locker.unlock();
+    QMutexLocker locker(&connectionOpMutex);
+    QThread *newThread = new QThread();
+    RyConnection *connection = new RyConnection(handle,_lastConnectionId);
+    _connections.append(connection);
+    _threads[connection] = newThread;
+    locker.unlock();
 
-        connect(connection,SIGNAL(idleTimeout()),SLOT(onConnectionIdleTimeout()));
+    connect(connection,SIGNAL(idleTimeout()),SLOT(onConnectionIdleTimeout()));
 
-        connect(connection,SIGNAL(pipeBegin(RyPipeData_ptr)),
-                SLOT(onPipeBegin(RyPipeData_ptr)));
-        connect(connection,SIGNAL(pipeComplete(RyPipeData_ptr)),
-                SLOT(onPipeComplete(RyPipeData_ptr)));
-        connect(connection,SIGNAL(pipeError(RyPipeData_ptr)),
-                SLOT(onPipeError(RyPipeData_ptr)));
+    connect(connection,SIGNAL(pipeBegin(RyPipeData_ptr)),
+            SLOT(onPipeBegin(RyPipeData_ptr)));
+    connect(connection,SIGNAL(pipeComplete(RyPipeData_ptr)),
+            SLOT(onPipeComplete(RyPipeData_ptr)));
+    connect(connection,SIGNAL(pipeError(RyPipeData_ptr)),
+            SLOT(onPipeError(RyPipeData_ptr)));
 
-        connect(connection,SIGNAL(connectionClose()),
-                SLOT(onConnectionClosed()));
+    connect(connection,SIGNAL(connectionClose()),
+            SLOT(onConnectionClosed()));
 
-        connect(connection,SIGNAL(pipeBegin(RyPipeData_ptr)),
-                SIGNAL(pipeBegin(RyPipeData_ptr)));
-        connect(connection,SIGNAL(pipeComplete(RyPipeData_ptr)),
-                SIGNAL(pipeComplete(RyPipeData_ptr)));
-        connect(connection,SIGNAL(pipeError(RyPipeData_ptr)),
-                SIGNAL(pipeError(RyPipeData_ptr)));
+    connect(connection,SIGNAL(pipeBegin(RyPipeData_ptr)),
+            SIGNAL(pipeBegin(RyPipeData_ptr)));
+    connect(connection,SIGNAL(pipeComplete(RyPipeData_ptr)),
+            SIGNAL(pipeComplete(RyPipeData_ptr)));
+    connect(connection,SIGNAL(pipeError(RyPipeData_ptr)),
+            SIGNAL(pipeError(RyPipeData_ptr)));
 
 
-        connection->moveToThread(newThread);
-        connect(newThread,SIGNAL(started()),connection,SLOT(run()));
-        connect(newThread,SIGNAL(finished()),SLOT(onThreadTerminated()));
-        newThread->start();
+    connection->moveToThread(newThread);
+    connect(newThread,SIGNAL(started()),connection,SLOT(run()));
+    connect(newThread,SIGNAL(finished()),SLOT(onThreadTerminated()));
+    newThread->start();
 
-        /*
-        qDebug()<<"=== create connection cost:"
-               <<time.msecsTo(QDateTime::currentDateTime())
-               <<time.toMSecsSinceEpoch();
-        */
-        return connection;
+    /*
+    qDebug()<<"=== create connection cost:"
+           <<time.msecsTo(QDateTime::currentDateTime())
+           <<time.toMSecsSinceEpoch();
+    */
+    return connection;
 }
 
 
@@ -178,9 +169,7 @@ RyConnection * RyProxyServer::_getConnection(int handle){
 void RyProxyServer::onConnectionIdleTimeout(){
     RyConnection *connection = qobject_cast<RyConnection*>(sender());
     _connections.removeOne(connection);
-    //connection->blockSignals(true);
     //connection->disconnect(this);
-    //_cacheConnections.remove(connection);
     connection->deleteLater();
 }
 
@@ -209,13 +198,13 @@ void RyProxyServer::onThreadTerminated(){
 void RyProxyServer::onConnectionClosed(){
     //qDebug()<<"connection closed";
     RyConnection *connection = qobject_cast<RyConnection*>(sender());
+    if(!connection){
+        return;
+    }
 
     _connections.removeOne(connection);
     QThread *thread = _threads.take(connection);
     connection->disconnect(this);
-    //_cacheConnections.remove(connection);
     QMetaObject::invokeMethod(thread,"quit");
     connection->deleteLater();
-
-    //thread->deleteLater();
 }

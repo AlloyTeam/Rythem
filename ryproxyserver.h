@@ -6,14 +6,13 @@
 #include "ryconnection.h"
 
 
-class RyProxyServer : public QTcpServer,public QRunnable
+class RyProxyServer : public QTcpServer
 {
         Q_OBJECT
     public:
         static RyProxyServer* instance();
         explicit RyProxyServer();
         ~RyProxyServer();
-        void run();
         void close();
 
         int maxOfSocket();
