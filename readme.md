@@ -1,4 +1,6 @@
-# Rythem <sub>web tool</sub>
+# Rythem 
+
+ <strong>fiddler like cross-platforms(MacOS/win/*linux*) tool using `Qt`</strong>
 
 
 ### 功能
@@ -43,8 +45,8 @@
         如无匹配规则，跳到2.4
     2.3 如获取规则则照获修改`RyPipeData`，如修改后的pipeData已有内容（内容替换类规则）
          跳到2.5，否则跳到2.4
-     2.4 向远程socket写入当前pipeData的http request 数据并监听返回
+    2.4 向远程socket写入当前pipeData的http request 数据并监听返回
          当远程返回数据解包完成，跳到2.5
-     2.5 获取下一个队列中的pipeData，如果为空，结束，否则跳到2.2步
+    2.5 获取下一个队列中的pipeData，如果为空，结束，否则跳到2.2步
     </pre>
 3. 当`RyConnection`解析到新的请求包时，或解析到返回包时，发出相应的signal给具体UI
