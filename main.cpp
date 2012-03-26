@@ -46,7 +46,7 @@ void myMessageHandler(QtMsgType type, const char *msg)
         outFile.close();
 }
 
-//#define DEBUGTOFILE
+#define DEBUGTOFILE
 
 int main(int argc, char *argv[])
 {
@@ -59,20 +59,12 @@ int main(int argc, char *argv[])
     qInstallMsgHandler(myMessageHandler);
 #endif
 
-	//new rule manager test----------------------------------------------------
-    //qDebug()<<appPath;
     RyRuleManager *manager = RyRuleManager::instance();
 #ifdef Q_WS_WIN32
     manager->loadLocalConfig(appPath+"/rythem_config.txt");
 #else
     manager->loadLocalConfig(appPath+"/../../../../Rythem/rythem_config.txt");
 #endif
-    //QList<RyRule *> matchResult;
-    //manager->getMatchRules(&matchResult, "http://abc.com/a.html"); //2ms
-    //qDebug() << matchResult;
-	//-------------------------------------------------------------------------
-
-
 
     // register metatypes
     qRegisterMetaType<RyPipeData_ptr>("RyPipeData_ptr");
@@ -92,19 +84,6 @@ int main(int argc, char *argv[])
     server->listen(QHostAddress("127.0.0.1"),8889);
 
     w.show();
-
-    //a.connect(&a,SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
-
-    //ConnectionMonitorWSServer wsServer;
-    //wsServer.start();
-    //QObject::connect(&w.pipeTableModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), &wsServer, SLOT(handleConnectionChange(QModelIndex, QModelIndex)));
-	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionAdded(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionAdd(RyPipeData_ptr)));
-	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionUpdated(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionUpdate(RyPipeData_ptr)));
-	//QObject::connect(&w.pipeTableModel, SIGNAL(connectionRemoved(RyPipeData_ptr)), &wsServer, SLOT(handleConnectionRemove(RyPipeData_ptr)));
-
-    //QString status;
-    //    status.sprintf("proxy listening on port %d, control waiting on port %d", server.serverPort(), wsServer.serverPort());
-    //w.statusBar()->showMessage(status);
 
     return a.exec();
 

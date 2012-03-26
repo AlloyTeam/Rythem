@@ -22,7 +22,6 @@ SOURCES += main.cpp\
     connectionmonitorwsserver.cpp \
     qirulesettingsdialog.cpp\
     httpdecoder.cpp \
-    json.cpp \
     ryproxyserver.cpp \
     rypipedata.cpp \
     ryconnection.cpp \
@@ -44,7 +43,6 @@ HEADERS  += mainwindow.h \
     connectionmonitorwsserver.h \
     qirulesettingsdialog.h \
     httpdecoder.h \
-    json.h \
     ryproxyserver.h \
     rypipedata.h \
     ryconnection.h \
