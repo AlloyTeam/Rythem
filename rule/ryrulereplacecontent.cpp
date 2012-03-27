@@ -151,10 +151,12 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
     QString mergeFileContent;
     QMap<QString,QVariant> mergeValueMap;
     bool mergeContentHasError=false;
+    QString mergeFilePath;
 
     bool fileCanOpen;
     file.setFileName(replace);
     if(file.open(QFile::ReadOnly)){
+        mergeFilePath = fileInfo.absolutePath();
         mimeTypeKey = fileInfo.suffix().toLower();
         mimeType = RyRule::getMimeType(mimeTypeKey,"application/javascript");
         mergeFileContent = file.readAll();
@@ -190,12 +192,17 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
         status = "200 OK";
         foreach(QVariant item,mergeValueMap["include"].toList()){
             //qDebug()<<item.toString();
-            file.setFileName(item.toString());
+            QString itemFileName = item.toString();
+            if(itemFileName.startsWith('.')){//相对路径
+                itemFileName.prepend("/");
+                itemFileName.prepend(mergeFilePath);
+            }
+            file.setFileName(itemFileName);
             fileCanOpen = file.open(QFile::ReadOnly);
             if(fileCanOpen){
                 body.append(file.readAll());
             }else{
-                body.append(QString("/*file:【%1】 not found*/").arg(item.toString()));
+                body.append(QString("/*file:【%1】 not found*/").arg(itemFileName));
             }
             file.close();
         }
@@ -262,8 +269,8 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(){
     }
     mimeType = RyRule::getMimeType(QFileInfo(file).suffix().toLower(),"text/plain");
     file.close();
-    contentLength = body.size();//
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nCache-Control:max-age=315360000 \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+    contentLength = body.size();// \r\nCache-Control:max-age=315360000
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
                        .arg(status)
                        .arg(mimeType)
                        //.arg(encode)

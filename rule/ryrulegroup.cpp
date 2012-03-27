@@ -122,10 +122,12 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
     QListIterator<QSharedPointer<RyRule> > it(_rules);
     while(it.hasNext()){
         QSharedPointer<RyRule> rule = it.next();
-        //qDebug()<<"getMatchRule rule:"<<url<<rule->toJSON();
         if(!rule->enabled){
+            qDebug()<<"rule not enabled "<<rule->toJSON(true,0);
             continue;
         }
+        //qDebug()<<"getMatchRule rule:"<<url<<rule->toJSON(true,0);
+        //qDebug()<<url;
         int type = rule->type();
         QString pattern = rule->pattern();
         bool isRegExp = rule->pattern().toLower().startsWith("regex:");
@@ -159,6 +161,7 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
         }else{
             if(isRegExp){
                 pattern  = pattern.mid(QString("regex:").length());
+                //qDebug()<<"pattern="<<pattern;
                 QRegExp rx(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
                 isMatch = rx.exactMatch(url);
             }else{
@@ -166,6 +169,7 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
             }
         }
         if(isMatch){
+            //qDebug()<<"match\n"<<rule->toJSON(true,0);
             ret.append(rule);
         }
     }

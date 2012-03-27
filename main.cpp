@@ -46,7 +46,7 @@ void myMessageHandler(QtMsgType type, const char *msg)
         outFile.close();
 }
 
-#define DEBUGTOFILE
+//#define DEBUGTOFILE
 
 int main(int argc, char *argv[])
 {
