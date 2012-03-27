@@ -60,11 +60,7 @@ int main(int argc, char *argv[])
 #endif
 
     RyRuleManager *manager = RyRuleManager::instance();
-#ifdef Q_WS_WIN32
     manager->loadLocalConfig(appPath+"/rythem_config.txt");
-#else
-    manager->loadLocalConfig(appPath+"/../../../../Rythem/rythem_config.txt");
-#endif
 
     // register metatypes
     qRegisterMetaType<RyPipeData_ptr>("RyPipeData_ptr");
