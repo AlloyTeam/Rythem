@@ -9,16 +9,7 @@ function unescapeFromHtml(html){
 }
 var oldConfigs;
 function updateConfigs(){
-          return;
-	var s = JSON.stringify(configs);
-	var changed = (s != oldConfigs);
-	if(changed){
-		console.log('updating configs ...');
-		if(window.App){
-			window.App.updateConfigs('{"groups":'+s+'}');
-		}
-		oldConfigs = s;
-	}
+    //已废弃
 }
     /**
      * 项目里的每条规则，支持编辑和启用/禁用，会自动同步相关的数据
@@ -307,7 +298,7 @@ function updateConfigs(){
         this.__rulesEl = el.querySelector('.rules');
         this.__rules = [];
 
-        if(groupConfig.rules.length){
+        if(groupConfig.rules.length && groupConfig.enable){
             this.expand();
         }
         this.setEnable(groupConfig.enable);
@@ -327,7 +318,7 @@ function updateConfigs(){
         var i, length = groupConfig.rules.length;
         for(i=0; i<length; i++){
             if(groupConfig.rules[i].type != 1){ //ignore complex host type
-                this.addRule(groupConfig.rules[i]);
+                this.addRule(groupConfig.rules[i],true);
             }
         }
     }
@@ -336,14 +327,16 @@ function updateConfigs(){
          * 添加一条规则
          * @param {Object} ruleConfig
          */
-        addRule: function(ruleConfig){
+        addRule: function(ruleConfig,donExpand){
             //console.info("addRule",ruleConfig);
 			ruleConfig.groupId = this.__groupId
             var r = new Rule(ruleConfig);
             r.setLineEnable(this.getEnable());
             this.__rulesEl.appendChild(r.getEl());
             this.__rules.push(r);
-            this.expand();
+            if(!donExpand){
+                this.expand();
+            }
         },
         /**
          * 删除一条规则
