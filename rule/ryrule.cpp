@@ -8,6 +8,8 @@ QMutex RyRule::mutex;
 QString RyRule::getMimeType(const QString &key, const QString &defaultMimeType){
     if(RyRule::_mimeTypeMap.isEmpty()){
         RyRule::_mimeTypeMap.insert("html",	"text/html");
+        RyRule::_mimeTypeMap.insert("htm",	"text/html");
+        RyRule::_mimeTypeMap.insert("shtml",	"text/html");
         RyRule::_mimeTypeMap.insert("js",	"text/javascript");
         RyRule::_mimeTypeMap.insert("css",	"text/css");
         RyRule::_mimeTypeMap.insert("txt",	"text/plain");
