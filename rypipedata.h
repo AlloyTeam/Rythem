@@ -115,6 +115,9 @@ class RyPipeData : public QObject
         QString getRequestHeader(const QString& name)const;
         QString getResponseHeader(const QString& name)const;
 
+        bool isMatchingRule;
+        int ruleType;
+
         QByteArray requestHeaderRawData()const{
             return _requestHeaderRawData;
         }

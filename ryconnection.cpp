@@ -531,6 +531,11 @@ void RyConnection::doRequestToNetwork(){
     RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
     QList<QSharedPointer<RyRule> > matchResult;
     matchResult = manager->getMatchRules(_sendingPipeData->fullUrl);
+    if(matchResult.size()>0){
+        _sendingPipeData->isMatchingRule = true;
+    }else{
+        _sendingPipeData->isMatchingRule = false;
+    }
     for(int i=0,l=matchResult.size();i<l;++i){
         QSharedPointer<RyRule> rule = matchResult.at(i);
         qDebug()<<"rule found"<<rule->toJSON();
