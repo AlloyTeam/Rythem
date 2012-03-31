@@ -87,7 +87,7 @@ private:
     QItemSelectionModel *itemSelectModel;
 protected:
     void closeEvent(QCloseEvent *event);
-
+    void contextMenuEvent(QContextMenuEvent *event);
     QSettings proxySetting;
 
 private slots:

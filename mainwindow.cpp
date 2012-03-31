@@ -155,7 +155,6 @@ QString RyJsBridge::getConfigs(){
     s.remove('\r');
     s.remove('\n');
     s.remove('\t');
-    s.replace("\\","\\\\");
     return s;
 }
 
@@ -178,6 +177,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
     ui->tableView->setColumnWidth(1,30);
+    ui->tableView->verticalHeader()->setDefaultSectionSize(20);
+    ui->tableView->verticalHeader()->hide();
     ui->tableView->setSortingEnabled(true);
 
     jsBridge = new RyJsBridge();
@@ -488,6 +489,11 @@ void MainWindow::closeEvent(QCloseEvent *event){
     QMainWindow::closeEvent(event);
     qDebug()<<"close event";
     qApp->quit();
+}
+
+void MainWindow::contextMenuEvent(QContextMenuEvent *event){
+    qDebug()<<"contextMenu";
+    event->accept();
 }
 
 void MainWindow::addJsObject(){

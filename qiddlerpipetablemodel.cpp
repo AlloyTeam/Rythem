@@ -17,7 +17,7 @@ int QiddlerPipeTableModel::rowCount( const QModelIndex & ) const{
     return pipesVector.count();
 }
 int QiddlerPipeTableModel::columnCount(const QModelIndex &) const{
-    return 11;
+    return 10;
 }
 
 QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
@@ -27,6 +27,23 @@ QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
         case 1:
             return QString::number(p->socketConnectionId);
         case 2:
+            return ((p->responseStatus.isEmpty())?QString("-"):p->responseStatus);
+        case 3:
+            return p->httpVersion;
+        case 4:
+            return p->host;
+        case 5:
+            return p->serverIp;
+        case 6:
+            return p->path;
+        case 7:
+            return QString::number(p->responseBodyRawData().size());
+        case 8:
+            return p->getResponseHeader("Cache-Control");
+        case 9:
+            //qDebug()<<QString::number(p->performances.responseDone)<<QString::number(p->performances.requestBegin);
+            return QString::number(p->performances.responseDone - p->performances.requestBegin);
+        /*
             return QString::number(p->socketHandle);
         case 3:
             return ((p->responseStatus.isEmpty())?QString("-"):p->responseStatus);
@@ -45,6 +62,7 @@ QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
         case 10:
             qDebug()<<QString::number(p->performances.responseDone)<<QString::number(p->performances.requestBegin);
             return QString::number(p->performances.responseDone - p->performances.requestBegin);
+        */
         default:
             return QString("-");
     }
@@ -65,6 +83,12 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
         }
         return rypipeDataGetDataByColumn(p,column);
 
+    }else if(role == Qt::BackgroundColorRole){
+        if(pipesVector.count()>index.row()){
+            return (pipesVector.at(index.row())->isMatchingRule ? Qt::cyan : QVariant());
+        }else{
+            return QVariant();
+        }
     }else{
         return QVariant();
     }
@@ -76,7 +100,7 @@ QVariant QiddlerPipeTableModel::headerData(int section, Qt::Orientation orientat
 
     //TODO
     QStringList headers;
-    headers<<"#"<<"#2"<<"#3(socket)"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching"<<"all time";
+    headers<<"#"<<"#2(socket)"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching"<<"all time";
 
     if (orientation == Qt::Horizontal) {
         if(section< headers.size() ){
@@ -156,7 +180,7 @@ void QiddlerPipeTableModel::removeAllItem(){
     //int l = pipesVector.size();
     pipesMap.clear();
     pipesVector.clear();
-    qDebug()<<"length="<<pipesVector.count();
+    //qDebug()<<"length="<<pipesVector.count();
     //emit dataChanged(index(0,0),index(l-1,7));
     emit reset();
 }
