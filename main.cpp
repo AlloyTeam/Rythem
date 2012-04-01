@@ -3,7 +3,6 @@
 #include "mainwindow.h"
 #include <QDebug>
 
-#include "connectionmonitorwsserver.h"
 #include <QDateTime>
 #include <QtCore>
 #include <QUrl>

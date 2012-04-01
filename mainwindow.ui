@@ -146,7 +146,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
@@ -167,7 +167,7 @@
   <action name="actionRemoveAll">
    <property name="icon">
     <iconset resource="httpfiles.qrc">
-     <normaloff>:/web/test/family.png</normaloff>:/web/test/family.png</iconset>
+     <normaloff>:/static/logo.png</normaloff>:/static/logo.png</iconset>
    </property>
    <property name="text">
     <string>removeAll</string>
@@ -182,45 +182,13 @@
    </property>
    <property name="icon">
     <iconset resource="httpfiles.qrc">
-     <normaloff>:/web/test/family.png</normaloff>:/web/test/family.png</iconset>
+     <normaloff>:/static/logo.png</normaloff>:/static/logo.png</iconset>
    </property>
    <property name="text">
     <string>capture</string>
    </property>
    <property name="toolTip">
     <string>begin</string>
-   </property>
-  </action>
-  <action name="actionRemoveAll_3">
-   <property name="icon">
-    <iconset resource="httpfiles.qrc">
-     <normaloff>:/web/test/family.png</normaloff>:/web/test/family.png</iconset>
-   </property>
-   <property name="text">
-    <string>removeAll</string>
-   </property>
-   <property name="toolTip">
-    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Remove&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt; All&lt;/span&gt; Sessions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-  </action>
-  <action name="actionRemoveAll_4">
-   <property name="icon">
-    <iconset resource="httpfiles.qrc">
-     <normaloff>:/web/test/family.png</normaloff>:/web/test/family.png</iconset>
-   </property>
-   <property name="text">
-    <string>removeAll</string>
-   </property>
-   <property name="toolTip">
-    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Remove&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt; All&lt;/span&gt; Sessions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </action>
   <action name="actionWaterfall">

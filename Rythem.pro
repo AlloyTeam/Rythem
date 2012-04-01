@@ -76,10 +76,6 @@ RESOURCES += \
     httpfiles.qrc
 
 OTHER_FILES += \
-    wsAPI/index.css \
-    wsAPI/index.html \
-    wsAPI/index.js \
-    index.html \
     RythemManagerUI/rules.html \
     RythemManagerUI/css/rules.css \
     RythemManagerUI/js/rules.js \
