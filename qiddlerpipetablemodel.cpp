@@ -1,5 +1,5 @@
 #include "qiddlerpipetablemodel.h"
-#include "rypipedata.h"
+#include "proxy/rypipedata.h"
 #include <QVector>
 #include <QStringList>
 #include <QDebug>

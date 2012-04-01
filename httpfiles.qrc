@@ -41,5 +41,6 @@
     </qresource>
     <qresource prefix="/static">
         <file>static/icloud_64.png</file>
+        <file>logo.png</file>
     </qresource>
 </RCC>

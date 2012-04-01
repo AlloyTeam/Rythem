@@ -11,8 +11,8 @@
 #include "rule/ryrulemanager.h"
 
 
-#include "ryproxyserver.h"
-#include "rypipedata.h"
+#include "proxy/ryproxyserver.h"
+#include "proxy/rypipedata.h"
 
 #include <QThread>
 
@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
+    a.setWindowIcon(QIcon(":/static/logo.png"));
     appPath =  qApp->applicationDirPath();
 
 

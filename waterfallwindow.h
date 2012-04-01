@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QtCore>
 #include <QCloseEvent>
-#include <rypipedata.h>
+#include <proxy/rypipedata.h>
 
 namespace Ui {
 class WaterfallWindow;

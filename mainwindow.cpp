@@ -3,8 +3,8 @@
 #include "waterfallwindow.h"
 
 #include <QTcpServer>
-#include "rypipedata.h"
-#include "ryproxyserver.h"
+#include "proxy/rypipedata.h"
+#include "proxy/ryproxyserver.h"
 #include <QSettings>
 #include <QVariant>
 #include <QUrl>
@@ -16,7 +16,7 @@
 #ifdef Q_WS_WIN32
 #include "wininet.h"
 #include "winnetwk.h"
-#include "rywinhttp.h"
+#include "proxy/rywinhttp.h"
 #endif
 #ifdef Q_WS_MAC
 #include <CoreFoundation/CoreFoundation.h>
@@ -177,6 +177,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
     ui->tableView->setColumnWidth(1,30);
+    ui->tableView->setColumnWidth(2,50);
+    ui->tableView->setColumnWidth(3,50);
     ui->tableView->verticalHeader()->setDefaultSectionSize(20);
     ui->tableView->verticalHeader()->hide();
     ui->tableView->setSortingEnabled(true);

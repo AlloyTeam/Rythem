@@ -15,15 +15,11 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     qiddlerpipetablemodel.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
-    rywinhttp.cpp \
     bytearray.cpp \
     websocketserver.cpp \
     websocketclient.cpp \
     connectionmonitorwsserver.cpp \
     qirulesettingsdialog.cpp\
-    ryproxyserver.cpp \
-    rypipedata.cpp \
-    ryconnection.cpp \
     composer.cpp \
     rypipetableview.cpp\
     waterfallwindow.cpp \
@@ -31,23 +27,22 @@ SOURCES += main.cpp\
     rule/ryrule.cpp \
     rule/ryrulegroup.cpp \
     rule/ryrulemanager.cpp \
-    rule/ryrulereplacecontent.cpp
+    rule/ryrulereplacecontent.cpp \
+    proxy/rywinhttp.cpp \
+    proxy/ryproxyserver.cpp \
+    proxy/rypipedata.cpp \
+    proxy/ryconnection.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
     qnetworkproxyfactoryexendforpac.h \
-    rywinhttp.h \
-    rypipedata.h \
     bytearray.h \
     websocketserver.h \
     websocketclient.h \
     connectionmonitorwsserver.h \
     qirulesettingsdialog.h \
-    ryproxyserver.h \
-    rypipedata.h \
-    ryconnection.h \
     composer.h \
     rypipetableview.h \
     waterfallwindow.h \
@@ -55,7 +50,11 @@ HEADERS  += mainwindow.h \
     rule/ryrule.h \
     rule/ryrulegroup.h \
     rule/ryrulemanager.h \
-    rule/ryrulereplacecontent.h
+    rule/ryrulereplacecontent.h \
+    proxy/rywinhttp.h \
+    proxy/ryproxyserver.h \
+    proxy/rypipedata.h \
+    proxy/ryconnection.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
@@ -68,9 +67,9 @@ win32:HEADERS += zlib/zutil.h \
     zlib/deflate.h \
     zlib/crc32.h
 
-mac:HEADERS -= rywinhttp.h
+mac:HEADERS -= proxy/rywinhttp.h
 
-mac:SOURCES -= rywinhttp.cpp
+mac:SOURCES -= proxy/rywinhttp.cpp
 
 FORMS    += mainwindow.ui \
     rule_config.ui \
@@ -116,3 +115,5 @@ CONFIG(release){
     #DEFINES -= DEBUGTOFILE
     #message("release")
 }
+
+ICON = logo.png

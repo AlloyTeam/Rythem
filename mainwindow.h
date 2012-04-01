@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include "qiddlerpipetablemodel.h"
-#include "rypipedata.h"
+#include "proxy/rypipedata.h"
 #include <QSettings>
 #include <QWebFrame>
 #include <QFileDialog>
@@ -13,7 +13,7 @@
 #include <QScriptValue>
 
 #include "rule/ryrulemanager.h"
-#include "ryproxyserver.h"
+#include "proxy/ryproxyserver.h"
 
 #include <QScriptEngine>
 

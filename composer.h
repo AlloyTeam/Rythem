@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QTcpSocket>
-#include "rypipedata.h"
+#include "proxy/rypipedata.h"
 
 namespace Ui {
     class Composer;

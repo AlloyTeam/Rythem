@@ -2,7 +2,7 @@
 #define CONNECTIONMONITORWSSERVER_H
 #include <QtCore>
 #include "websocketserver.h"
-#include "rypipedata.h"
+#include "proxy/rypipedata.h"
 
 //this class is for monitoring proxy connection and forward changes of them via websocket to client(s)
 class ConnectionMonitorWSServer : public WebSocketServer
