@@ -178,9 +178,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setColumnWidth(1,30);
     ui->tableView->setColumnWidth(2,50);
     ui->tableView->setColumnWidth(3,50);
+    ui->tableView->setColumnWidth(7,50);
     ui->tableView->verticalHeader()->setDefaultSectionSize(20);
     ui->tableView->verticalHeader()->hide();
-    ui->tableView->setSortingEnabled(true);
+    //ui->tableView->setSortingEnabled(true);
 
     jsBridge = new RyJsBridge();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
@@ -197,7 +198,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     itemSelectModel = ui->tableView->selectionModel();
 
-    connect(itemSelectModel,SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),SLOT(onSelectionChange(QModelIndex,QModelIndex)));
+    connect(ui->tableView,SIGNAL(doubleClicked(QModelIndex)),SLOT(onItemDoubleClicked(QModelIndex)));
+    connect(itemSelectModel,SIGNAL(currentChanged(QModelIndex,QModelIndex)),SLOT(onSelectionChange(QModelIndex)));
 
     //ui->tableView->setItemDelegate();
     createMenus();
@@ -239,7 +241,13 @@ void MainWindow::onNewPipe(RyPipeData_ptr pipeData){
     pipeTableModel.addItem(pipeData);
 }
 
-void MainWindow::onSelectionChange(QModelIndex topLeft, QModelIndex){
+void MainWindow::onSelectionChange(QModelIndex index){
+    if(ui->tollTabs->currentWidget() == ui->inspectorTab){
+        onItemDoubleClicked(index);
+    }
+}
+
+void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
     //qDebug()<<"onSelectionChange";
     int row = topLeft.row();
     RyPipeData_ptr data = pipeTableModel.getItem(row);

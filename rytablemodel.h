@@ -6,6 +6,8 @@
 #include <QMap>
 #include <QSharedPointer>
 #include "proxy/rypipedata.h"
+#include <QtCore>
+
 class RyTableModel : public QAbstractTableModel
 {
     Q_OBJECT
