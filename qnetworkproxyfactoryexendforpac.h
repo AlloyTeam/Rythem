@@ -9,7 +9,6 @@ class QNetworkProxyFactoryExendForPAC : public QObject
 
 
     Q_OBJECT
-    Q_PROPERTY( QString config WRITE setConfig )
 
 public:
     QNetworkProxyFactoryExendForPAC();

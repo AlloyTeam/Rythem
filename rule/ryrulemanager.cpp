@@ -124,9 +124,6 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QString&
     QScriptValue value = engine.evaluate("(" + groupJSONData + ")");
     return addRuleProject(value);
 }
-const QSharedPointer<RyRuleProject> RyRuleManager::addRuleProject(const QString &groupJSONData, const QString &address, bool isRemote, const QString &host){
-    return QSharedPointer<RyRuleProject>();
-}
 
 const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProject(const QString& url,bool){
     QString urlEscaped = url;
@@ -149,13 +146,6 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProject(const QStrin
     return addRuleProject("{'localAddress':'"+localAddress+"','remoteAddress':'"+urlEscaped+"'}");
 }
 
-const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProjectFromLocal(const QString &localAddress,
-                                              const QString &remoteAddress,
-                                              const QString &pwd,
-                                              const QString &owner){
-    return QSharedPointer<RyRuleProject>();
-
-}
 const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QString& content){
     // add to project default_local_project
     QString projectName = "default_local_project.txt";

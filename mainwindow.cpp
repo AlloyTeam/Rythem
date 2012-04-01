@@ -27,7 +27,6 @@
 #include <QtCore>
 #include <QItemSelectionModel>
 
-#include "qirulesettingsdialog.h"
 
 #ifdef Q_OS_WIN32
 #include "zlib/zlib.h"
@@ -227,8 +226,6 @@ void MainWindow::createMenus(){
 }
 
 void MainWindow::showSettingsDialog(){
-    QiRuleSettingsDialog dialog(this);
-    dialog.exec();
 
 }
 

@@ -15,11 +15,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     qiddlerpipetablemodel.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
-    bytearray.cpp \
-    websocketserver.cpp \
-    websocketclient.cpp \
-    connectionmonitorwsserver.cpp \
-    qirulesettingsdialog.cpp\
     composer.cpp \
     rypipetableview.cpp\
     waterfallwindow.cpp \
@@ -38,11 +33,6 @@ mac:SOURCES -= qiwinhttp.cpp
 HEADERS  += mainwindow.h \
     qiddlerpipetablemodel.h \
     qnetworkproxyfactoryexendforpac.h \
-    bytearray.h \
-    websocketserver.h \
-    websocketclient.h \
-    connectionmonitorwsserver.h \
-    qirulesettingsdialog.h \
     composer.h \
     rypipetableview.h \
     waterfallwindow.h \
@@ -72,7 +62,6 @@ mac:HEADERS -= proxy/rywinhttp.h
 mac:SOURCES -= proxy/rywinhttp.cpp
 
 FORMS    += mainwindow.ui \
-    rule_config.ui \
     composer.ui \
     waterfallwindow.ui
 
