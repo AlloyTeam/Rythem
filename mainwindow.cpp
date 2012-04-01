@@ -163,7 +163,7 @@ QString RyJsBridge::getConfigs(){
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    pipeTableModel(new QiddlerPipeTableModel()),
+    pipeTableModel(new RyTableModel()),
     ui(new Ui::MainWindow),
     isUsingCapture(false)
 

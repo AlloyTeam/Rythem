@@ -1,22 +1,22 @@
-#include "qiddlerpipetablemodel.h"
+#include "rytablemodel.h"
 #include "proxy/rypipedata.h"
 #include <QVector>
 #include <QStringList>
 #include <QDebug>
 
-QiddlerPipeTableModel::QiddlerPipeTableModel(QObject *parent) :
+RyTableModel::RyTableModel(QObject *parent) :
     QAbstractTableModel(parent),_pipeNumber(0){
 }
-QiddlerPipeTableModel::~QiddlerPipeTableModel(){
+RyTableModel::~RyTableModel(){
     blockSignals(true);
     removeAllItem();
-    qDebug()<<"~QiddlerPipeTableModel";
+    qDebug()<<"~RyTableModel";
 }
 
-int QiddlerPipeTableModel::rowCount( const QModelIndex & ) const{
+int RyTableModel::rowCount( const QModelIndex & ) const{
     return pipesVector.count();
 }
-int QiddlerPipeTableModel::columnCount(const QModelIndex &) const{
+int RyTableModel::columnCount(const QModelIndex &) const{
     return 10;
 }
 
@@ -68,7 +68,7 @@ QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
     }
 }
 
-QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
+QVariant RyTableModel::data(const QModelIndex &index, int role) const{
     if(role == Qt::DisplayRole || role == Qt::ToolTipRole){
         int row = index.row();
         int column = index.column();
@@ -93,7 +93,7 @@ QVariant QiddlerPipeTableModel::data(const QModelIndex &index, int role) const{
         return QVariant();
     }
 }
-QVariant QiddlerPipeTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant RyTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -111,19 +111,19 @@ QVariant QiddlerPipeTableModel::headerData(int section, Qt::Orientation orientat
     }
     return QVariant();
 }
-Qt::ItemFlags QiddlerPipeTableModel::flags(const QModelIndex &index) const{
+Qt::ItemFlags RyTableModel::flags(const QModelIndex &index) const{
     if(!index.isValid()){
         return Qt::ItemIsEnabled;
     }
     return QAbstractTableModel::flags(index);
 }
 
-bool QiddlerPipeTableModel::itemLessThan(RyPipeData_ptr a,RyPipeData_ptr b){
+bool RyTableModel::itemLessThan(RyPipeData_ptr a,RyPipeData_ptr b){
     return rypipeDataGetDataByColumn(a,1) <
                 rypipeDataGetDataByColumn(b,1);
 }
 
-void QiddlerPipeTableModel::sort(int column, Qt::SortOrder/* = Qt::AscendingOrder*/){
+void RyTableModel::sort(int column, Qt::SortOrder/* = Qt::AscendingOrder*/){
     //qDebug()<<"sort called..";
     _sortingColumn = column;
     //rypipeDataGetDataByColumn(a,_sortingColumn),
@@ -131,7 +131,7 @@ void QiddlerPipeTableModel::sort(int column, Qt::SortOrder/* = Qt::AscendingOrde
     //qSort(pipesVector.begin(),pipesVector.end(),itemLessThan);
 }
 
-RyPipeData_ptr QiddlerPipeTableModel::getItem(int row){
+RyPipeData_ptr RyTableModel::getItem(int row){
     //qDebug()<<pipesVector.size()<<row;
     //if(pipesVector.size() >= row){
         return pipesVector.at(row);
@@ -140,7 +140,7 @@ RyPipeData_ptr QiddlerPipeTableModel::getItem(int row){
     //return RyPipeData_ptr(new RyPipeData());
 }
 
-void QiddlerPipeTableModel::updateItem(RyPipeData_ptr p){
+void RyTableModel::updateItem(RyPipeData_ptr p){
     int i = pipesMap.keys().indexOf(p->id);
     if(i!=-1){
         /*
@@ -156,7 +156,7 @@ void QiddlerPipeTableModel::updateItem(RyPipeData_ptr p){
     }
 }
 
-void QiddlerPipeTableModel::addItem(RyPipeData_ptr p){
+void RyTableModel::addItem(RyPipeData_ptr p){
     //qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
     RyPipeData_ptr p1 = p;
     ++_pipeNumber;
@@ -176,7 +176,7 @@ void QiddlerPipeTableModel::addItem(RyPipeData_ptr p){
 	emit connectionAdded(p);
 }
 
-void QiddlerPipeTableModel::removeAllItem(){
+void RyTableModel::removeAllItem(){
     //int l = pipesVector.size();
     pipesMap.clear();
     pipesVector.clear();
@@ -184,6 +184,6 @@ void QiddlerPipeTableModel::removeAllItem(){
     //emit dataChanged(index(0,0),index(l-1,7));
     emit reset();
 }
-void QiddlerPipeTableModel::removeItems(){
+void RyTableModel::removeItems(){
 
 }

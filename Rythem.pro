@@ -13,7 +13,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    qiddlerpipetablemodel.cpp \
+    rytablemodel.cpp \
     qnetworkproxyfactoryexendforpac.cpp \
     composer.cpp \
     rypipetableview.cpp\
@@ -31,7 +31,7 @@ SOURCES += main.cpp\
 mac:SOURCES -= qiwinhttp.cpp
 
 HEADERS  += mainwindow.h \
-    qiddlerpipetablemodel.h \
+    rytablemodel.h \
     qnetworkproxyfactoryexendforpac.h \
     composer.h \
     rypipetableview.h \

@@ -1,17 +1,17 @@
-#ifndef QIDDLERPIPETABLEMODEL_H
-#define QIDDLERPIPETABLEMODEL_H
+#ifndef RYTABLEMODEL_H
+#define RYTABLEMODEL_H
 
 #include <QAbstractTableModel>
 #include <QVector>
 #include <QMap>
 #include <QSharedPointer>
 #include "proxy/rypipedata.h"
-class QiddlerPipeTableModel : public QAbstractTableModel
+class RyTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit QiddlerPipeTableModel(QObject *parent = 0);
-    ~QiddlerPipeTableModel();
+    explicit RyTableModel(QObject *parent = 0);
+    ~RyTableModel();
     QMap<int,RyPipeData_ptr > pipesMap;
     QVector<RyPipeData_ptr > pipesVector;
 
@@ -46,4 +46,4 @@ private:
     int _sortingColumn;
 };
 
-#endif // QIDDLERPIPETABLEMODEL_H
+#endif // RYTABLEMODEL_H

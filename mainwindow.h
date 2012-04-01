@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "qiddlerpipetablemodel.h"
+#include "rytablemodel.h"
 #include "proxy/rypipedata.h"
 #include <QSettings>
 #include <QWebFrame>
@@ -67,7 +67,7 @@ public:
 		QString pacUrl;
 		QString isUsingPac;
 	}ProxyInfo;
-	QiddlerPipeTableModel pipeTableModel;
+    RyTableModel pipeTableModel;
 
 protected:
         void mousePressEvent(QMouseEvent *);
