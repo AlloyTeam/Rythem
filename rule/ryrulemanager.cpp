@@ -6,7 +6,7 @@ extern QString appPath;
 using namespace rule;
 
 
-QMutex RyRuleManager::_singletonMutex;
+//QMutex RyRuleManager::_singletonMutex;
 RyRuleManager* RyRuleManager::_instancePtr = 0;
 RyRuleManager* RyRuleManager::instance(){
     if(!_instancePtr){

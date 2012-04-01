@@ -28,7 +28,7 @@ function updateConfigs(){
                 <option value="2">Simple Host</option>\
                 <option value="3">Remote Content</option>\
                 <option value="4">Local File</option>\
-                <option value="5">Local Files(.qzmin)</option>\
+                <option value="5">Local File Merge</option>\
                 <option value="6">Local Directory</option>\
             </select>\
             <div class="pattern editable" contentEditable>' + escapeToHtml(ruleConfig.rule.pattern) + '</div>\

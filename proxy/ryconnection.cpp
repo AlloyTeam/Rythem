@@ -23,7 +23,7 @@ RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent
     //qDebug()<<"RyConnection"<<socketHandle;
     //setHandle(socketHandle);
 
-    pipeDataMutex = new QMutex( QMutex::Recursive );
+    //pipeDataMutex = new QMutex( QMutex::Recursive );
 
     _receivingPerformance.clientConnected = QDateTime::currentMSecsSinceEpoch();
     //qDebug()<<"RyConnection";
@@ -56,7 +56,7 @@ RyConnection::~RyConnection(){
     //        << (QApplication::instance()->thread() == QThread::currentThread());
     //QThread::currentThread()->quit();
     //_pipeList.clear();
-    delete pipeDataMutex;
+    //delete pipeDataMutex;
 }
 int RyConnection::handle()const{
     return _handle;
@@ -794,6 +794,7 @@ RyPipeData_ptr RyConnection::nextPipe(){
     if(_pipeList.length()>0){
         return _pipeList.takeAt(0);
     }
+    locker.unlock();
     return RyPipeData_ptr();
 }
 void RyConnection::appendPipe(RyPipeData_ptr thePipeData){

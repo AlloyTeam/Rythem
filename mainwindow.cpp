@@ -499,7 +499,6 @@ void MainWindow::closeEvent(QCloseEvent *event){
 }
 
 void MainWindow::contextMenuEvent(QContextMenuEvent *event){
-    qDebug()<<"contextMenu";
     event->accept();
 }
 

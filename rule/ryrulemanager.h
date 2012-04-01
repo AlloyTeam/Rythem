@@ -77,7 +77,7 @@ private:
     QMap<quint64,QSharedPointer<RyRuleProject> > _groupToProjectMap;
     QMap<QString,QSharedPointer<RyRuleProject> > _projectFileNameToProjectMap;
 
-    static QMutex _singletonMutex;
+    //static QMutex _singletonMutex;
     static RyRuleManager* _instancePtr;
 
 }; // class RyRuleManager

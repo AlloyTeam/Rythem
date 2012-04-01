@@ -8,6 +8,7 @@ namespace rule{
 class RyRuleGroup{
 public:
     RyRuleGroup(const QScriptValue& group);
+    ~RyRuleGroup();
     /*
     RyRuleGroup(const QString& groupName,bool isOwner=false);
     RyRuleGroup(quint64 groupId,const QString& groupName,bool isOwner=false);

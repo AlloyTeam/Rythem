@@ -23,6 +23,7 @@ public:
     RyRule(quint64 groupId,const QScriptValue& rule);
     RyRule(quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable = true);
     RyRule(quint64 id,quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable=true);
+
     QString toJSON(bool format=false,int space=16)const;
 
     int type();
@@ -30,13 +31,12 @@ public:
     QString replace();
 
     void update(const QScriptValue& value){
-        qDebug()<<"before"<<this->toJSON();
-
+        //qDebug()<<"before"<<this->toJSON();
         this->_type = value.property("type").toInt32();
         this->enabled = value.property("enable").toBool();
         this->_pattern = value.property("rule").property("pattern").toString();
         this->_replace = value.property("rule").property("replace").toString();
-        qDebug()<<"after"<<this->toJSON();
+        //qDebug()<<"after"<<this->toJSON();
     }
 
     quint64 ruleId()const{

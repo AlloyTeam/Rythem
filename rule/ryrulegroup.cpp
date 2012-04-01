@@ -23,6 +23,9 @@ RyRuleGroup::RyRuleGroup(const QScriptValue &group){
         addRules(rules);
     }
 }
+RyRuleGroup::~RyRuleGroup(){
+    _rules.clear();
+}
 
 quint64 RyRuleGroup::groupId()const{
     return _groupId;
