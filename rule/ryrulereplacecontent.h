@@ -12,16 +12,16 @@ class RyRuleReplaceContent{
 public:
     RyRuleReplaceContent(QSharedPointer<RyRule> rule, const QString& url="");
     ~RyRuleReplaceContent();
-    QPair<QByteArray,QByteArray> getReplaceContent(const QString& url);
-    QPair<QByteArray,QByteArray> getReplaceContent();
+    QPair<QByteArray,QByteArray> getReplaceContent(const QString& url,bool setLongCache=false);
+    QPair<QByteArray,QByteArray> getReplaceContent(bool setLongCache=false);
     void setUrl(const QString&);
     void setRule(QSharedPointer<RyRule>);
 private:
 
-    QPair<QByteArray,QByteArray> getRemoteReplaceContent();
-    QPair<QByteArray,QByteArray> getLocalReplaceContent();
-    QPair<QByteArray,QByteArray> getLocalMergeReplaceContent();
-    QPair<QByteArray,QByteArray> getLocalDirReplaceContent();
+    QPair<QByteArray,QByteArray> getRemoteReplaceContent(bool setLongCache=false);
+    QPair<QByteArray,QByteArray> getLocalReplaceContent(bool setLongCache=false);
+    QPair<QByteArray,QByteArray> getLocalMergeReplaceContent(bool setLongCache=false);
+    QPair<QByteArray,QByteArray> getLocalDirReplaceContent(bool setLongCache=false);
 
     QNetworkAccessManager manager;
     QString _url;

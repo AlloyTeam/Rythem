@@ -506,3 +506,7 @@ void MainWindow::addJsObject(){
     ui->webView->page()->mainFrame()->addToJavaScriptWindowObject(QString("App"),jsBridge);
 }
 
+
+void MainWindow::on_actionLongCache_triggered(){
+    RyRuleManager::instance()->toggleLongCache();
+}

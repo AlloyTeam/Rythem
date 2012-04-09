@@ -67,6 +67,9 @@ public:
     //返回header body
     QPair<QByteArray,QByteArray> getReplaceContent(QSharedPointer<RyRule> rule,const QString& url="");
     QString toJson(bool format=false)const;
+
+    // for Q+ offline-app
+    void toggleLongCache();
 private:
 
     QString _configFileName;
@@ -79,6 +82,11 @@ private:
 
     //static QMutex _singletonMutex;
     static RyRuleManager* _instancePtr;
+
+    // for Q+ offline-app
+    //    when _longCache == true
+    //    all response from replace will take a 100-years cache
+    bool _longCache;
 
 }; // class RyRuleManager
 
