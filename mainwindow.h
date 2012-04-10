@@ -93,6 +93,7 @@ protected:
 
 private slots:
     void addJsObject();
+    void on_actionLongCache_triggered();
 };
 
 #endif // MAINWINDOW_H

@@ -16,7 +16,7 @@ RyRuleManager* RyRuleManager::instance(){
     return _instancePtr;
 }
 
-RyRuleManager::RyRuleManager():QObject(qApp){
+RyRuleManager::RyRuleManager():QObject(qApp),_longCache(false){
 }
 RyRuleManager::~RyRuleManager(){
     qDebug()<<"~rulemanager";
@@ -266,7 +266,7 @@ QList<QSharedPointer<RyRule> > RyRuleManager::getMatchRules(const QString& url){
 //返回header body
 QPair<QByteArray,QByteArray> RyRuleManager::getReplaceContent(QSharedPointer<RyRule> rule,const QString& url){
     RyRuleReplaceContent rc(rule,url);
-    return rc.getReplaceContent();
+    return rc.getReplaceContent(_longCache);
 }
 
 QString RyRuleManager::toJson(bool format)const{
@@ -284,4 +284,9 @@ QString RyRuleManager::toJson(bool format)const{
     str += projectsList.join(","+newLine)+newLine;
     str += "]";
     return str;
+}
+
+void RyRuleManager::toggleLongCache(){
+    qDebug()<<"toggle long cache";
+    _longCache = !_longCache;
 }

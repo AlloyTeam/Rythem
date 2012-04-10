@@ -101,8 +101,6 @@
                    </widget>
                   </item>
                  </layout>
-                 <zorder>label</zorder>
-                 <zorder>label</zorder>
                 </widget>
                </widget>
               </item>
@@ -170,6 +168,8 @@
    <addaction name="separator"/>
    <addaction name="actionRemoveAll"/>
    <addaction name="separator"/>
+   <addaction name="actionLongCache"/>
+   <addaction name="separator"/>
    <addaction name="actionWaterfall"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -210,6 +210,21 @@
    </property>
    <property name="toolTip">
     <string>瀑布图</string>
+   </property>
+  </action>
+  <action name="actionLongCache">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="httpfiles.qrc">
+     <normaloff>:/static/family.png</normaloff>:/static/family.png</iconset>
+   </property>
+   <property name="text">
+    <string>longCache</string>
+   </property>
+   <property name="toolTip">
+    <string>long cache</string>
    </property>
   </action>
  </widget>
