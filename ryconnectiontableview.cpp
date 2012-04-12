@@ -52,12 +52,11 @@ void RyConnectionTableView::onAction(){
         return;
     }
     if(action==_saveSelectedSessionAct){
-        QTemporaryFile file;
 
-        if(!file.open()){
-            return;
-        }
-        QuaZip zip(appPath+"/../../../../test.zip");
+        QFileDialog dialog;
+        QString saveFileName = dialog.getSaveFileName(this);
+
+        QuaZip zip(saveFileName);
         zip.open(QuaZip::mdCreate);
 
         RyTableModel *model = qobject_cast<RyTableModel*>(this->model());
@@ -66,8 +65,7 @@ void RyConnectionTableView::onAction(){
         int index=0;
         for(int j=0;j<selection.length();++j){
             QItemSelectionRange r = selection.at(j);
-            int c = r.top();
-            //for(int c=r.top();c<r.bottom();++c){
+            for(int c=r.top();c<=r.bottom();++c){
                 index++;
                 RyPipeData_ptr item = model->getItem(c);
                 QByteArray baRequest = item->requestHeaderRawData();
@@ -97,7 +95,7 @@ void RyConnectionTableView::onAction(){
                 }
                 outFileRes.write(baResponse);
                 outFileRes.close();
-            //}
+            }
 
         }
         zip.close();
