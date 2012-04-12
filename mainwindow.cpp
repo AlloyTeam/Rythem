@@ -219,16 +219,14 @@ MainWindow::~MainWindow()
 }
 void MainWindow::createMenus(){
     fileMenu = menuBar()->addMenu(tr("&File"));
-    captureAct = new QAction(tr("&Capture"),this);
-    captureAct->setCheckable(true);
-    fileMenu->addAction(captureAct);
-    QAction *a = fileMenu->addAction(tr("&rules"));
-    connect(a,SIGNAL(triggered()),SLOT(showSettingsDialog()));
-    connect(captureAct,SIGNAL(triggered()),SLOT(toggleCapture()));
+    QAction *importSessions = fileMenu->addAction(tr("&import session..."));
+    connect(importSessions,SIGNAL(triggered()),SLOT(importSessions()));
 }
 
-void MainWindow::showSettingsDialog(){
-
+void MainWindow::importSessions(){
+    QFileDialog dialog;
+    QString file = dialog.getOpenFileName(this,tr("select file to open"),"","Archiev Files(*.saz *.zip)");
+    qDebug()<<file;
 }
 
 void MainWindow::onPipeUpdate(RyPipeData_ptr pipeData){
