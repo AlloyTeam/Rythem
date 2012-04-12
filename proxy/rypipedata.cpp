@@ -10,6 +10,7 @@ RyPipeData::RyPipeData(int _socketHandle,quint64 connectionId,QObject *parent):
     socketConnectionId = connectionId;
     _isContentLenthUnLimit =false;
     _isResponseChunked = false;
+    isMatchingRule = false;
 }
 
 bool RyPipeData::operator <(RyPipeData &pipeData){

@@ -37,6 +37,8 @@
 #include <QMovie>
 #include <QPixmap>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 
 QByteArray gzipDecompress(QByteArray data){
@@ -225,8 +227,64 @@ void MainWindow::createMenus(){
 
 void MainWindow::importSessions(){
     QFileDialog dialog;
-    QString file = dialog.getOpenFileName(this,tr("select file to open"),"","Archiev Files(*.saz *.zip)");
-    qDebug()<<file;
+    QString fileName = dialog.getOpenFileName(this,tr("select file to open"),"","Archiev Files(*.saz *.zip)");
+    QuaZip zip(fileName);
+    if(!zip.open(QuaZip::mdUnzip)){
+        qDebug()<<"cannot open "<<fileName;
+        return;
+    }
+    QuaZipFileInfo info;
+    QuaZipFile file(&zip);
+
+    RyPipeData_ptr pipeData;
+
+    QString name;
+    for (bool more = zip.goToFirstFile(); more; more = zip.goToNextFile()) {
+
+        if (!zip.getCurrentFileInfo(&info)) {
+            qWarning("testRead(): getCurrentFileInfo(): %d\n", zip.getZipError());
+            return;
+        }
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning("testRead(): file.open(): %d", file.getZipError());
+            return;
+        }
+
+        name = file.getActualFileName();
+        QByteArray ba = file.readAll();
+        if(name.endsWith("_c.txt")){
+            //pipeData.clear();
+            pipeData = RyPipeData_ptr(new RyPipeData(0,0));
+            pipeData->parseRequest(&ba);
+            onNewPipe(pipeData);
+        }else{
+            pipeData->parseResponse(&ba);
+            onPipeUpdate(pipeData);
+            pipeData.clear();
+        }
+
+        if (file.getZipError() != UNZ_OK) {
+            qWarning("testRead(): file.getFileName(): %d", file.getZipError());
+            return ;
+        }
+
+        if (!file.atEnd()) {
+            qWarning("testRead(): read all but not EOF");
+            return ;
+        }
+
+        file.close();
+
+        if (file.getZipError() != UNZ_OK) {
+            qWarning("testRead(): file.close(): %d", file.getZipError());
+            return ;
+        }
+
+    }
+
+    zip.close();
+
 }
 
 void MainWindow::onPipeUpdate(RyPipeData_ptr pipeData){
