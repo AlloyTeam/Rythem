@@ -26,7 +26,17 @@ SOURCES += main.cpp\
     proxy/rywinhttp.cpp \
     proxy/ryproxyserver.cpp \
     proxy/rypipedata.cpp \
-    proxy/ryconnection.cpp
+    proxy/ryconnection.cpp \
+    ryconnectiontableview.cpp \
+    quazip/zip.c \
+    quazip/unzip.c \
+    quazip/quazipnewinfo.cpp \
+    quazip/quazipfile.cpp \
+    quazip/quazip.cpp \
+    quazip/quacrc32.cpp \
+    quazip/quaadler32.cpp \
+    quazip/qioapi.cpp \
+    quazip/JlCompress.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -44,7 +54,21 @@ HEADERS  += mainwindow.h \
     proxy/rywinhttp.h \
     proxy/ryproxyserver.h \
     proxy/rypipedata.h \
-    proxy/ryconnection.h
+    proxy/ryconnection.h \
+    ryconnectiontableview.h \
+    quazip/zip.h \
+    quazip/unzip.h \
+    quazip/quazipnewinfo.h \
+    quazip/quazipfileinfo.h \
+    quazip/quazipfile.h \
+    quazip/quazip.h \
+    quazip/quazip_global.h \
+    quazip/quacrc32.h \
+    quazip/quachecksum32.h \
+    quazip/quaadler32.h \
+    quazip/JlCompress.h \
+    quazip/ioapi.h \
+    quazip/crypt.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
@@ -101,4 +125,4 @@ CONFIG(release){
     #message("release")
 }
 
-ICON = logo.png
+ICON = rythem.icns
