@@ -46,7 +46,7 @@ class MainWindow : public QMainWindow
 
 private slots:
         void toggleCapture();
-        void showSettingsDialog();
+        void importSessions();
 public:
     explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
@@ -70,9 +70,6 @@ public:
 	}ProxyInfo;
     RyTableModel pipeTableModel;
 
-protected:
-        void mousePressEvent(QMouseEvent *);
-        void dragEnterEvent(QDragEnterEvent *);
 
 private:
     Ui::MainWindow *ui;

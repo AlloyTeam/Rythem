@@ -107,7 +107,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(bool s
     QString encode = "utf-8";
     QString cacheControl = "";
     if(setLongCache){
-        cacheControl = "Last-Modified:Fri, 06 Apr 2012 09:44:34 GMT\r\nCache-Control:max-age=315360000 \r\n";
+        cacheControl = "Cache-Control:max-age=315360000 \r\n";
     }
 
     file.setFileName(replace);
@@ -159,7 +159,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(b
     QString mergeFilePath;
     QString cacheControl = "";
     if(setLongCache){
-        cacheControl = "Last-Modified:Fri, 06 Apr 2012 09:44:34 GMT\r\nCache-Control:max-age=315360000 \r\n";
+        cacheControl = "Cache-Control:max-age=315360000 \r\n";
     }
 
     bool fileCanOpen;
@@ -245,7 +245,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(boo
 
     QString cacheControl = "";
     if(setLongCache){
-        cacheControl = "Last-Modified:Fri, 06 Apr 2012 09:44:34 GMT\r\nCache-Control:max-age=315360000 \r\n";
+        cacheControl = "Cache-Control:max-age=315360000 \r\n";
     }
 
 

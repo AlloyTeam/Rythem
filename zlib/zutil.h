@@ -20,7 +20,7 @@
 #  define ZLIB_INTERNAL
 #endif
 
-#include "zlib.h"
+#include "zlib/zlib.h"
 
 #ifdef STDC
 #  if !(defined(_WIN32_WCE) && defined(_MSC_VER))

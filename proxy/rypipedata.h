@@ -116,6 +116,7 @@ class RyPipeData : public QObject
         QString getResponseHeader(const QString& name)const;
 
         bool isMatchingRule;
+        bool isImported;
         int ruleType;
 
         QByteArray requestHeaderRawData()const{

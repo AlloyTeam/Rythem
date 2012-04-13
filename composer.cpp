@@ -1,6 +1,9 @@
 #include "composer.h"
 #include "ui_composer.h"
 #include <QNetworkProxy>
+
+#include "rymimedata.h"
+
 Composer::Composer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Composer){
@@ -177,6 +180,7 @@ void Composer::setupProxy(QString host,qint16 port){
 }
 
 void Composer::dragEnterEvent(QDragEnterEvent *event){
+
     qDebug()<<"drag enter";
     if (event->mimeData()->hasText()) {
         if (event->source() == this) {
@@ -188,12 +192,18 @@ void Composer::dragEnterEvent(QDragEnterEvent *event){
     } else {
         event->ignore();
     }
+
 }
 
 void Composer::dropEvent(QDropEvent *event){
-    qDebug()<<event->source();
-    if (event->mimeData()->hasText()) {
-        const QMimeData *mime = event->mimeData();
+    qDebug()<<"drop";
+    const RyMimeData* mime = dynamic_cast<const RyMimeData*>(event->mimeData());
+
+    if (mime) {
+        RyPipeData_ptr d = mime->pipeData();
+        this->ui->server->setText(d->host);
+        this->ui->port->setText(QString::number(d->port));
+        this->ui->request->setPlainText(QString(d->requestHeaderRawData()).append("\r\n\r\n").append(d->requestBodyRawData()));
         qDebug()<<"drop text="<<mime->text();
         event->acceptProposedAction();
     } else {
