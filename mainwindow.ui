@@ -13,10 +13,6 @@
   <property name="windowTitle">
    <string>Rythem</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>logo.png</normaloff>logo.png</iconset>
-  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
@@ -24,10 +20,16 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTableView" name="tableView"/>
+      <widget class="RyConnectionTableView" name="tableView"/>
       <widget class="QTabWidget" name="tollTabs">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="inspectorTab">
         <attribute name="title">
@@ -88,8 +90,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>557</width>
-                   <height>195</height>
+                   <width>98</width>
+                   <height>40</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -101,8 +103,6 @@
                    </widget>
                   </item>
                  </layout>
-                 <zorder>label</zorder>
-                 <zorder>label</zorder>
                 </widget>
                </widget>
               </item>
@@ -155,7 +155,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -169,6 +169,8 @@
    <addaction name="ActionCapture"/>
    <addaction name="separator"/>
    <addaction name="actionRemoveAll"/>
+   <addaction name="separator"/>
+   <addaction name="actionLongCache"/>
    <addaction name="separator"/>
    <addaction name="actionWaterfall"/>
   </widget>
@@ -212,6 +214,21 @@
     <string>瀑布图</string>
    </property>
   </action>
+  <action name="actionLongCache">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="httpfiles.qrc">
+     <normaloff>:/static/family.png</normaloff>:/static/family.png</iconset>
+   </property>
+   <property name="text">
+    <string>longCache</string>
+   </property>
+   <property name="toolTip">
+    <string>long cache</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -225,6 +242,11 @@
    <extends>QWidget</extends>
    <header>composer.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RyConnectionTableView</class>
+   <extends>QTableView</extends>
+   <header>ryconnectiontableview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

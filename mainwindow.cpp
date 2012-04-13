@@ -37,6 +37,8 @@
 #include <QMovie>
 #include <QPixmap>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 
 QByteArray gzipDecompress(QByteArray data){
@@ -219,15 +221,65 @@ MainWindow::~MainWindow()
 }
 void MainWindow::createMenus(){
     fileMenu = menuBar()->addMenu(tr("&File"));
-    captureAct = new QAction(tr("&Capture"),this);
-    captureAct->setCheckable(true);
-    fileMenu->addAction(captureAct);
-    QAction *a = fileMenu->addAction(tr("&rules"));
-    connect(a,SIGNAL(triggered()),SLOT(showSettingsDialog()));
-    connect(captureAct,SIGNAL(triggered()),SLOT(toggleCapture()));
+    QAction *importSessions = fileMenu->addAction(tr("&import session..."));
+    connect(importSessions,SIGNAL(triggered()),SLOT(importSessions()));
 }
 
-void MainWindow::showSettingsDialog(){
+void MainWindow::importSessions(){
+    QFileDialog dialog;
+    QString fileName = dialog.getOpenFileName(this,tr("select file to open"),"","Archiev Files(*.saz *.zip)");
+    QuaZip zip(fileName);
+    if(!zip.open(QuaZip::mdUnzip)){
+        qDebug()<<"cannot open "<<fileName;
+        return;
+    }
+    QuaZipFileInfo info;
+    QuaZipFile file(&zip);
+
+    RyPipeData_ptr pipeData;
+
+    QString name;
+    for (bool more = zip.goToFirstFile(); more; more = zip.goToNextFile()) {
+
+        if (!zip.getCurrentFileInfo(&info)) {
+            qWarning("testRead(): getCurrentFileInfo(): %d\n", zip.getZipError());
+            return;
+        }
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning("testRead(): file.open(): %d", file.getZipError());
+            return;
+        }
+
+        name = file.getActualFileName();
+        QByteArray ba = file.readAll();
+        if(name.endsWith("_c.txt")){
+            //pipeData.clear();
+            pipeData = RyPipeData_ptr(new RyPipeData(0,0));
+            pipeData->isImported = true;
+            pipeData->parseRequest(&ba);
+            onNewPipe(pipeData);
+        }else if(name.endsWith("_s.txt")){
+            pipeData->parseResponse(&ba);
+            onPipeUpdate(pipeData);
+            pipeData.clear();
+        }
+
+        if (file.getZipError() != UNZ_OK) {
+            qWarning("testRead(): file.getFileName(): %d", file.getZipError());
+            return ;
+        }
+
+        file.close();
+
+        if (file.getZipError() != UNZ_OK) {
+            qWarning("testRead(): file.close(): %d", file.getZipError());
+            return ;
+        }
+
+    }
+
+    zip.close();
 
 }
 
@@ -345,27 +397,6 @@ void MainWindow::onWaterfallActionTriggered(){
 }
 
 
-void MainWindow::mousePressEvent(QMouseEvent *event){
-    qDebug()<<"mouseenter";
-    QTableView *table = static_cast<QTableView*>(childAt(event->pos()));
-    if (!table || table!=ui->tableView){
-        return;
-    }
-    qDebug()<<"is table";
-    QPoint hotSpot = event->pos() - table->pos();
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setText("child->text()");
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    //drag->setPixmap(pixmap);
-    drag->setHotSpot(hotSpot);
-    drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
-}
-
-void MainWindow::dragEnterEvent(QDragEnterEvent *){
-
-}
-
 void MainWindow::toggleProxy(){
     if(isUsingCapture){
         isUsingCapture = false;
@@ -428,7 +459,7 @@ void MainWindow::toggleProxy(){
 }
 
 void MainWindow::toggleCapture(){
-    captureAct->setChecked(!isUsingCapture);
+    //captureAct->setChecked(!isUsingCapture);
 #ifdef Q_WS_WIN32
     RyWinHttp::init();
     toggleProxy();
@@ -506,3 +537,7 @@ void MainWindow::addJsObject(){
     ui->webView->page()->mainFrame()->addToJavaScriptWindowObject(QString("App"),jsBridge);
 }
 
+
+void MainWindow::on_actionLongCache_triggered(){
+    RyRuleManager::instance()->toggleLongCache();
+}

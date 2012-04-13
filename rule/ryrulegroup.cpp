@@ -126,7 +126,7 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
     while(it.hasNext()){
         QSharedPointer<RyRule> rule = it.next();
         if(!rule->enabled){
-            qDebug()<<"rule not enabled "<<rule->toJSON(true,0);
+            //qDebug()<<"rule not enabled "<<rule->toJSON(true,0);
             continue;
         }
         //qDebug()<<"getMatchRule rule:"<<url<<rule->toJSON(true,0);

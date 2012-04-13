@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>624</width>
+    <width>727</width>
     <height>385</height>
    </rect>
   </property>
@@ -21,6 +21,9 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
      </property>
      <property name="text">
       <string>w.l.qq.com</string>
@@ -49,6 +52,9 @@
        <width>30</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
      </property>
      <property name="text">
       <string>80</string>
@@ -101,6 +107,9 @@
    </item>
    <item row="1" column="0" colspan="6">
     <widget class="QPlainTextEdit" name="request">
+     <property name="acceptDrops">
+      <bool>false</bool>
+     </property>
      <property name="toolTip">
       <string>request</string>
      </property>
@@ -126,6 +135,9 @@ Range: bytes=48-6116217
    </item>
    <item row="2" column="0" colspan="6">
     <widget class="QPlainTextEdit" name="response">
+     <property name="acceptDrops">
+      <bool>false</bool>
+     </property>
      <property name="toolTip">
       <string>response</string>
      </property>

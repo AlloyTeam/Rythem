@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
-    a.setWindowIcon(QIcon(":/static/logo.png"));
+    //a.setWindowIcon(QIcon(":/static/rythem.icns"));
     appPath =  qApp->applicationDirPath();
 
 
@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->listen(QHostAddress("127.0.0.1"),8889);
 
-    w.showMaximized();
-
+    //w.showMaximized();
+    w.show();
     return a.exec();
 
 }
