@@ -18,24 +18,24 @@ RyRuleReplaceContent::~RyRuleReplaceContent(){
 
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(const QString& url){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(const QString& url,bool setLongCache){
     setUrl(url);
-    return getReplaceContent();
+    return getReplaceContent(setLongCache);
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(bool setLongCache){
     switch(_rule->type()){
     case RyRule::LOCAL_FILE_REPLACE:
-        return getLocalReplaceContent();
+        return getLocalReplaceContent(setLongCache);
         break;
     case RyRule::LOCAL_FILES_REPLACE:
-        return getLocalMergeReplaceContent();
+        return getLocalMergeReplaceContent(setLongCache);
         break;
     case RyRule::LOCAL_DIR_REPLACE:
-        return getLocalDirReplaceContent();
+        return getLocalDirReplaceContent(setLongCache);
         break;
     case RyRule::REMOTE_CONTENT_REPLACE:
-        return getRemoteReplaceContent();
+        return getRemoteReplaceContent(setLongCache);
         break;
     default:// error.
         qWarning()<<"this type of rule has no content to replace";
@@ -45,7 +45,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(){
     }
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(bool ){
     QPair<QByteArray,QByteArray> ret;
     QByteArray header,body;
 
@@ -92,7 +92,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(){
     return ret;
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(bool setLongCache){
     QPair<QByteArray,QByteArray> ret;
     //open local file for read
     QString status;
@@ -105,6 +105,11 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(){
     QString mimeType = "text/plain";
     int contentLength;
     QString encode = "utf-8";
+    QString cacheControl = "";
+    if(setLongCache){
+        cacheControl = "Cache-Control:max-age=315360000 \r\n";
+    }
+
     file.setFileName(replace);
     if(file.open(QFile::ReadOnly)){
         mimeTypeKey = fileInfo.suffix().toLower();
@@ -123,18 +128,18 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(){
     header.append(QString("HTTP/1.1 %1 \r\n"
                      "Server: Rythem \r\n"
                      "Content-Type: %2 \r\n"
-                     "Content-Length: %3 \r\n\r\n")
+                     "Content-Length: %3 \r\n%4\r\n")
             .arg(status)
             .arg(mimeType)
-            //.arg(encode)
-            .arg(contentLength));
+            .arg(contentLength)
+            .arg(cacheControl));
 
     ret.first = header;
     ret.second = body;
     return ret;
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(bool setLongCache){
     QPair<QByteArray,QByteArray> ret;
     //open local file for read
     QString status;
@@ -152,6 +157,10 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
     QMap<QString,QVariant> mergeValueMap;
     bool mergeContentHasError=false;
     QString mergeFilePath;
+    QString cacheControl = "";
+    if(setLongCache){
+        cacheControl = "Cache-Control:max-age=315360000 \r\n";
+    }
 
     bool fileCanOpen;
     file.setFileName(replace);
@@ -162,7 +171,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
         mergeFileContent = file.readAll();
         mergeValueMap = engine.evaluate(mergeFileContent.prepend("(").append(")")).toVariant().toMap();
         if(engine.hasUncaughtException() || mergeValueMap.isEmpty()){//wrong content
-            qDebug() << "wrong qzmin format:" << replace << mergeFileContent;
+            qDebug() << "wrong qzmin format:" << replace << mergeFileContent << engine.uncaughtException().toString();
             mergeContentHasError = true;
         }else{
             if(mergeValueMap.contains("encode")){
@@ -171,16 +180,18 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
             //qDebug()<<mergeValueMap;
             //qDebug()<<mergeFileContent;
             if(mergeValueMap["projects"].toList().isEmpty() ){
+                qDebug() << "wrong qzmin format:" << replace << mergeFileContent << engine.uncaughtException().toString();
                 mergeContentHasError = true;
             }else{
                 mergeValueMap = mergeValueMap["projects"].toList().first().toMap();
                 if(mergeValueMap["include"].toList().isEmpty()){
+                    qDebug() << "wrong qzmin format:" << replace << mergeFileContent << engine.uncaughtException().toString();
                     mergeContentHasError = true;
                 }
             }
         }
     }else{
-        qDebug()<<"file cannot open ";
+        qDebug()<<"file cannot open "<<replace;
         mergeContentHasError = true;
     }
     file.close();
@@ -208,18 +219,18 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent()
         }
     }
     contentLength = body.size();
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n%4\r\n")
                        .arg(status)
                        .arg(mimeType) // TODO
-                       //.arg(encode)
-                       .arg(contentLength));
+                       .arg(contentLength)
+                       .arg(cacheControl));
 
     ret.first = header;
     ret.second = body;
     return ret;
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(bool setLongCache){
     QPair<QByteArray,QByteArray> ret;
     //open local file for read
     QString status;
@@ -231,6 +242,11 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(){
     QString mimeType = "text/plain";
     int contentLength;
     QString encode = "utf-8";
+
+    QString cacheControl = "";
+    if(setLongCache){
+        cacheControl = "Cache-Control:max-age=315360000 \r\n";
+    }
 
 
     QString fileName;
@@ -270,11 +286,11 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(){
     mimeType = RyRule::getMimeType(QFileInfo(file).suffix().toLower(),"text/plain");
     file.close();
     contentLength = body.size();// \r\nCache-Control:max-age=315360000
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n\r\n")
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n%4\r\n")
                        .arg(status)
                        .arg(mimeType)
-                       //.arg(encode)
-                       .arg(contentLength));
+                       .arg(contentLength)
+                       .arg(cacheControl));
     ret.first = header;
     ret.second = body;
     return ret;
