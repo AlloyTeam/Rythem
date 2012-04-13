@@ -17,6 +17,9 @@ public slots:
     
 protected:
     virtual void contextMenuEvent (QContextMenuEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 private slots:
     void onAction();
 private:
@@ -32,6 +35,8 @@ private:
     QAction *_removeSessionsRevertAct;
 
     QAction *_autoScrollAct;
+
+    bool _isMouseDown;
 
     void createMenu();
 };

@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->listen(QHostAddress("127.0.0.1"),8889);
 
-    w.showMaximized();
-
+    //w.showMaximized();
+    w.show();
     return a.exec();
 
 }

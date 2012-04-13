@@ -68,7 +68,8 @@ HEADERS  += mainwindow.h \
     quazip/quaadler32.h \
     quazip/JlCompress.h \
     quazip/ioapi.h \
-    quazip/crypt.h
+    quazip/crypt.h \
+    rymimedata.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \

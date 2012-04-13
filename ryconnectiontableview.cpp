@@ -4,11 +4,14 @@
 #include "quazip/quazipfile.h"
 #include "rytablemodel.h"
 
+#include "rymimedata.h"
+
 extern QString appPath;
 
 RyConnectionTableView::RyConnectionTableView(QWidget *parent) :
     QTableView(parent){
-
+    _isMouseDown = false;
+    this->setDragEnabled(true);
     createMenu();
 }
 
@@ -45,6 +48,37 @@ void RyConnectionTableView::createMenu(){
     _saveSelectedSessionAct->connect(_saveSelectedSessionAct,SIGNAL(triggered()),this,SLOT(onAction()));
 
 }
+
+void RyConnectionTableView::mousePressEvent(QMouseEvent *event){
+    _isMouseDown = true;
+    QTableView::mousePressEvent(event);
+}
+void RyConnectionTableView::mouseReleaseEvent(QMouseEvent *event){
+    _isMouseDown = false;
+    QTableView::mouseReleaseEvent(event);
+}
+
+void RyConnectionTableView::mouseMoveEvent(QMouseEvent *event){
+    if(!_isMouseDown){
+        QTableView::mouseMoveEvent(event);
+        return;
+    }
+    QModelIndex index = this->indexAt(event->pos());
+    if (!index.isValid()){
+        return;
+    }
+    QPoint hotSpot = event->pos() - this->pos();
+    RyTableModel* model = qobject_cast<RyTableModel*>(this->model());
+    RyPipeData_ptr data = model->getItem(index.column());
+    RyMimeData *mimeData = new RyMimeData(data);
+    mimeData->setText(data->getRequestHeader("Host"));
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mimeData);
+    //drag->setPixmap(pixmap);
+    drag->setHotSpot(hotSpot);
+    drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+}
+
 
 void RyConnectionTableView::onAction(){
     QAction *action = qobject_cast<QAction*>(sender());

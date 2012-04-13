@@ -397,27 +397,6 @@ void MainWindow::onWaterfallActionTriggered(){
 }
 
 
-void MainWindow::mousePressEvent(QMouseEvent *event){
-    qDebug()<<"mouseenter";
-    QTableView *table = static_cast<QTableView*>(childAt(event->pos()));
-    if (!table || table!=ui->tableView){
-        return;
-    }
-    qDebug()<<"is table";
-    QPoint hotSpot = event->pos() - table->pos();
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setText("child->text()");
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    //drag->setPixmap(pixmap);
-    drag->setHotSpot(hotSpot);
-    drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
-}
-
-void MainWindow::dragEnterEvent(QDragEnterEvent *){
-
-}
-
 void MainWindow::toggleProxy(){
     if(isUsingCapture){
         isUsingCapture = false;
