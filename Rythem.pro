@@ -92,7 +92,8 @@ OTHER_FILES += \
     static/icloud_64.png \
     RythemTimes/lib/parseuri.js \
     RythemTimes/lib/jo2.js \
-    RythemTimes/lib/jo2.dom.js
+    RythemTimes/lib/jo2.dom.js \
+    logo.rc
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")
@@ -101,4 +102,4 @@ CONFIG(release){
     #message("release")
 }
 
-ICON = logo.png
+RC_FILE = logo.rc
