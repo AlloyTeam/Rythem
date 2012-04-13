@@ -256,9 +256,10 @@ void MainWindow::importSessions(){
         if(name.endsWith("_c.txt")){
             //pipeData.clear();
             pipeData = RyPipeData_ptr(new RyPipeData(0,0));
+            pipeData->isImported = true;
             pipeData->parseRequest(&ba);
             onNewPipe(pipeData);
-        }else{
+        }else if(name.endsWith("_s.txt")){
             pipeData->parseResponse(&ba);
             onPipeUpdate(pipeData);
             pipeData.clear();
@@ -266,11 +267,6 @@ void MainWindow::importSessions(){
 
         if (file.getZipError() != UNZ_OK) {
             qWarning("testRead(): file.getFileName(): %d", file.getZipError());
-            return ;
-        }
-
-        if (!file.atEnd()) {
-            qWarning("testRead(): read all but not EOF");
             return ;
         }
 
