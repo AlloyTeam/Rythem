@@ -164,9 +164,16 @@ void RyConnectionTableView::onAction(QAction *action){
                 if(isEncrypted){
                     baResponse = gzipDecompress(baResponse);
                 }
+                if(baResponse.isEmpty()){
+                    continue;
+                }
+
                 QString pathWithoutQueryAndHash = item->path;
                 if(item->path.indexOf("?")!=-1){
                     pathWithoutQueryAndHash = item->path.left(item->path.indexOf("?"));
+                }
+                if(item->path.indexOf("&")!=-1){
+                    pathWithoutQueryAndHash = item->path.left(item->path.indexOf("&"));
                 }
                 QString fileName = "/"+item->host+pathWithoutQueryAndHash;
 
