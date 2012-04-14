@@ -7,6 +7,7 @@
 #include "rymimedata.h"
 
 extern QString appPath;
+extern QByteArray gzipDecompress(QByteArray data);
 
 RyConnectionTableView::RyConnectionTableView(QWidget *parent) :
     QTableView(parent){
@@ -153,7 +154,17 @@ void RyConnectionTableView::onAction(QAction *action){
             for(int c=r.top();c<=r.bottom();++c){
                 index++;
                 RyPipeData_ptr item = model->getItem(c);
-                QByteArray baResponse = item->responseBodyRawData();
+                QByteArray baResponse;
+                if(item->isResponseChunked()){
+                    baResponse = item->responseBodyRawDataUnChunked();
+                }else{
+                    baResponse = item->responseBodyRawData();
+                }
+                bool isEncrypted = !item->getResponseHeader("Content-Encoding").isEmpty();
+                if(isEncrypted){
+                    baResponse = gzipDecompress(baResponse);
+                }
+
                 QString fileName = "/"+item->host+item->path;
 
                 if(fileName.endsWith("/")){
@@ -166,8 +177,9 @@ void RyConnectionTableView::onAction(QAction *action){
                 dir.mkpath(dirPath);
                 if(saveFile.exists()){
                     //todo
+                    qDebug()<<"exits"<<fileName;
                 }
-                qDebug()<<fileName;
+                //qDebug()<<fileName;
                 saveFile.open(QIODevice::WriteOnly);
                 saveFile.write(baResponse);
                 saveFile.close();
