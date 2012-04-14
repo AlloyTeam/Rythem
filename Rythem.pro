@@ -126,4 +126,4 @@ CONFIG(release){
     #message("release")
 }
 
-RC_FILE = logo.rc
+#RC_FILE = logo.rc
