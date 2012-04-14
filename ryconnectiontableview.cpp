@@ -20,9 +20,11 @@ void RyConnectionTableView::contextMenuEvent(QContextMenuEvent *event){
     if(this->selectionModel()->selection().length() > 0){
         _saveSelectedSessionAct->setEnabled(true);
         _removeSelectedSessionAct->setEnabled(true);
+        _saveSessionRespnoseBodyAct->setEnabled(true);
     }else{
         _saveSelectedSessionAct->setEnabled(false);
         _removeSelectedSessionAct->setEnabled(false);
+        _saveSessionRespnoseBodyAct->setEnabled(false);
     }
     _contextMenu->popup(event->globalPos());
     event->accept();
@@ -30,7 +32,8 @@ void RyConnectionTableView::contextMenuEvent(QContextMenuEvent *event){
 
 void RyConnectionTableView::createMenu(){
     _contextMenu = new QMenu(this);
-    _saveSelectedSessionAct = _contextMenu->addAction(tr("save selected session"));
+    _saveSelectedSessionAct = _contextMenu->addAction(tr("save selected session..."));
+    _saveSessionRespnoseBodyAct = _contextMenu->addAction(tr("&save response body..."));
 
     _autoScrollAct = _contextMenu->addAction(tr("auto scroll session list"));
     _autoScrollAct->setCheckable(true);
@@ -45,7 +48,8 @@ void RyConnectionTableView::createMenu(){
     _removeSessionsRevertAct = _removeMenu->addAction(tr("remove sessions unselected"));
 
 
-    _saveSelectedSessionAct->connect(_saveSelectedSessionAct,SIGNAL(triggered()),this,SLOT(onAction()));
+
+    _contextMenu->connect(_contextMenu,SIGNAL(triggered(QAction*)),this,SLOT(onAction(QAction*)));
 
 }
 
@@ -80,8 +84,7 @@ void RyConnectionTableView::mouseMoveEvent(QMouseEvent *event){
 }
 
 
-void RyConnectionTableView::onAction(){
-    QAction *action = qobject_cast<QAction*>(sender());
+void RyConnectionTableView::onAction(QAction *action){
     if(0 == action){
         return;
     }
@@ -133,8 +136,43 @@ void RyConnectionTableView::onAction(){
 
         }
         zip.close();
-    }else{
+    }else if(action == _saveSessionRespnoseBodyAct){
 
+        QFileDialog dialog;
+        QString saveDir = dialog.getExistingDirectory(this,tr("save session response body to..."));
+        if(saveDir.isEmpty()){
+            return;
+        }
+        QDir dir(saveDir);
+
+        RyTableModel *model = qobject_cast<RyTableModel*>(this->model());
+        QItemSelection selection = this->selectionModel()->selection();
+        int index=0;
+        for(int j=0;j<selection.length();++j){
+            QItemSelectionRange r = selection.at(j);
+            for(int c=r.top();c<=r.bottom();++c){
+                index++;
+                RyPipeData_ptr item = model->getItem(c);
+                QByteArray baResponse = item->responseBodyRawData();
+                QString fileName = "/"+item->host+item->path;
+
+                if(fileName.endsWith("/")){
+                    fileName.append("index.html");
+                }
+                fileName.prepend(saveDir);
+                QFile saveFile(fileName);
+                QFileInfo fi(saveFile);
+                QString dirPath = fi.absolutePath();
+                dir.mkpath(dirPath);
+                if(saveFile.exists()){
+                    //todo
+                }
+                qDebug()<<fileName;
+                saveFile.open(QIODevice::WriteOnly);
+                saveFile.write(baResponse);
+                saveFile.close();
+            }
+        }
     }
 
 }

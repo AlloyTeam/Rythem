@@ -21,7 +21,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 private slots:
-    void onAction();
+    void onAction(QAction*);
 private:
     QMenu *_contextMenu;
     QMenu *_saveMenu;
@@ -33,6 +33,9 @@ private:
     QAction *_removeSelectedSessionAct;
     QAction *_removeAllSessionAct;
     QAction *_removeSessionsRevertAct;
+
+    QAction *_saveSessionRespnoseBodyAct;
+    QAction *_saveSessionRequestAct;
 
     QAction *_autoScrollAct;
 
