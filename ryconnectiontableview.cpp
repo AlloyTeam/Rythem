@@ -2,9 +2,10 @@
 #include <QTemporaryFile>
 #include "quazip/quazip.h"
 #include "quazip/quazipfile.h"
-#include "rytablemodel.h"
+#include "rytablesortfilterproxymodel.h"
 
 #include "rymimedata.h"
+#include "savesessionsdialog.h"
 
 extern QString appPath;
 extern QByteArray gzipDecompress(QByteArray data);
@@ -13,6 +14,7 @@ RyConnectionTableView::RyConnectionTableView(QWidget *parent) :
     QTableView(parent){
     _isMouseDown = false;
     this->setDragEnabled(true);
+    this->setAlternatingRowColors(true);
     createMenu();
 }
 
@@ -73,8 +75,11 @@ void RyConnectionTableView::mouseMoveEvent(QMouseEvent *event){
         return;
     }
     QPoint hotSpot = event->pos() - this->pos();
-    RyTableModel* model = qobject_cast<RyTableModel*>(this->model());
-    RyPipeData_ptr data = model->getItem(index.row());
+    RyTableSortFilterProxyModel* model = qobject_cast<RyTableSortFilterProxyModel*>(this->model());
+    RyPipeData_ptr data = model->getItem(index);
+    if(data.isNull()){
+        return;
+    }
     RyMimeData *mimeData = new RyMimeData(data);
     mimeData->setText(data->getRequestHeader("Host"));
     QDrag *drag = new QDrag(this);
@@ -97,8 +102,10 @@ void RyConnectionTableView::onAction(QAction *action){
         QuaZip zip(saveFileName);
         zip.open(QuaZip::mdCreate);
 
-        RyTableModel *model = qobject_cast<RyTableModel*>(this->model());
+        RyTableSortFilterProxyModel *model = qobject_cast<RyTableSortFilterProxyModel*>(this->model());
         QItemSelection selection = this->selectionModel()->selection();
+
+
 
         int index=0;
         for(int j=0;j<selection.length();++j){
@@ -139,6 +146,7 @@ void RyConnectionTableView::onAction(QAction *action){
         zip.close();
     }else if(action == _saveSessionRespnoseBodyAct){
 
+
         QFileDialog dialog;
         QString saveDir = dialog.getExistingDirectory(this,tr("save session response body to..."));
         if(saveDir.isEmpty()){
@@ -146,7 +154,7 @@ void RyConnectionTableView::onAction(QAction *action){
         }
         QDir dir(saveDir);
 
-        RyTableModel *model = qobject_cast<RyTableModel*>(this->model());
+        RyTableSortFilterProxyModel *model = qobject_cast<RyTableSortFilterProxyModel*>(this->model());
         QItemSelection selection = this->selectionModel()->selection();
         int index=0;
         for(int j=0;j<selection.length();++j){

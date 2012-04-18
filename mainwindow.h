@@ -15,6 +15,7 @@
 #include "rule/ryrulemanager.h"
 #include "proxy/ryproxyserver.h"
 
+
 #include <QScriptEngine>
 
 using namespace rule;
@@ -23,6 +24,7 @@ namespace Ui {
     class MainWindow;
 }
 class RyPipeData;
+class RyTableSortFilterProxyModel;
 class QItemSelectionModel;
 class RyJsBridge:public QObject{
         Q_OBJECT
@@ -44,9 +46,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 
-private slots:
-        void toggleCapture();
-        void importSessions();
 public:
     explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
@@ -68,21 +67,26 @@ public:
 		QString pacUrl;
 		QString isUsingPac;
 	}ProxyInfo;
-    RyTableModel pipeTableModel;
+    RyTableModel *pipeTableModel;
+    RyTableSortFilterProxyModel *sortFilterProxyModel;
 
 
 private:
     Ui::MainWindow *ui;
-    RyJsBridge *jsBridge;
+    RyJsBridge *_jsBridge;
     void createMenus();
-    RyProxyServer *server;
+    RyProxyServer *_server;
 
-    bool isUsingCapture;
-    ProxyInfo previousProxyInfo;
-    QMenu *fileMenu;
-    QMenu *toolMenu;
-    QAction *captureAct;
-    QItemSelectionModel *itemSelectModel;
+    bool _isUsingCapture;
+    ProxyInfo _previousProxyInfo;
+    QMenu *_fileMenu;
+    QMenu *_filterMenu;
+    QAction *_importSessions;
+    QAction *_filterNoImagesAct;
+    QAction *_filterNo304sAct;
+    QAction *_filterShowMatchOnly;
+    QAction *_captureAct;
+    QItemSelectionModel *_itemSelectModel;
 protected:
     void closeEvent(QCloseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
@@ -90,7 +94,11 @@ protected:
 
 private slots:
     void addJsObject();
+    void onAction(QAction*);
     void on_actionLongCache_triggered();
+    void toggleCapture();
+    void importSessions();
+    void onActionRemoveAll();
 };
 
 #endif // MAINWINDOW_H

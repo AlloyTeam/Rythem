@@ -85,7 +85,19 @@ QVariant RyTableModel::data(const QModelIndex &index, int role) const{
 
     }else if(role == Qt::BackgroundColorRole){
         if(pipesVector.count()>index.row()){
-            return (pipesVector.at(index.row())->isMatchingRule ? Qt::cyan : QVariant());
+
+            RyPipeData_ptr d = pipesVector.at(index.row());
+            if(d->isMatchingRule){
+                return Qt::cyan;
+            }else if(d->responseStatus.startsWith('4') || d->responseStatus.startsWith('5')){
+                return Qt::darkCyan;
+            }
+        }else{
+            return QVariant();
+        }
+    }else if(role == RyTableModel::RowDataRole){
+        if(pipesVector.count()>index.row()){
+            return QVariant(pipesVector.at(index.row()));
         }else{
             return QVariant();
         }
@@ -118,40 +130,49 @@ Qt::ItemFlags RyTableModel::flags(const QModelIndex &index) const{
     return QAbstractTableModel::flags(index);
 }
 
-bool RyTableModel::itemLessThan(RyPipeData_ptr a,RyPipeData_ptr b){
-    return rypipeDataGetDataByColumn(a,1) <
-                rypipeDataGetDataByColumn(b,1);
+bool RyTableModel::itemLessThan(RyPipeData_ptr left,int leftColumn,RyPipeData_ptr right,int rightColumn){
+    if(left.isNull() || right.isNull()){
+        return false;
+    }
+    QString leftData = rypipeDataGetDataByColumn(left,leftColumn) ;
+    QString rightData = rypipeDataGetDataByColumn(right,rightColumn);
+    bool isNumber=false;
+    long long leftNumber = leftData.toLongLong(&isNumber);
+    long long rightNumber;
+    if(isNumber){
+        rightNumber = rightData.toLongLong(&isNumber);
+        if(isNumber){
+            return leftNumber<rightNumber;
+        }
+    }
+    return leftData < rightData;
+}
+bool RyTableModel::itemLessThan(const QModelIndex &left, const QModelIndex &right){
+    return itemLessThan(getItem(left.row()),left.column(),getItem(right.row()),right.column());
 }
 
-void RyTableModel::sort(int column, Qt::SortOrder/* = Qt::AscendingOrder*/){
-    //qDebug()<<"sort called..";
-    _sortingColumn = column;
-    //rypipeDataGetDataByColumn(a,_sortingColumn),
-    //rypipeDataGetDataByColumn(b,_sortingColumn)
-    //qSort(pipesVector.begin(),pipesVector.end(),itemLessThan);
-}
 
 RyPipeData_ptr RyTableModel::getItem(int row){
     //qDebug()<<pipesVector.size()<<row;
-    //if(pipesVector.size() >= row){
+    if(pipesVector.size() >= row){
         return pipesVector.at(row);
-    //}
-    //qDebug()<<row<<" ---";
-    //return RyPipeData_ptr(new RyPipeData());
+    }
+    qDebug()<<QString("getItem invalid row:%1").arg(row);
+    return RyPipeData_ptr();
 }
 
 void RyTableModel::updateItem(RyPipeData_ptr p){
     int i = pipesMap.keys().indexOf(p->id);
     if(i!=-1){
-        /*
+
         RyPipeData_ptr ori = pipesMap[p->id];
         pipesMap[p->id] = p;
         int j = pipesVector.indexOf(ori);
         if(j!=-1){
             pipesVector.replace(j,p);
         }
-        */
-        emit dataChanged(index(i,0),index(i,8));//TODO.. magic number 7
+
+        emit dataChanged(index(i,0),index(i,columnCount()));
         emit connectionUpdated(p);
     }
 }
@@ -160,9 +181,12 @@ void RyTableModel::addItem(RyPipeData_ptr p){
     //qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
     RyPipeData_ptr p1 = p;
     ++_pipeNumber;
+    int l = pipesVector.size();
+    if(l==0){
+        _pipeNumber = 1;
+    }
     p1->number=_pipeNumber;
-
-    this->beginInsertRows(index(_pipeNumber-1, 0),_pipeNumber-1,_pipeNumber-1);
+    this->beginInsertRows(index(l, 0),l,l);
 
     //TODO thread safe?
 	pipesMap[p1->id] = p1;
@@ -177,12 +201,11 @@ void RyTableModel::addItem(RyPipeData_ptr p){
 }
 
 void RyTableModel::removeAllItem(){
-    //int l = pipesVector.size();
+    beginResetModel();
     pipesMap.clear();
     pipesVector.clear();
     //qDebug()<<"length="<<pipesVector.count();
-    //emit dataChanged(index(0,0),index(l-1,7));
-    emit reset();
+    endResetModel();
 }
 void RyTableModel::removeItems(){
 

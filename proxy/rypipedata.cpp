@@ -475,7 +475,7 @@ QString& RyPipeData::httpVersion()const{
 */
 
 QString RyPipeData::getRequestHeader(const QString &name) const{
-    return _requestHeaders.value(name,"undefined");
+    return _requestHeaders.value(name,"");
 }
 QString RyPipeData::getResponseHeader(const QString &name) const{
     return _responseHeaders.value(name,"");
