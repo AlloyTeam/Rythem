@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QVariant>
-
+#include <QDebug>
 
 
 class RyPipeData : public QObject

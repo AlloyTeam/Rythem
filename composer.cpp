@@ -181,7 +181,7 @@ void Composer::setupProxy(QString host,qint16 port){
 
 void Composer::dragEnterEvent(QDragEnterEvent *event){
 
-    qDebug()<<"drag enter";
+    //qDebug()<<"drag enter";
     if (event->mimeData()->hasText()) {
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -196,7 +196,7 @@ void Composer::dragEnterEvent(QDragEnterEvent *event){
 }
 
 void Composer::dropEvent(QDropEvent *event){
-    qDebug()<<"drop";
+    //qDebug()<<"drop";
     const RyMimeData* mime = dynamic_cast<const RyMimeData*>(event->mimeData());
 
     if (mime) {
@@ -204,7 +204,7 @@ void Composer::dropEvent(QDropEvent *event){
         this->ui->server->setText(d->host);
         this->ui->port->setText(QString::number(d->port));
         this->ui->request->setPlainText(QString(d->requestHeaderRawData()).append("\r\n\r\n").append(d->requestBodyRawData()));
-        qDebug()<<"drop text="<<mime->text();
+        //qDebug()<<"drop text="<<mime->text();
         event->acceptProposedAction();
     } else {
         event->ignore();
