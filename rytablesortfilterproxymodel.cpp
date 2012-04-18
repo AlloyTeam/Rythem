@@ -15,7 +15,6 @@ bool RyTableSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIn
     if(p.isNull()){
         return true;
     }
-
     if(_filterFlags & NoImageFilter){
         if(p->getResponseHeader("Content-Type").toLower().indexOf("image")!=-1){
         //if(!noImageFilterAccepted(p)){
@@ -55,7 +54,7 @@ RyPipeData_ptr RyTableSortFilterProxyModel::getItem(const QModelIndex& proxyInde
 
 void RyTableSortFilterProxyModel::setFilter(int flag){
     _filterFlags = flag;
-    emit invalidateFilter();
+    invalidateFilter();
 }
 
 int RyTableSortFilterProxyModel::filter()const{

@@ -43,6 +43,8 @@ private:
     RyTableModel *_sourceModel;
     int _filterFlags;
     FilterCallBack _filterCallback;
+
+    QMutex _filterFlagMutex;
 };
 
 #endif // RYTABLESORTFILTERPROXYMODEL_H
