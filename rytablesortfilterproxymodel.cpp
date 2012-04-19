@@ -11,10 +11,13 @@ void RyTableSortFilterProxyModel::setSourceModel(RyTableModel *sourceModel){
 }
 
 bool RyTableSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &) const{
+    //qDebug()<<"filterAcceptsRow comparing";
     RyPipeData_ptr p = _sourceModel->getItem(sourceRow);
     if(p.isNull()){
+        qDebug()<<"filterAcceptsRow got null";
         return true;
     }
+    //qDebug()<<"filterAcceptsRow comparing"<<p->responseStatus;
     if(_filterFlags & NoImageFilter){
         if(p->getResponseHeader("Content-Type").toLower().indexOf("image")!=-1){
         //if(!noImageFilterAccepted(p)){
@@ -53,8 +56,12 @@ RyPipeData_ptr RyTableSortFilterProxyModel::getItem(const QModelIndex& proxyInde
 }
 
 void RyTableSortFilterProxyModel::setFilter(int flag){
+    int oldFlags = _filterFlags;
     _filterFlags = flag;
-    invalidateFilter();
+    qDebug()<<"setting flags";
+    if(oldFlags!=_filterFlags){
+        invalidateFilter();
+    }
 }
 
 int RyTableSortFilterProxyModel::filter()const{
