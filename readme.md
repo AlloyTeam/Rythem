@@ -1,7 +1,7 @@
 # Rythem 
 
  <strong>fiddler like cross-platforms(MacOS/win/*linux*) tool using `Qt`</strong>
-
+By [Tencent AlloyTeam](http://www.AlloyTeam.com/)
 
 ### 功能
  
