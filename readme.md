@@ -1,11 +1,13 @@
 # Rythem 
 
  <strong>fiddler like cross-platforms(MacOS/win/*linux*) tool using `Qt`</strong>
-
+ 
+By [Tencent AlloyTeam](http://www.AlloyTeam.com/)
 
 ### 功能
  
-* http代理服务 (https未实现)
+* http代理服务 
+* https tunnel透传(https抓包需求似乎不是很大，暂不实现)
 * 规则替换
 
     <pre>
@@ -18,15 +20,16 @@
 * host设置
 * 替换规则远程及本地导入。
 * 替换规则增删改。
+* 颜色标记已被替换的请求
+* 导入/导出 每条请求（兼容fiddler *.saz文件)
+* 批量导出response body（可用于保存整站）
+* 过滤显示请求
 
 ### TODOs
 
 * 规则管理(远程规则的更新机制）
 * 各OS/浏览器版本下稳定性测试
 * MacOS下自动设置代理
-* 导入/导出 每条请求
-* 过滤显示请求
-* 颜色标记已被替换的请求
 
 
 ### 主要代码结构

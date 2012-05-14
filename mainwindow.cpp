@@ -37,7 +37,10 @@
 #include <QMovie>
 #include <QPixmap>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
+#include "rytablesortfilterproxymodel.h"
 
 QByteArray gzipDecompress(QByteArray data){
     if (data.size() <= 4) {
@@ -163,16 +166,22 @@ QString RyJsBridge::getConfigs(){
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    pipeTableModel(new RyTableModel()),
     ui(new Ui::MainWindow),
-    isUsingCapture(false)
+    _isUsingCapture(false)
 
 #ifdef Q_OS_WIN
     ,proxySetting("\\HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\",QSettings::NativeFormat)
 #endif
 {
     ui->setupUi(this);
-    ui->tableView->setModel(&pipeTableModel);
+
+    pipeTableModel = new RyTableModel(this);
+    sortFilterProxyModel = new RyTableSortFilterProxyModel(this);
+
+    ui->tableView->setSortingEnabled(true);
+    ui->tableView->setModel(sortFilterProxyModel);
+    sortFilterProxyModel->setDynamicSortFilter(true);
+    sortFilterProxyModel->setSourceModel(pipeTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setColumnWidth(0,30);
     ui->tableView->setColumnWidth(1,30);
@@ -181,9 +190,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setColumnWidth(7,50);
     ui->tableView->verticalHeader()->setDefaultSectionSize(20);
     ui->tableView->verticalHeader()->hide();
-    //ui->tableView->setSortingEnabled(true);
 
-    jsBridge = new RyJsBridge();
+
+    _jsBridge = new RyJsBridge();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     addJsObject();
     connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
@@ -196,17 +205,17 @@ MainWindow::MainWindow(QWidget *parent) :
                              8889);
 
 
-    itemSelectModel = ui->tableView->selectionModel();
+    _itemSelectModel = ui->tableView->selectionModel();
 
     connect(ui->tableView,SIGNAL(doubleClicked(QModelIndex)),SLOT(onItemDoubleClicked(QModelIndex)));
-    connect(itemSelectModel,SIGNAL(currentChanged(QModelIndex,QModelIndex)),SLOT(onSelectionChange(QModelIndex)));
+    connect(_itemSelectModel,SIGNAL(currentChanged(QModelIndex,QModelIndex)),SLOT(onSelectionChange(QModelIndex)));
 
     //ui->tableView->setItemDelegate();
     createMenus();
     //toggleCapture();
 
     connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
-    connect(ui->actionRemoveAll,SIGNAL(triggered()),&pipeTableModel,SLOT(removeAllItem()));
+    connect(ui->actionRemoveAll,SIGNAL(triggered()),this,SLOT(onActionRemoveAll()));
     connect(ui->actionWaterfall, SIGNAL(triggered()), this, SLOT(onWaterfallActionTriggered()));
 }
 
@@ -214,31 +223,92 @@ MainWindow::~MainWindow()
 {
     RyProxyServer* server = RyProxyServer::instance();
     server->close();
-    delete jsBridge;
+    delete _jsBridge;
     delete ui;
 }
 void MainWindow::createMenus(){
-    fileMenu = menuBar()->addMenu(tr("&File"));
-    captureAct = new QAction(tr("&Capture"),this);
-    captureAct->setCheckable(true);
-    fileMenu->addAction(captureAct);
-    QAction *a = fileMenu->addAction(tr("&rules"));
-    connect(a,SIGNAL(triggered()),SLOT(showSettingsDialog()));
-    connect(captureAct,SIGNAL(triggered()),SLOT(toggleCapture()));
+    _fileMenu = menuBar()->addMenu(tr("&File"));
+    _importSessionsAct = _fileMenu->addAction(tr("&import session..."));
+    _filterNoImagesAct = _fileMenu->addAction(tr("hide image requests"));
+    _filterNoImagesAct->setCheckable(true);
+    _filterNo304sAct = _fileMenu->addAction(tr("hide 304s"));
+    _filterNo304sAct->setCheckable(true);
+    _filterShowMatchOnlyAct = _fileMenu->addAction(tr("show matching sessions only"));
+    _filterShowMatchOnlyAct->setCheckable(true);
+    _hideConnectTunnelAct = _fileMenu->addAction(tr("hide connect tunnels"));
+    _hideConnectTunnelAct->setCheckable(true);
+
+    connect(_fileMenu,SIGNAL(triggered(QAction*)),SLOT(onAction(QAction*)));
 }
 
-void MainWindow::showSettingsDialog(){
+void MainWindow::importSessions(){
+    QFileDialog dialog;
+    QString fileName = dialog.getOpenFileName(this,tr("select file to open"),"","Archiev Files(*.saz *.zip)");
+    QuaZip zip(fileName);
+    if(!zip.open(QuaZip::mdUnzip)){
+        qDebug()<<"cannot open "<<fileName;
+        return;
+    }
+    QuaZipFileInfo info;
+    QuaZipFile file(&zip);
+
+    RyPipeData_ptr pipeData;
+
+    QString name;
+    for (bool more = zip.goToFirstFile(); more; more = zip.goToNextFile()) {
+
+        if (!zip.getCurrentFileInfo(&info)) {
+            qWarning("testRead(): getCurrentFileInfo(): %d\n", zip.getZipError());
+            return;
+        }
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning("testRead(): file.open(): %d", file.getZipError());
+            return;
+        }
+
+        name = file.getActualFileName();
+        QByteArray ba = file.readAll();
+        if(name.endsWith("_c.txt")){
+            //pipeData.clear();
+            pipeData = RyPipeData_ptr(new RyPipeData(0,0));
+            pipeData->isImported = true;
+            pipeData->parseRequest(&ba);
+            onNewPipe(pipeData);
+        }else if(name.endsWith("_s.txt")){
+            pipeData->parseResponse(&ba);
+            onPipeUpdate(pipeData);
+            pipeData.clear();
+        }
+
+        if (file.getZipError() != UNZ_OK) {
+            qWarning("testRead(): file.getFileName(): %d", file.getZipError());
+            return ;
+        }
+
+        file.close();
+
+        if (file.getZipError() != UNZ_OK) {
+            qWarning("testRead(): file.close(): %d", file.getZipError());
+            return ;
+        }
+
+    }
+
+    zip.close();
 
 }
 
 void MainWindow::onPipeUpdate(RyPipeData_ptr pipeData){
-    //qDebug()<<"connected";
-    pipeTableModel.updateItem(pipeData);
+    //qDebug()<<"updated "<<pipeData->responseStatus;
+    //pipeTableModel->updateItem(pipeData);
+    sortFilterProxyModel->updateItem(pipeData);
 }
 
 void MainWindow::onNewPipe(RyPipeData_ptr pipeData){
     //pipeTableModel
-    pipeTableModel.addItem(pipeData);
+    //pipeTableModel->addItem(pipeData);
+    sortFilterProxyModel->addItem(pipeData);
 }
 
 void MainWindow::onSelectionChange(QModelIndex index){
@@ -249,8 +319,11 @@ void MainWindow::onSelectionChange(QModelIndex index){
 
 void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
     //qDebug()<<"onSelectionChange";
-    int row = topLeft.row();
-    RyPipeData_ptr data = pipeTableModel.getItem(row);
+    RyPipeData_ptr data = sortFilterProxyModel->getItem(topLeft);
+    if(data.isNull()){
+        qDebug()<<QString("isNull %1").arg(topLeft.row());
+        return;
+    }
 
     ui->tollTabs->setCurrentWidget(ui->inspectorTab);
     ui->requestInspectorTabs->setCurrentWidget(ui->requestInspectorTextview);
@@ -275,7 +348,7 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
     QByteArray decrypedData =
             (data->isResponseChunked()?
               data->responseBodyRawDataUnChunked()
-              :data->responseBodyRawData());;
+              :data->responseBodyRawData());
     if(isEncrypted){
         decrypedData = gzipDecompress(decrypedData);
     }
@@ -286,7 +359,6 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
     //    delete movie;
     //}
     if(data->getResponseHeader("Content-Type").toLower().indexOf("image")!=-1){
-        ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorImageView);
         if(!decrypedData.isEmpty()){
             if(data->getResponseHeader("Content-Type").toLower().indexOf("gif")!=-1){
                 //QBuffer *data = new QBuffer(&decrypedData);
@@ -298,11 +370,16 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
                 pixmap.loadFromData(decrypedData);
                 ui->label->setPixmap(pixmap);
             }
+            ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorImageView);
+        }else{
+            ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorTextView);
+            ui->label->clear();
         }
     }else{
         ui->label->clear();
         ui->responseInspectorTabs->setCurrentWidget(ui->responseInspectorTextView);
     }
+
 
     // show in textview
     QTextCodec* oldCodec = QTextCodec::codecForCStrings();
@@ -327,7 +404,7 @@ void MainWindow::onWaterfallActionTriggered(){
     QListIterator<QModelIndex> it(list);
     while(it.hasNext()){
         QModelIndex i = it.next();
-        RyPipeData_ptr data = pipeTableModel.getItem(i.row());
+        RyPipeData_ptr data = sortFilterProxyModel->getItem(i);
         pipes.append(data);
     }
 
@@ -345,36 +422,15 @@ void MainWindow::onWaterfallActionTriggered(){
 }
 
 
-void MainWindow::mousePressEvent(QMouseEvent *event){
-    qDebug()<<"mouseenter";
-    QTableView *table = static_cast<QTableView*>(childAt(event->pos()));
-    if (!table || table!=ui->tableView){
-        return;
-    }
-    qDebug()<<"is table";
-    QPoint hotSpot = event->pos() - table->pos();
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setText("child->text()");
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    //drag->setPixmap(pixmap);
-    drag->setHotSpot(hotSpot);
-    drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
-}
-
-void MainWindow::dragEnterEvent(QDragEnterEvent *){
-
-}
-
 void MainWindow::toggleProxy(){
-    if(isUsingCapture){
-        isUsingCapture = false;
-        proxySetting.setValue("ProxyEnable",previousProxyInfo.enable);
-        if(previousProxyInfo.enable != 0){
-            proxySetting.setValue("ProxyServer",previousProxyInfo.proxyString);
+    if(_isUsingCapture){
+        _isUsingCapture = false;
+        proxySetting.setValue("ProxyEnable",_previousProxyInfo.enable);
+        if(_previousProxyInfo.enable != 0){
+            proxySetting.setValue("ProxyServer",_previousProxyInfo.proxyString);
         }
-        if( previousProxyInfo.isUsingPac != "0"){
-            proxySetting.setValue("AutoConfigURL",previousProxyInfo.isUsingPac);
+        if( _previousProxyInfo.isUsingPac != "0"){
+            proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
         }
 
         /*
@@ -386,10 +442,10 @@ void MainWindow::toggleProxy(){
         //}
         */
     }else{
-        isUsingCapture = true;
-        previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
-        previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
-        previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
+        _isUsingCapture = true;
+        _previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
+        _previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
+        _previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
         //qDebug()<<previousProxyInfo.proxyString;
         ///qDebug()<<previousProxyInfo.isUsingPac;
         //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
@@ -397,10 +453,11 @@ void MainWindow::toggleProxy(){
 
         //initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
         QString proxyServer="127.0.0.1:8889";
-        if(previousProxyInfo.enable){
-            if(previousProxyInfo.proxyString.indexOf(";")!=-1){
+        /*
+        if(_previousProxyInfo.enable){
+            if(_previousProxyInfo.proxyString.indexOf(";")!=-1){
                 proxyServer = QString("http=")+proxyServer;
-                QStringList proxies = previousProxyInfo.proxyString.split(";");
+                QStringList proxies = _previousProxyInfo.proxyString.split(";");
                 for(int i=0;i<proxies.length();++i){
                     QStringList tmp = proxies[i].split("=");
                     if(tmp.at(0).toLower()=="http"){
@@ -410,13 +467,16 @@ void MainWindow::toggleProxy(){
                 }
                 proxyServer = proxies.join(";");
             }else{
-                proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(previousProxyInfo.proxyString);
+                // since https has been supported remove code b
+                //proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(_previousProxyInfo.proxyString);
             }
         }else{
             proxyServer = "http="+proxyServer;
         }
+        */
         //qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
         proxySetting.remove("AutoConfigURL");
+        //proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
         proxySetting.setValue("ProxyEnable",QVariant(1));
         proxySetting.setValue("ProxyServer",proxyServer);
     }
@@ -428,7 +488,7 @@ void MainWindow::toggleProxy(){
 }
 
 void MainWindow::toggleCapture(){
-    captureAct->setChecked(!isUsingCapture);
+    //captureAct->setChecked(!isUsingCapture);
 #ifdef Q_WS_WIN32
     RyWinHttp::init();
     toggleProxy();
@@ -490,7 +550,7 @@ void MainWindow::toggleCapture(){
 
 
 void MainWindow::closeEvent(QCloseEvent *event){
-    if(isUsingCapture){
+    if(_isUsingCapture){
         toggleCapture();
     }
     QMainWindow::closeEvent(event);
@@ -503,10 +563,44 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event){
 }
 
 void MainWindow::addJsObject(){
-    ui->webView->page()->mainFrame()->addToJavaScriptWindowObject(QString("App"),jsBridge);
+    ui->webView->page()->mainFrame()->addToJavaScriptWindowObject(QString("App"),_jsBridge);
 }
 
+void MainWindow::onAction(QAction *action){
+    if(action == _filterNoImagesAct){
+        if(action->isChecked()){
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() | RyTableSortFilterProxyModel::NoImageFilter);
+        }else{
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::NoImageFilter));
+        }
+    }else if(action == _filterNo304sAct){
+        if(action->isChecked()){
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() | RyTableSortFilterProxyModel::No304Filter);
+        }else{
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::No304Filter));
+        }
+    }else if(action == _importSessionsAct){
+        importSessions();
+    }else if(action == _filterShowMatchOnlyAct){
+        if(action->isChecked()){
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() | RyTableSortFilterProxyModel::OnlyMatchingFilter);
+        }else{
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::OnlyMatchingFilter));
+        }
+    }else if(action == _hideConnectTunnelAct){
+        if(action->isChecked()){
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() | RyTableSortFilterProxyModel::HideTunnelFilter);
+        }else{
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::HideTunnelFilter));
+        }
+    }
+}
 
 void MainWindow::on_actionLongCache_triggered(){
     RyRuleManager::instance()->toggleLongCache();
+}
+
+void MainWindow::onActionRemoveAll(){
+    pipeTableModel->removeAllItem();
+    sortFilterProxyModel->removeAllItem();
 }

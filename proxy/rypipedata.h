@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QVariant>
-
+#include <QDebug>
 
 
 class RyPipeData : public QObject
@@ -116,6 +116,8 @@ class RyPipeData : public QObject
         QString getResponseHeader(const QString& name)const;
 
         bool isMatchingRule;
+        bool isImported;
+        bool isConnectTunnel;
         int ruleType;
 
         QByteArray requestHeaderRawData()const{
