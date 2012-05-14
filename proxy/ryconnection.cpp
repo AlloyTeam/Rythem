@@ -121,6 +121,11 @@ void RyConnection::onRequestReadyRead(){
     }
     QByteArray newContent = _requestSocket->readAll();
     //qDebug()<<"requestReadyRead"<<newContent;
+    if(_isConnectTunnel){
+        _responseSocket->write(newContent);
+        _responseSocket->flush();
+        return;
+    }
 
     _requestBuffer.append(newContent);
     parseRequest();
@@ -225,12 +230,13 @@ void RyConnection::onResponseConnected(){
     _sendingPipeData->serverIp = _responseSocket->peerAddress().toString();
     _responseState = ConnectionStateConnected;
     if(_sendingPipeData->method=="CONNECT"){
-        qDebug()<<"is establishing connect tunnel";
-        qDebug()<<"CONNECT method: connect success";
+        //qDebug()<<"is establishing connect tunnel";
+        //qDebug()<<"CONNECT method: connect success";
         QByteArray ba("HTTP/1.1 200 Connection established"
                        "\r\n"
                        "Connection: keep-alive\r\n\r\n");
         _requestSocket->write(ba);
+        _requestSocket->flush();
         _responseBuffer.append(ba);
         parseResponse();
         return;
@@ -247,7 +253,11 @@ void RyConnection::onResponseReadyRead(){
     }
     //qDebug()<<"onResponsReadyRead"<<handle();
     QByteArray newContent = _responseSocket->readAll();
-
+    if(_isConnectTunnel){
+        _requestSocket->write(newContent);
+        _requestSocket->flush();
+        return;
+    }
     //qDebug()<<"response come readAll:"
     //        <<newContent.size()
     //        <<"bytesAvailable:"
@@ -270,7 +280,10 @@ void RyConnection::onResponseReadyRead(){
 void RyConnection::onResponseClose(){
     //pipeDataMutex->tryLock();
     qDebug()<<"response close";
-    closed = true;
+    if(closed){
+        return;
+    }
+    onResponseError();
     //pipeDataMutex->unlock();
 }
 void RyConnection::onResponseError(QAbstractSocket::SocketError){
@@ -349,10 +362,6 @@ void RyConnection::onRequestPackageFound(){
     _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
     if(_receivingPipeData->method == "CONNECT"){
         _isConnectTunnel = true;
-        qDebug()<<"requestPackageFound"
-                <<_receivingPipeData->requestHeaderRawData()
-                <<_receivingPipeData->requestBodyRawData().size()
-                <<_receivingPipeData->dataToSend();
     }
     _requestState = ConnectionStatePackageFound;
     _receivingPipeData->performances = _receivingPerformance;
