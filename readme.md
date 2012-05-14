@@ -6,7 +6,8 @@ By [Tencent AlloyTeam](http://www.AlloyTeam.com/)
 
 ### 功能
  
-* http代理服务 (https未实现)
+* http代理服务 
+* https tunnel透传(https抓包需求似乎不是很大，暂不实现)
 * 规则替换
 
     <pre>
@@ -21,7 +22,7 @@ By [Tencent AlloyTeam](http://www.AlloyTeam.com/)
 * 替换规则增删改。
 * 颜色标记已被替换的请求
 * 导入/导出 每条请求（兼容fiddler *.saz文件)
-* 导出response body
+* 批量导出response body（可用于保存整站）
 
 ### TODOs
 
