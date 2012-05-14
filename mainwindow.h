@@ -81,11 +81,12 @@ private:
     ProxyInfo _previousProxyInfo;
     QMenu *_fileMenu;
     QMenu *_filterMenu;
-    QAction *_importSessions;
+    QAction *_importSessionsAct;
     QAction *_filterNoImagesAct;
     QAction *_filterNo304sAct;
-    QAction *_filterShowMatchOnly;
+    QAction *_filterShowMatchOnlyAct;
     QAction *_captureAct;
+    QAction *_hideConnectTunnelAct;
     QItemSelectionModel *_itemSelectModel;
 protected:
     void closeEvent(QCloseEvent *event);
