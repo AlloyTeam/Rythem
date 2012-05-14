@@ -178,16 +178,19 @@ void RyConnectionTableView::onAction(QAction *action){
 
                 QString pathWithoutQueryAndHash = item->path;
                 if(item->path.indexOf("?")!=-1){
+                    //http://game.duopao.com/show/project/yangtuoxiadao/yangtuoxiadao.html?urltype=game&app_id=200201191&app_lang=2052&app_nonce=3078456541&app_openid=21AAFDDB7426843957238A9D56F3AD42&app_openkey=8F13C6A479C715CF3655E5B15DD50E15&app_ts=1334802669&pushparam=0&sig=1580B0E043129FFA3BFF396678568010C7B1B09A
                     pathWithoutQueryAndHash = item->path.left(item->path.indexOf("?"));
+                    qDebug()<<"remove ? to"<<pathWithoutQueryAndHash;
                 }
-                if(item->path.indexOf("&")!=-1){
-                    pathWithoutQueryAndHash = item->path.left(item->path.indexOf("&"));
+                if(pathWithoutQueryAndHash.indexOf("&")!=-1){
+                    pathWithoutQueryAndHash = pathWithoutQueryAndHash.left(pathWithoutQueryAndHash.indexOf("&"));
                 }
                 QString fileName = "/"+item->host+pathWithoutQueryAndHash;
 
                 if(fileName.endsWith("/")){
                     fileName.append("index.html");
                 }
+                qDebug()<<fileName;
                 fileName.prepend(saveDir);
                 QFile saveFile(fileName);
                 QFileInfo fi(saveFile);

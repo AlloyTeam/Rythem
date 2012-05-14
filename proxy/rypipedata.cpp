@@ -142,22 +142,21 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
     if(indexOfHost==-1){
         // request after CONNECT tunnel
         path = fullUrl;
-    }else{
-        QString hostAndPort = withouProtocol;
-        int indexOfPath = withouProtocol.indexOf("/");
-        if(indexOfPath!=-1){
-            hostAndPort = withouProtocol.left(indexOfPath);
-            path = withouProtocol.mid(indexOfPath);
-        }
-        int indexOfPort = hostAndPort.indexOf(":");
-        host = hostAndPort;
-        if(indexOfPort!=-1){
-            host = hostAndPort.left(indexOfPort);
-            port = hostAndPort.mid(indexOfPort+1).toInt();
-        }
-        if(method == "CONNECT"){
-            fullUrl.prepend("http://");
-        }
+    }
+    QString hostAndPort = withouProtocol;
+    int indexOfPath = withouProtocol.indexOf("/");
+    if(indexOfPath!=-1){
+        hostAndPort = withouProtocol.left(indexOfPath);
+        path = withouProtocol.mid(indexOfPath);
+    }
+    int indexOfPort = hostAndPort.indexOf(":");
+    host = hostAndPort;
+    if(indexOfPort!=-1){
+        host = hostAndPort.left(indexOfPort);
+        port = hostAndPort.mid(indexOfPort+1).toInt();
+    }
+    if(method == "CONNECT"){
+        fullUrl.prepend("http://");
     }
 
     //qDebug()<<"host="<<host<<port;
@@ -177,7 +176,6 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
                 port = value.mid(d+1).trimmed().toInt();
             }else{
                 host = value;
-                port = 80;
             }
         }
 

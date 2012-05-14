@@ -298,13 +298,15 @@ void MainWindow::importSessions(){
 }
 
 void MainWindow::onPipeUpdate(RyPipeData_ptr pipeData){
-    //qDebug()<<"connected";
-    pipeTableModel->updateItem(pipeData);
+    //qDebug()<<"updated "<<pipeData->responseStatus;
+    //pipeTableModel->updateItem(pipeData);
+    sortFilterProxyModel->updateItem(pipeData);
 }
 
 void MainWindow::onNewPipe(RyPipeData_ptr pipeData){
     //pipeTableModel
-    pipeTableModel->addItem(pipeData);
+    //pipeTableModel->addItem(pipeData);
+    sortFilterProxyModel->addItem(pipeData);
 }
 
 void MainWindow::onSelectionChange(QModelIndex index){
@@ -449,6 +451,7 @@ void MainWindow::toggleProxy(){
 
         //initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
         QString proxyServer="127.0.0.1:8889";
+        /*
         if(_previousProxyInfo.enable){
             if(_previousProxyInfo.proxyString.indexOf(";")!=-1){
                 proxyServer = QString("http=")+proxyServer;
@@ -462,13 +465,16 @@ void MainWindow::toggleProxy(){
                 }
                 proxyServer = proxies.join(";");
             }else{
-                proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(_previousProxyInfo.proxyString);
+                // since https has been supported remove code b
+                //proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(_previousProxyInfo.proxyString);
             }
         }else{
             proxyServer = "http="+proxyServer;
         }
+        */
         //qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
         proxySetting.remove("AutoConfigURL");
+        //proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
         proxySetting.setValue("ProxyEnable",QVariant(1));
         proxySetting.setValue("ProxyServer",proxyServer);
     }
