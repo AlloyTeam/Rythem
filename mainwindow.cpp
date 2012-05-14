@@ -299,12 +299,14 @@ void MainWindow::importSessions(){
 
 void MainWindow::onPipeUpdate(RyPipeData_ptr pipeData){
     //qDebug()<<"updated "<<pipeData->responseStatus;
-    pipeTableModel->updateItem(pipeData);
+    //pipeTableModel->updateItem(pipeData);
+    sortFilterProxyModel->updateItem(pipeData);
 }
 
 void MainWindow::onNewPipe(RyPipeData_ptr pipeData){
     //pipeTableModel
-    pipeTableModel->addItem(pipeData);
+    //pipeTableModel->addItem(pipeData);
+    sortFilterProxyModel->addItem(pipeData);
 }
 
 void MainWindow::onSelectionChange(QModelIndex index){

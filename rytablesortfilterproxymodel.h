@@ -20,6 +20,7 @@ public:
 
     explicit RyTableSortFilterProxyModel(QObject *parent = 0);
     void setSourceModel(RyTableModel *sourceModel);
+    RyTableModel *sourceModel()const;
     RyPipeData_ptr getItem(int sourceRow);
     RyPipeData_ptr getItem(const QModelIndex& proxyIndex);
 
@@ -27,9 +28,9 @@ public:
     int filter()const;
     void setCustomeFilter(FilterCallBack);
 
-    void removeAllItem(){
-        reset();
-    }
+    void removeAllItem();
+    void updateItem(RyPipeData_ptr);
+    void addItem(RyPipeData_ptr);
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;

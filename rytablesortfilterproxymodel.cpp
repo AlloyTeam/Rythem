@@ -9,6 +9,9 @@ void RyTableSortFilterProxyModel::setSourceModel(RyTableModel *sourceModel){
     QSortFilterProxyModel::setSourceModel(sourceModel);
     _sourceModel = sourceModel;
 }
+RyTableModel *RyTableSortFilterProxyModel::sourceModel()const{
+    return _sourceModel;
+}
 
 bool RyTableSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &) const{
     //qDebug()<<"filterAcceptsRow comparing";
@@ -69,4 +72,19 @@ int RyTableSortFilterProxyModel::filter()const{
 }
 void RyTableSortFilterProxyModel::setCustomeFilter(FilterCallBack filtercb){
     _filterCallback = filtercb;
+}
+
+void RyTableSortFilterProxyModel::removeAllItem(){
+    sourceModel()->removeAllItem();
+    reset();
+}
+
+void RyTableSortFilterProxyModel::updateItem(RyPipeData_ptr p){
+    sourceModel()->updateItem(p);
+    //emit dataChanged(index(0,0),index(rowCount()-1,columnCount()-1));
+}
+
+void RyTableSortFilterProxyModel::addItem(RyPipeData_ptr p){
+    sourceModel()->addItem(p);
+    //emit dataChanged(index(0,0),index(rowCount()-1,columnCount()-1));
 }
