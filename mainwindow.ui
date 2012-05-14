@@ -173,7 +173,6 @@
    <addaction name="actionLongCache"/>
    <addaction name="separator"/>
    <addaction name="actionWaterfall"/>
-   <addaction name="actionShowConnectOnly"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRemoveAll">
@@ -228,14 +227,6 @@
    </property>
    <property name="toolTip">
     <string>long cache</string>
-   </property>
-  </action>
-  <action name="actionShowConnectOnly">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>showConnectOnly</string>
    </property>
   </action>
  </widget>
