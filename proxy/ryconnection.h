@@ -47,7 +47,7 @@ class RyConnection:public QObject{
         void onResponseConnected();
         void onResponseReadyRead();
         void onResponseClose();
-        void onResponseError(QAbstractSocket::SocketError);
+        void onResponseError(QAbstractSocket::SocketError = QAbstractSocket::RemoteHostClosedError);
 
         void onRequestHeaderFound();
         void onRequestPackageFound();

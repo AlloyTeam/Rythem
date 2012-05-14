@@ -171,8 +171,8 @@ void RyTableModel::updateItem(RyPipeData_ptr p){
         if(j!=-1){
             pipesVector.replace(j,p);
         }
-
-        emit dataChanged(index(i,0),index(i,columnCount()));
+        qDebug()<<"update row"<<QString::number(i);
+        emit dataChanged(index(i,0),index(i,columnCount()-1));
         emit connectionUpdated(p);
     }
 }
