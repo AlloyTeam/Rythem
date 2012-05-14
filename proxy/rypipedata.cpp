@@ -12,6 +12,7 @@ RyPipeData::RyPipeData(int _socketHandle,quint64 connectionId,QObject *parent):
     _isResponseChunked = false;
     isMatchingRule = false;
     isImported = false;
+    isConnectTunnel = false;
 }
 
 bool RyPipeData::operator <(RyPipeData &pipeData){
@@ -156,6 +157,7 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
         port = hostAndPort.mid(indexOfPort+1).toInt();
     }
     if(method == "CONNECT"){
+        isConnectTunnel = true;
         fullUrl.prepend("http://");
     }
 

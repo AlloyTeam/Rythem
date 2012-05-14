@@ -15,7 +15,8 @@ public:
         NoImageFilter = 0x01,
         No304Filter = 0x02,
         CustomFilter = 0x04,
-        OnlyMatchingFilter = 0x08
+        OnlyMatchingFilter = 0x08,
+        HideTunnelFilter = 0x16
     };
 
     explicit RyTableSortFilterProxyModel(QObject *parent = 0);
