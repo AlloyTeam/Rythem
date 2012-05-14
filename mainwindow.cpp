@@ -255,7 +255,7 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
     ui->tollTabs->setCurrentWidget(ui->inspectorTab);
     ui->requestInspectorTabs->setCurrentWidget(ui->requestInspectorTextview);
 
-    //TODO
+    // TODO: test
     ui->requestTextEdit->setPlainText(data->requestHeaderRawData() +"\r\n\r\n"+data->requestBodyRawData() );
 
 
@@ -280,7 +280,7 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
         decrypedData = gzipDecompress(decrypedData);
     }
 
-    //TODO..
+    //TODO: gif
     //QMovie *movie = ui->label->movie();
     //if(movie){
     //    delete movie;
@@ -292,7 +292,7 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
                 //QBuffer *data = new QBuffer(&decrypedData);
                 //QMovie *movie = new QMovie(data);
                 //ui->label->setMovie(movie);
-                //TODO start and delete movie..
+                //TODO: start and delete movie..
             }else{
                 QPixmap pixmap;
                 pixmap.loadFromData(decrypedData);
