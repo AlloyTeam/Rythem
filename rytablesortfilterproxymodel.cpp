@@ -37,6 +37,11 @@ bool RyTableSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIn
             return false;
         }
     }
+    if(_filterFlags & HideTunnelFilter){
+        if(p->isConnectTunnel){
+            return false;
+        }
+    }
     if(_filterFlags & CustomFilter){
         //if(!_filterCallback(p)){
         //    return false;
@@ -86,5 +91,6 @@ void RyTableSortFilterProxyModel::updateItem(RyPipeData_ptr p){
 
 void RyTableSortFilterProxyModel::addItem(RyPipeData_ptr p){
     sourceModel()->addItem(p);
+    invalidateFilter();
     //emit dataChanged(index(0,0),index(rowCount()-1,columnCount()-1));
 }

@@ -228,13 +228,15 @@ MainWindow::~MainWindow()
 }
 void MainWindow::createMenus(){
     _fileMenu = menuBar()->addMenu(tr("&File"));
-    _importSessions = _fileMenu->addAction(tr("&import session..."));
+    _importSessionsAct = _fileMenu->addAction(tr("&import session..."));
     _filterNoImagesAct = _fileMenu->addAction(tr("hide image requests"));
     _filterNoImagesAct->setCheckable(true);
     _filterNo304sAct = _fileMenu->addAction(tr("hide 304s"));
     _filterNo304sAct->setCheckable(true);
-    _filterShowMatchOnly = _fileMenu->addAction(tr("show matching sessions only"));
-    _filterShowMatchOnly->setCheckable(true);
+    _filterShowMatchOnlyAct = _fileMenu->addAction(tr("show matching sessions only"));
+    _filterShowMatchOnlyAct->setCheckable(true);
+    _hideConnectTunnelAct = _fileMenu->addAction(tr("hide connect tunnels"));
+    _hideConnectTunnelAct->setCheckable(true);
 
     connect(_fileMenu,SIGNAL(triggered(QAction*)),SLOT(onAction(QAction*)));
 }
@@ -577,13 +579,19 @@ void MainWindow::onAction(QAction *action){
         }else{
             sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::No304Filter));
         }
-    }else if(action == _importSessions){
+    }else if(action == _importSessionsAct){
         importSessions();
-    }else if(action == _filterShowMatchOnly){
+    }else if(action == _filterShowMatchOnlyAct){
         if(action->isChecked()){
             sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() | RyTableSortFilterProxyModel::OnlyMatchingFilter);
         }else{
             sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::OnlyMatchingFilter));
+        }
+    }else if(action == _hideConnectTunnelAct){
+        if(action->isChecked()){
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() | RyTableSortFilterProxyModel::HideTunnelFilter);
+        }else{
+            sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::HideTunnelFilter));
         }
     }
 }

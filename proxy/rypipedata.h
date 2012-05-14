@@ -117,6 +117,7 @@ class RyPipeData : public QObject
 
         bool isMatchingRule;
         bool isImported;
+        bool isConnectTunnel;
         int ruleType;
 
         QByteArray requestHeaderRawData()const{
