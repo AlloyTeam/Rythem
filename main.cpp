@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
-    //a.setWindowIcon(QIcon(":/static/rythem.icns"));
     appPath =  qApp->applicationDirPath();
 
 

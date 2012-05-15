@@ -154,7 +154,7 @@ bool RyTableModel::itemLessThan(const QModelIndex &left, const QModelIndex &righ
 
 RyPipeData_ptr RyTableModel::getItem(int row){
     //qDebug()<<pipesVector.size()<<row;
-    if(pipesVector.size() >= row){
+    if(pipesVector.size() > row){
         return pipesVector.at(row);
     }
     qDebug()<<QString("getItem invalid row:%1").arg(row);

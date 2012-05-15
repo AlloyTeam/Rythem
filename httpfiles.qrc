@@ -24,4 +24,22 @@
         <file>logo.png</file>
         <file>family.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>static/img1.png</file>
+        <file>static/img2.png</file>
+        <file>static/img3.png</file>
+        <file>static/img4.png</file>
+        <file>static/img5.png</file>
+        <file>static/img6.png</file>
+        <file>static/img7.png</file>
+        <file>static/img8.png</file>
+        <file>static/img9.png</file>
+        <file>static/img10.png</file>
+        <file>static/img11.png</file>
+        <file>static/img12.png</file>
+        <file>static/img13.png</file>
+        <file>static/img14.png</file>
+        <file>static/img15.png</file>
+        <file>static/img16.png</file>
+    </qresource>
 </RCC>

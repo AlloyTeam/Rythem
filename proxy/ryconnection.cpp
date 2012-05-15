@@ -20,21 +20,13 @@ RyConnection::RyConnection(int socketHandle,quint64 connectionId,QObject* parent
     _pipeTotal = 0;
     _isConnectTunnel = false;
     _requestState = _responseState = ConnectionStateInit;
-    //qDebug()<<"RyConnection"<<socketHandle;
-    //setHandle(socketHandle);
-
-    //pipeDataMutex = new QMutex( QMutex::Recursive );
-
     _receivingPerformance.clientConnected = QDateTime::currentMSecsSinceEpoch();
-    //qDebug()<<"RyConnection";
 }
 
 RyConnection::~RyConnection(){
     if(_responseState!=ConnectionStatePackageFound &&
             _responseState!=ConnectionStateInit){
         qDebug()<<"response stile receving...";
-    }else{
-        //qDebug()<<"~RyConnection";
     }
     //qDebug()<<"~RyConnection pipeTotal:"<<_pipeTotal<<"_connection id = "<<_connectionId;
     if(_requestSocket){
@@ -51,45 +43,27 @@ RyConnection::~RyConnection(){
         delete _responseSocket;
         _responseSocket = NULL;
     }
-    //qDebug()<<"~RyConnection end";
-    //qDebug()<<"~RyConnection in main"
-    //        << (QApplication::instance()->thread() == QThread::currentThread());
-    //QThread::currentThread()->quit();
-    //_pipeList.clear();
-    //delete pipeDataMutex;
 }
 int RyConnection::handle()const{
     return _handle;
 }
 
 void RyConnection::setHandle(int theHandle){
-    //if(_handle == theHandle){
-    //    qDebug()<<"same handle"<<theHandle;
-    //    return;
-    //}
-    //if(_requestSocket->isOpen()){
-    //    return;
-    //}
     _handle = theHandle;
+    // run方法的出现是QThread使用方法变迁的历史遗留问题
     run();
 }
 
 // public slots
-void RyConnection::deleteLater(){
-    QObject::deleteLater();
-    // do some clearup work?
-}
 void RyConnection::run(){
+    //初始化socket
+
     if(!_requestSocket){
         _requestSocket = new QTcpSocket();
-        //_requestSocket->abort();
     }else if(_requestSocket->isOpen()){
         qDebug()<<"socket listening.. do nothing..";
         return;
     }
-    //qDebug()<<"run.."<<_handle;
-    //qDebug()<<(QThread::currentThread() == QApplication::instance()->thread());
-
     if(_responseState!=ConnectionStatePackageFound &&
             _responseState!=ConnectionStateInit){
         qDebug()<<"response stile receving...";
@@ -97,21 +71,22 @@ void RyConnection::run(){
             qDebug()<<_sendingPipeData->fullUrl;
         }
     }
+    //初始化状态，缓存数据
     _responseBuffer.clear();
     _requestBuffer.clear();
-
     _requestState = _responseState = ConnectionStateInit;
     _sendingPipeData.clear();
-
     _responseSocket = NULL;
+
+    //监听事件
     connect(_requestSocket,SIGNAL(readyRead()),SLOT(onRequestReadyRead()));
     connect(_requestSocket,SIGNAL(aboutToClose()),SLOT(onRequestClose()));
     connect(_requestSocket,SIGNAL(error(QAbstractSocket::SocketError)),
             SLOT(onRequestError(QAbstractSocket::SocketError)));
     if(!_requestSocket->isOpen()){
+        //打开连接
         _requestSocket->setSocketDescriptor(_handle);
     }
-
 }
 
 //private slots
@@ -122,23 +97,25 @@ void RyConnection::onRequestReadyRead(){
     QByteArray newContent = _requestSocket->readAll();
     //qDebug()<<"requestReadyRead"<<newContent;
     if(_isConnectTunnel){
+        // https隧道,直接透传不解析
+        // TODO: decrypt https tunnel
+        // TODO: rename _isConnectTunnel
         _responseSocket->write(newContent);
         _responseSocket->flush();
         return;
     }
 
+    // append new content and parse request
     _requestBuffer.append(newContent);
     parseRequest();
 }
 void RyConnection::onRequestClose(){
-    //pipeDataMutex->tryLock();
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
-
-        // 暂时不缓存socket
         _responseSocket->abort();
         delete _responseSocket;
+        // 暂时不缓存socket
         /*
         RyProxyServer::instance()->cacheSocket(
                     _connectingHost,
@@ -152,18 +129,15 @@ void RyConnection::onRequestClose(){
     _responseState = ConnectionStateInit;
     emit connectionClose();
     closed = true;
-    //pipeDataMutex->unlock();
 }
 void RyConnection::onRequestError(QAbstractSocket::SocketError){
-    //pipeDataMutex->tryLock();
-    //qDebug()<<"request error";
     if(_responseSocket){
         _responseSocket->blockSignals(true);
         _responseSocket->disconnect(this);
 
-        // 暂时不缓存socket
         _responseSocket->abort();
         delete _responseSocket;
+        // 暂时不缓存socket
         /*
         RyProxyServer::instance()->cacheSocket(
                     _connectingHost,
@@ -175,10 +149,6 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError){
 
     if(_sendingPipeData){
         if(_sendingPipeData->isContentLenthUnLimit()){
-            //_responseState = ConnectionStatePackageFound;
-            //qDebug()<<"respones close when content-length not found";
-            //qDebug()<<_sendingPipeData->responseBodyRawData();
-            //emit pipeComplete(_sendingPipeData);
             onResponsePackageFound();
         }else{//maybe remote connection disconnect with error
             //if(!_sendingPipeData->isPackageFound()){
@@ -198,42 +168,31 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError){
 
                     _sendingPipeData->parseResponse(&ba);
                 }
-                //emit pipeError(_sendingPipeData);
-                //TODO
+                // TODO: emit pipeError(_sendingPipeData);
                 onResponsePackageFound();
             //}
-
         }
-        //_sendingPipeData.clear();
     }
     _responseState = ConnectionStateInit;
-
-    //TODO
     emit connectionClose();
     closed = true;
-    //pipeDataMutex->unlock();
 }
 
 void RyConnection::onResponseConnected(){
-    //pipeDataMutex->tryLock();
     if(_sendingPerformance.responseConnected==-1){
         _sendingPerformance.responseConnected = QDateTime::currentMSecsSinceEpoch();
     }
 
 
-    //qDebug()<<_responseSocket->state() ;
     _connectionNotOkTime = 0;
-    //qDebug()<<"onResponseConnected begin";
     //because the socket will be reuse. so remove unnecessary signal/slot connections
     disconnect(_responseSocket,SIGNAL(connected()),this,SLOT(onResponseConnected()));
 
     _sendingPipeData->serverIp = _responseSocket->peerAddress().toString();
     _responseState = ConnectionStateConnected;
     if(_sendingPipeData->method=="CONNECT"){
-        //qDebug()<<"is establishing connect tunnel";
-        //qDebug()<<"CONNECT method: connect success";
-        QByteArray ba("HTTP/1.1 200 Connection established"
-                       "\r\n"
+        QByteArray ba("HTTP/1.1 200 Connection established\r\n"
+                       "Proxy-Server: Rythem\r\n"
                        "Connection: keep-alive\r\n\r\n");
         _requestSocket->write(ba);
         _requestSocket->flush();
@@ -245,50 +204,40 @@ void RyConnection::onResponseConnected(){
         _responseSocket->write(_sendingPipeData->dataToSend());
         _responseSocket->flush();
     }
-    //pipeDataMutex->unlock();
 }
 void RyConnection::onResponseReadyRead(){
     if(_sendingPerformance.responseBegin == -1){
         _sendingPerformance.responseBegin = QDateTime::currentMSecsSinceEpoch();
     }
-    //qDebug()<<"onResponsReadyRead"<<handle();
     QByteArray newContent = _responseSocket->readAll();
     if(_isConnectTunnel){
+        // HTTPS Tunnel 直接透传
+        // TODO: https解析
         _requestSocket->write(newContent);
         _requestSocket->flush();
         return;
     }
-    //qDebug()<<"response come readAll:"
-    //        <<newContent.size()
-    //        <<"bytesAvailable:"
-    //        <<length;
 
     if(newContent.isEmpty()){
         qDebug()<<"empty response";
         return;
     }
-    //qDebug()<<"response ready read\n"
-    //        <<newContent;
+
     _requestSocket->write(newContent);
     _requestSocket->flush();
     _responseBuffer.append(newContent);
-    //qDebug()<<_responseBuffer;
     parseResponse();
-    //qDebug()<<"onResponsReadyRead end"<<handle();
 
 }
 void RyConnection::onResponseClose(){
-    //pipeDataMutex->tryLock();
     qDebug()<<"response close";
     if(closed){
         return;
     }
     onResponseError();
-    //pipeDataMutex->unlock();
 }
 void RyConnection::onResponseError(QAbstractSocket::SocketError){
-    //pipeDataMutex->tryLock();
-    //qDebug()<<"onResponseError"<<handle();
+    // TODO: markAsError
     if(_sendingPipeData){
         if(_sendingPipeData->responseHeaderRawData().isEmpty()){
 
@@ -307,20 +256,17 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
             QByteArray ba = QByteArray("nRythem:remote server close");
             _sendingPipeData->parseResponse(&byteToWrite);
             onResponsePackageFound();
-            //emit pipeError(_sendingPipeData);
         }else if(_sendingPipeData->isContentLenthUnLimit()){
-            qDebug()<<"respones close when content-length not found";
+            // response without content-length
+            // qDebug()<<"respones close when content-length not found";
             onResponsePackageFound();
-            //emit pipeComplete(_sendingPipeData);
-        }else{//maybe remote connection disconnect with error
+        }else{
+            //maybe remote connection disconnect with error
             //   when the response doesn't complete.
             //if(!_sendingPipeData->isPackageFound()){
             //   _sendingPipeData->markAsError();
-
             //}
             onResponsePackageFound();
-            //emit pipeComplete(_sendingPipeData);
-
         }
         _sendingPipeData.clear();
     }
@@ -332,25 +278,9 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
     }
     emit connectionClose();
     closed = true;
-    //pipeDataMutex->unlock();
-    //qDebug()<<"onResponseError end"<<handle();
 }
 
 void RyConnection::onRequestHeaderFound(){
-    /*
-    if(_isConnectTunnel){
-        _receivingPipeData->path = _receivingPipeData->fullUrl;
-        _receivingPipeData->fullUrl
-                .prepend(
-                    QString("http://")
-                    .append(_connectingHost)
-                    .append(":")
-                    .append(QString("%1").arg(_connectingPort))
-                 );
-        _receivingPipeData->host = _connectingHost;
-        _receivingPipeData->port = _connectingPort;
-    }
-    */
     _requestState = ConnectionStateHeadFound;
 }
 
@@ -358,9 +288,9 @@ void RyConnection::onRequestPackageFound(){
     if(closed){
         return;
     }
-    //pipeDataMutex->tryLock();
     _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
-    if(_receivingPipeData->method == "CONNECT"){
+    if(_receivingPipeData->method == "CONNECT" &&
+            _receivingPipeData->port != 80){// TODO: 80端口一定不是https?
         _isConnectTunnel = true;
     }
     _requestState = ConnectionStatePackageFound;
@@ -372,7 +302,6 @@ void RyConnection::onRequestPackageFound(){
     _lastSocketConnectedDateTime = _receivingPerformance.clientConnected;
     _receivingPerformance.reset();
     doRequestToNetwork();
-    //pipeDataMutex->unlock();
 }
 
 void RyConnection::onResponseHeaderFound(){
@@ -383,24 +312,14 @@ void RyConnection::onResponsePackageFound(){
     if(closed){
         return;
     }
-    //pipeDataMutex->tryLock();
     _sendingPerformance.responseDone = QDateTime::currentMSecsSinceEpoch();
-    //qDebug()<<"isClosed?"<<(closed?"yes":"no")<<(_sendingPipeData.isNull()?" sending is null :yes":"no");
     _sendingPipeData->performances = _sendingPerformance;
     _responseState = ConnectionStatePackageFound;
     emit pipeComplete(_sendingPipeData);
-    /*
-    qDebug()<<"PackageFound:\n"
-            <<_sendingPipeData->fullUrl
-            <<_sendingPipeData->responseHeaderRawData()
-            <<_sendingPipeData->responseBodyRawData().size();
-    */
+
     _sendingPipeData.clear();
     _sendingPerformance.reset();
     doRequestToNetwork();
-    //pipeDataMutex->unlock();
-
-
 }
 
 // ============ end of private slots
@@ -459,7 +378,6 @@ void RyConnection::parseResponse(){
     if(_responseState == ConnectionStateConnected ||
             _responseState == ConnectionStatePackageFound){
         bool isResponseOk;
-        //qDebug()<<newContent;
         int byteRemain = _sendingPipeData->parseResponse(&_responseBuffer,&isResponseOk);
         if(isResponseOk){
             onResponseHeaderFound();
@@ -483,17 +401,6 @@ void RyConnection::parseResponse(){
             }
         }else{
             _connectionNotOkTime++;
-            /*
-            printStates();
-            qDebug()<<"response not ok"
-                    <<_sendingPipeData->responseBodyRawData()
-                    <<_sendingPipeData->responseHeaderRawData()
-                    <<_sendingPipeData->host
-                    <<"response not ok is socket from cache:"
-                    <<_isSocketFromCache
-                    <<_connectionNotOkTime
-                    <<_responseBuffer;
-            */
             return;
         }
     }else if(_responseState == ConnectionStateHeadFound){
@@ -581,7 +488,7 @@ void RyConnection::doRequestToNetwork(){
     //qDebug()<<host<<QString::number(port);
     if(host == RyProxyServer::instance()->serverAddress().toString()
             && port == RyProxyServer::instance()->serverPort()){
-        //TODO
+        // TODO: move these mapping to global util
         qDebug()<<"simple http"<<_sendingPipeData->path;
         QMap<QString,QString> contentTypeMapping;
         contentTypeMapping["jpg"] = "image/jpeg";
@@ -785,8 +692,6 @@ void RyConnection::doRequestToNetwork(){
         */
         _responseSocket->connectToHost(host,port);
     }else{
-        //qDebug()<<"responseSocket opened"
-        //        <<responseState;
         if(responseState == QAbstractSocket::ConnectedState){
             onResponseConnected();
         }else{
