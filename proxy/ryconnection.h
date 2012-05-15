@@ -24,8 +24,7 @@ class RyConnection:public QObject{
         int handle() const;
         void setHandle(int theHandle);
     public slots:
-        void deleteLater();
-        void run();//for qthread
+        void run();
         void printStates(){
             qDebug()<<_requestState
                       <<_responseState;
