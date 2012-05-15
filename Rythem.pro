@@ -36,7 +36,6 @@ SOURCES += main.cpp\
     quazip/quaadler32.cpp \
     quazip/qioapi.cpp \
     quazip/JlCompress.cpp \
-    savesessionsdialog.cpp \
     rytablesortfilterproxymodel.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
@@ -70,7 +69,6 @@ HEADERS  += mainwindow.h \
     quazip/ioapi.h \
     quazip/crypt.h \
     rymimedata.h \
-    savesessionsdialog.h \
     rytablesortfilterproxymodel.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
@@ -90,8 +88,7 @@ mac:SOURCES -= proxy/rywinhttp.cpp
 
 FORMS    += mainwindow.ui \
     composer.ui \
-    waterfallwindow.ui \
-    savesessionsdialog.ui
+    waterfallwindow.ui
 
 mac:CONFIG += app_bundle
 
