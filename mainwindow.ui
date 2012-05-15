@@ -90,8 +90,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>98</width>
-                   <height>32</height>
+                   <width>523</width>
+                   <height>164</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -155,7 +155,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -178,7 +178,8 @@
   <action name="actionRemoveAll">
    <property name="icon">
     <iconset resource="httpfiles.qrc">
-     <normaloff>:/static/logo.png</normaloff>:/static/logo.png</iconset>
+     <normaloff>:/static/img9.png</normaloff>
+     <normalon>:/static/img9.png</normalon>:/static/img9.png</iconset>
    </property>
    <property name="text">
     <string>removeAll</string>
@@ -193,7 +194,8 @@
    </property>
    <property name="icon">
     <iconset resource="httpfiles.qrc">
-     <normaloff>:/static/logo.png</normaloff>:/static/logo.png</iconset>
+     <normaloff>:/static/img13.png</normaloff>
+     <normalon>:/static/img16.png</normalon>:/static/img13.png</iconset>
    </property>
    <property name="text">
     <string>capture</string>
@@ -205,7 +207,7 @@
   <action name="actionWaterfall">
    <property name="icon">
     <iconset resource="httpfiles.qrc">
-     <normaloff>:/static/static/icloud_64.png</normaloff>:/static/static/icloud_64.png</iconset>
+     <normaloff>:/static/img11.png</normaloff>:/static/img11.png</iconset>
    </property>
    <property name="text">
     <string>瀑布图</string>
@@ -220,7 +222,7 @@
    </property>
    <property name="icon">
     <iconset resource="httpfiles.qrc">
-     <normaloff>:/static/family.png</normaloff>:/static/family.png</iconset>
+     <normaloff>:/static/img10.png</normaloff>:/static/img10.png</iconset>
    </property>
    <property name="text">
     <string>longCache</string>

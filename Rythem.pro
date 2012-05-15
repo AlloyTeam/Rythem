@@ -120,7 +120,25 @@ OTHER_FILES += \
     static/icloud_64.png \
     RythemTimes/lib/parseuri.js \
     RythemTimes/lib/jo2.js \
-    RythemTimes/lib/jo2.dom.js
+    RythemTimes/lib/jo2.dom.js \
+    rythem.icns \
+    Rythem2.icns \
+    static/img16.png \
+    static/img15.png \
+    static/img14.png \
+    static/img13.png \
+    static/img12.png \
+    static/img11.png \
+    static/img10.png \
+    static/img9.png \
+    static/img8.png \
+    static/img7.png \
+    static/img6.png \
+    static/img5.png \
+    static/img4.png \
+    static/img3.png \
+    static/img2.png \
+    static/img1.png
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")
@@ -130,3 +148,6 @@ CONFIG(release){
 }
 
 #RC_FILE = logo.rc
+
+ICON = Rythem2.icns
+
