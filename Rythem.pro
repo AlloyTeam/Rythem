@@ -138,7 +138,8 @@ OTHER_FILES += \
     static/img4.png \
     static/img3.png \
     static/img2.png \
-    static/img1.png
+    static/img1.png \
+    logo.rc
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")
@@ -147,7 +148,7 @@ CONFIG(release){
     #message("release")
 }
 
-#RC_FILE = logo.rc
+RC_FILE = logo.rc
 
 ICON = Rythem2.icns
 
