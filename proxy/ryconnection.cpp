@@ -241,7 +241,10 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
     if(_sendingPipeData){
         if(_sendingPipeData->responseHeaderRawData().isEmpty()){
 
-            QByteArray s = "[Rythem:remote server unreachable]";
+            QByteArray s = QByteArray().append(QString("[Rythem:remote server unreachable]\n host:%1\n port:%2\n fullUrl:%3")
+                    .arg(_sendingPipeData->host)
+                    .arg(_sendingPipeData->port)
+                    .arg(_sendingPipeData->fullUrl));
             int count = s.length();
             QByteArray byteToWrite;
             byteToWrite.append(QString("HTTP/1.0 %1 \r\n"
@@ -253,7 +256,8 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
                                         .arg(count)
                                );
             byteToWrite.append(s);
-            QByteArray ba = QByteArray("nRythem:remote server close");
+            _requestSocket->write(byteToWrite);
+            _requestSocket->flush();
             _sendingPipeData->parseResponse(&byteToWrite);
             onResponsePackageFound();
         }else if(_sendingPipeData->isContentLenthUnLimit()){
