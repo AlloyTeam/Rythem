@@ -19,11 +19,6 @@
         <file>RythemTimes/lib/jo2.dom.js</file>
         <file>RythemTimes/lib/jo2.js</file>
     </qresource>
-    <qresource prefix="/static">
-        <file>static/icloud_64.png</file>
-        <file>logo.png</file>
-        <file>family.png</file>
-    </qresource>
     <qresource prefix="/">
         <file>static/img1.png</file>
         <file>static/img2.png</file>
@@ -41,5 +36,6 @@
         <file>static/img14.png</file>
         <file>static/img15.png</file>
         <file>static/img16.png</file>
+        <file>remove.png</file>
     </qresource>
 </RCC>

@@ -208,7 +208,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _itemSelectModel = ui->tableView->selectionModel();
 
     connect(ui->tableView,SIGNAL(doubleClicked(QModelIndex)),SLOT(onItemDoubleClicked(QModelIndex)));
-    connect(_itemSelectModel,SIGNAL(currentChanged(QModelIndex,QModelIndex)),SLOT(onSelectionChange(QModelIndex)));
+    //connect(_itemSelectModel,SIGNAL(currentChanged(QModelIndex,QModelIndex)),SLOT(onSelectionChange(QModelIndex)));
+    connect(_itemSelectModel,SIGNAL(selectionChanged(QItemSelection,QItemSelection)),SLOT(onSelectionChange(QItemSelection,QItemSelection)));
 
     //ui->tableView->setItemDelegate();
     createMenus();
@@ -311,14 +312,19 @@ void MainWindow::onNewPipe(RyPipeData_ptr pipeData){
     sortFilterProxyModel->addItem(pipeData);
 }
 
-void MainWindow::onSelectionChange(QModelIndex index){
-    if(ui->tollTabs->currentWidget() == ui->inspectorTab){
-        onItemDoubleClicked(index);
+void MainWindow::onSelectionChange(QItemSelection selected,QItemSelection){
+    if(selected.indexes().isEmpty()){
+        ui->actionWaterfall->setEnabled(false);
+    }else{
+        if(ui->tollTabs->currentWidget() == ui->inspectorTab){
+            QModelIndex index = selected.indexes().first();
+            onItemDoubleClicked(index);
+        }
+        ui->actionWaterfall->setEnabled(true);
     }
 }
 
 void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
-    //qDebug()<<"onSelectionChange";
     RyPipeData_ptr data = sortFilterProxyModel->getItem(topLeft);
     if(data.isNull()){
         qDebug()<<QString("isNull %1").arg(topLeft.row());
@@ -423,78 +429,6 @@ void MainWindow::onWaterfallActionTriggered(){
 
 
 void MainWindow::toggleProxy(){
-    if(_isUsingCapture){
-        _isUsingCapture = false;
-        proxySetting.setValue("ProxyEnable",_previousProxyInfo.enable);
-        if(_previousProxyInfo.enable != 0){
-            proxySetting.setValue("ProxyServer",_previousProxyInfo.proxyString);
-        }
-        if( _previousProxyInfo.isUsingPac != "0"){
-            proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
-        }
-
-        /*
-        // hard code just for some crash issue
-        proxySetting.setValue("ProxyEnable",1);
-        proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
-        //if( previousProxyInfo.isUsingPac != "0"){
-            proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
-        //}
-        */
-    }else{
-        _isUsingCapture = true;
-        _previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
-        _previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
-        _previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
-        //qDebug()<<previousProxyInfo.proxyString;
-        ///qDebug()<<previousProxyInfo.isUsingPac;
-        //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
-
-
-        //initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
-        QString proxyServer="127.0.0.1:8889";
-        /*
-        if(_previousProxyInfo.enable){
-            if(_previousProxyInfo.proxyString.indexOf(";")!=-1){
-                proxyServer = QString("http=")+proxyServer;
-                QStringList proxies = _previousProxyInfo.proxyString.split(";");
-                for(int i=0;i<proxies.length();++i){
-                    QStringList tmp = proxies[i].split("=");
-                    if(tmp.at(0).toLower()=="http"){
-                        proxies[i] = proxyServer;
-                        break;
-                    }
-                }
-                proxyServer = proxies.join(";");
-            }else{
-                // since https has been supported remove code b
-                //proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(_previousProxyInfo.proxyString);
-            }
-        }else{
-            proxyServer = "http="+proxyServer;
-        }
-        */
-        //qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
-        proxySetting.remove("AutoConfigURL");
-        //proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
-        proxySetting.setValue("ProxyEnable",QVariant(1));
-        proxySetting.setValue("ProxyServer",proxyServer);
-    }
-    proxySetting.sync();
-#ifdef Q_WS_WIN32
-	::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
-    ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
-#endif
-}
-
-void MainWindow::toggleCapture(){
-    //captureAct->setChecked(!isUsingCapture);
-#ifdef Q_WS_WIN32
-    RyWinHttp::init();
-    toggleProxy();
-    //QtConcurrent::run(this,&MainWindow::toggleProxy);
-    //qDebug()<<previousProxyInfo.isUsingPac;
-#endif
 #ifdef Q_WS_MAC
     /*
     CFDictionaryRef dict = SCDynamicStoreCopyProxies(NULL);
@@ -546,6 +480,80 @@ void MainWindow::toggleCapture(){
     plist.setValue("NetworkServices",services);
     plist.sync();//doesn't work.. plist readonly
 #endif
+
+#ifdef Q_WS_WIN32
+    RyWinHttp::init();
+    if(_isUsingCapture){
+        ui->ActionCapture->setText(tr("开始抓包"));
+        proxySetting.setValue("ProxyEnable",_previousProxyInfo.enable);
+        if(_previousProxyInfo.enable != 0){
+            proxySetting.setValue("ProxyServer",_previousProxyInfo.proxyString);
+        }
+        if( _previousProxyInfo.isUsingPac != "0"){
+            proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
+        }
+
+        /*
+        // hard code just for some crash issue
+        proxySetting.setValue("ProxyEnable",1);
+        proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
+        //if( previousProxyInfo.isUsingPac != "0"){
+            proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
+        //}
+        */
+    }else{
+        ui->ActionCapture->setText(tr("停止抓包"));
+        _previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
+        _previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
+        _previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
+        //qDebug()<<previousProxyInfo.proxyString;
+        ///qDebug()<<previousProxyInfo.isUsingPac;
+        //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
+
+
+        //initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
+        QString proxyServer="127.0.0.1:8889";
+        /*
+        if(_previousProxyInfo.enable){
+            if(_previousProxyInfo.proxyString.indexOf(";")!=-1){
+                proxyServer = QString("http=")+proxyServer;
+                QStringList proxies = _previousProxyInfo.proxyString.split(";");
+                for(int i=0;i<proxies.length();++i){
+                    QStringList tmp = proxies[i].split("=");
+                    if(tmp.at(0).toLower()=="http"){
+                        proxies[i] = proxyServer;
+                        break;
+                    }
+                }
+                proxyServer = proxies.join(";");
+            }else{
+                // since https has been supported remove code b
+                //proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(_previousProxyInfo.proxyString);
+            }
+        }else{
+            proxyServer = "http="+proxyServer;
+        }
+        */
+        //qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
+        proxySetting.remove("AutoConfigURL");
+        //proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
+        proxySetting.setValue("ProxyEnable",QVariant(1));
+        proxySetting.setValue("ProxyServer",proxyServer);
+    }
+    proxySetting.sync();
+	::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
+    ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+#endif
+    _isUsingCapture = !_isUsingCapture;
+    if(_isUsingCapture){
+        ui->ActionCapture->setText(tr("停止抓包"));
+    }else{
+        ui->ActionCapture->setText(tr("开始抓包"));
+    }
+}
+
+void MainWindow::toggleCapture(){
+    toggleProxy();
 }
 
 
@@ -603,4 +611,5 @@ void MainWindow::on_actionLongCache_triggered(){
 void MainWindow::onActionRemoveAll(){
     pipeTableModel->removeAllItem();
     sortFilterProxyModel->removeAllItem();
+    ui->actionWaterfall->setEnabled(false);
 }

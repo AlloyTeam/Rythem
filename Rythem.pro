@@ -136,7 +136,8 @@ OTHER_FILES += \
     static/img3.png \
     static/img2.png \
     static/img1.png \
-    logo.rc
+    logo.rc \
+    remove.png
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

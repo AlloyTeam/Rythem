@@ -5,7 +5,6 @@
 #include "rytablesortfilterproxymodel.h"
 
 #include "rymimedata.h"
-#include "savesessionsdialog.h"
 
 extern QString appPath;
 extern QByteArray gzipDecompress(QByteArray data);
@@ -35,20 +34,29 @@ void RyConnectionTableView::contextMenuEvent(QContextMenuEvent *event){
 
 void RyConnectionTableView::createMenu(){
     _contextMenu = new QMenu(this);
-    _saveSelectedSessionAct = _contextMenu->addAction(tr("save selected session..."));
-    _saveSessionRespnoseBodyAct = _contextMenu->addAction(tr("&save response body..."));
+    _saveSelectedSessionAct = _contextMenu->addAction(tr("save selected sessions..."));
+    _saveSessionRespnoseBodyAct = _contextMenu->addAction(tr("&save selected response body..."));
 
+    // TODO: finish these actions
     _autoScrollAct = _contextMenu->addAction(tr("auto scroll session list"));
     _autoScrollAct->setCheckable(true);
+    _autoScrollAct->setEnabled(false);
 
     _saveMenu = _contextMenu->addMenu(tr("&save"));
+    _saveMenu->setEnabled(false);
     _saveAllSessionAct = _saveMenu->addAction(tr("&save all sessions"));
+    _saveAllSessionAct->setEnabled(false);
     _saveSessionsRevertAct = _saveMenu->addAction(tr("save sessions unselected"));
+    _saveSessionsRevertAct->setEnabled(false);
 
     _removeMenu = _contextMenu->addMenu(tr("&remove"));
+    _removeMenu->setEnabled(false);
     _removeSelectedSessionAct = _removeMenu->addAction(tr("remove selected session"));
+    _removeSelectedSessionAct->setEnabled(false);
     _removeAllSessionAct = _removeMenu->addAction(tr("remove all sessions"));
+    _removeAllSessionAct->setEnabled(false);
     _removeSessionsRevertAct = _removeMenu->addAction(tr("remove sessions unselected"));
+    _removeSessionsRevertAct->setEnabled(false);
 
 
 
