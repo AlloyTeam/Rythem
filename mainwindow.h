@@ -56,7 +56,7 @@ public slots:
         void toggleProxy();
 
         void onItemDoubleClicked(QModelIndex);
-        void onSelectionChange(QModelIndex);
+        void onSelectionChange(QItemSelection selected,QItemSelection deselected);
         void onWaterfallActionTriggered();
 
 
