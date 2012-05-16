@@ -39,7 +39,7 @@ void WaterfallWindow::setPipeData(QList<RyPipeData_ptr> list){
                    << ", host:\""                   << p->host << "\""
                    << ", url:\""                    << p->fullUrl << "\""
                    << ", method:\""                 << p->method << "\""
-                   << ", status:"                   << p->responseStatus
+                   << ", status:\""                 << p->responseStatus+"\""
                    << ", startTime:"                << p->performances.requestBegin
                    << ", responseStartTime:"        << p->performances.responseBegin
                    << ", responseFinishTime:"       << p->performances.responseDone
@@ -52,6 +52,7 @@ void WaterfallWindow::setPipeData(QList<RyPipeData_ptr> list){
         //invoke js update method
         QWebFrame *frame = ui->webView->page()->mainFrame();
         QString args = "[" + results.join(",") + "]";
+        qDebug()<<args;
         frame->evaluateJavaScript("window.updateAllConnections(" + args + ")");
     }
 }

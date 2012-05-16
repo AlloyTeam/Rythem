@@ -11,6 +11,7 @@
 
 #include <QScriptEngine>
 #include <QScriptValue>
+#include <QItemSelection>
 
 #include "rule/ryrulemanager.h"
 #include "proxy/ryproxyserver.h"

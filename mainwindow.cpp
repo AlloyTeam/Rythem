@@ -218,6 +218,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
     connect(ui->actionRemoveAll,SIGNAL(triggered()),this,SLOT(onActionRemoveAll()));
     connect(ui->actionWaterfall, SIGNAL(triggered()), this, SLOT(onWaterfallActionTriggered()));
+
+#ifdef Q_WS_MAC
+    // TODO: mac下需手动设置代理
+    ui->ActionCapture->setEnabled(false);
+    ui->ActionCapture->setText(tr("请手动设置代理"));
+    ui->ActionCapture->setToolTip(tr("mac下需手动设置代理为127.0.0.1:8889"));
+#endif
+
 }
 
 MainWindow::~MainWindow()
