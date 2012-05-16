@@ -95,8 +95,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>523</width>
-                   <height>164</height>
+                   <width>63</width>
+                   <height>32</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -160,7 +160,7 @@ background:#dddfe2;
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
@@ -210,9 +210,6 @@ background:#dddfe2;
    </property>
    <property name="text">
     <string>开始抓包</string>
-   </property>
-   <property name="toolTip">
-    <string>开始捕获</string>
    </property>
   </action>
   <action name="actionWaterfall">
