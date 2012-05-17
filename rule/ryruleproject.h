@@ -28,7 +28,7 @@ public:
     QSharedPointer<RyRuleGroup> addRuleGroup(const QScriptValue& group,bool updateLocalFile=false);
 
     QString localAddress()const;
-    QString toJson(bool format=false,int beforeSpace = 4);
+    QString toJson(bool format=false,int beforeSpace = 4)const;
 
     QString toConfigJson(bool format=true);
     bool isValid()const;

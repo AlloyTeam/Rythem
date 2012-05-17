@@ -176,7 +176,7 @@ const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QS
 
         //TODO
         QList<QSharedPointer<RyRuleGroup> > groups = p->groups();
-        //qDebug()<<"length = "<<QString::number(groups.length());
+        qDebug()<<"length = "<<QString::number(groups.length());
         if(groups.length()>0){
             QSharedPointer<RyRuleGroup> group = groups.last();
             _groupToProjectMap[group->groupId()] = p;

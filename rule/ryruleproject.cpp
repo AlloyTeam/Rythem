@@ -158,7 +158,7 @@ QSharedPointer<RyRuleGroup> RyRuleProject::addRuleGroup(const QScriptValue& grou
 QString RyRuleProject::localAddress()const{
     return _localAddress;
 }
-QString RyRuleProject::RyRuleProject::toJson(bool format,int beforeSpace){
+QString RyRuleProject::RyRuleProject::toJson(bool format,int beforeSpace)const{
     QString space = "";
     QString currentSpace="";
     int increasement = 0;
@@ -257,5 +257,7 @@ QSharedPointer<RyRuleGroup> RyRuleProject::groupById(quint64 groupId)const{
             return g;
         }
     }
+    qDebug()<<"invalid groupId:"<<QString::number(groupId);
+    qDebug()<< toJson(true,4);
     return QSharedPointer<RyRuleGroup>();
 }
