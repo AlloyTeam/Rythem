@@ -92,6 +92,9 @@ QSharedPointer<RyRule> RyRuleGroup::updateRule(const QString& ruleJson){
     }
     if(!ret.isNull()){
         ret->update(value);
+    }else{
+        qDebug()<<"no such rule"<<QString::number(ruleId);
+        qDebug()<< toJSON(true,4);
     }
     return ret;
 }

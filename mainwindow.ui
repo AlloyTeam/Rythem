@@ -34,7 +34,7 @@ background:#dddfe2;
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="inspectorTab">
         <attribute name="title">
@@ -95,8 +95,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>63</width>
-                   <height>32</height>
+                   <width>523</width>
+                   <height>164</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -160,7 +160,7 @@ background:#dddfe2;
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -181,6 +181,8 @@ background:#dddfe2;
    <addaction name="actionWaterfall"/>
    <addaction name="actionRemoveAll"/>
    <addaction name="actionLongCache"/>
+   <addaction name="separator"/>
+   <addaction name="actionDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRemoveAll">
@@ -243,6 +245,18 @@ background:#dddfe2;
    </property>
    <property name="visible">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="icon">
+    <iconset resource="httpfiles.qrc">
+     <normaloff>:/static/img5.png</normaloff>:/static/img5.png</iconset>
+   </property>
+   <property name="text">
+    <string>Debug</string>
+   </property>
+   <property name="toolTip">
+    <string>debug</string>
    </property>
   </action>
  </widget>

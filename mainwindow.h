@@ -101,6 +101,7 @@ private slots:
     void toggleCapture();
     void importSessions();
     void onActionRemoveAll();
+    void on_actionDebug_triggered();
 };
 
 #endif // MAINWINDOW_H
