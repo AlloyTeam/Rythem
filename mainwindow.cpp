@@ -112,7 +112,9 @@ QString RyJsBridge::doAction(int action, const QString msg, quint64 groupId){
     case 1://add rule to group
         rule = manager->addRuleToGroup(msg,groupId);
         if(!rule.isNull()){
-            return QString::number(rule->ruleId());
+            //qDebug()<<QString::number(rule->ruleId());
+            //return QString::number(rule->ruleId());
+            return rule->toJSON();
         }
         break;
     case 2://add remote project
@@ -620,4 +622,8 @@ void MainWindow::onActionRemoveAll(){
     pipeTableModel->removeAllItem();
     sortFilterProxyModel->removeAllItem();
     ui->actionWaterfall->setEnabled(false);
+}
+
+void MainWindow::on_actionDebug_triggered(){
+    qDebug()<<RyRuleManager::instance()->toJson(true);
 }
