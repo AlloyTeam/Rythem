@@ -260,20 +260,39 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
             _requestSocket->flush();
             _sendingPipeData->parseResponse(&byteToWrite);
             onResponsePackageFound();
+            _sendingPipeData.clear();
+            _responseState = ConnectionStateInit;
+            if(_requestSocket){
+                _requestSocket->blockSignals(true);
+                _requestSocket->disconnect(this);
+                _requestSocket->abort();
+            }
+            emit connectionClose();
+            return;
         }else if(_sendingPipeData->isContentLenthUnLimit()){
             // response without content-length
             // qDebug()<<"respones close when content-length not found";
             onResponsePackageFound();
+            _sendingPipeData.clear();
+            _responseState = ConnectionStateInit;
+            if(_requestSocket){
+                _requestSocket->blockSignals(true);
+                _requestSocket->disconnect(this);
+                _requestSocket->abort();
+            }
+            emit connectionClose();
+            closed = true;
         }else{
             //maybe remote connection disconnect with error
             //   when the response doesn't complete.
             //if(!_sendingPipeData->isPackageFound()){
             //   _sendingPipeData->markAsError();
             //}
-            onResponsePackageFound();
+            //onResponsePackageFound();
         }
-        _sendingPipeData.clear();
+        //_sendingPipeData.clear();
     }
+    /*
     _responseState = ConnectionStateInit;
     if(_requestSocket){
         _requestSocket->blockSignals(true);
@@ -282,6 +301,7 @@ void RyConnection::onResponseError(QAbstractSocket::SocketError){
     }
     emit connectionClose();
     closed = true;
+    */
 }
 
 void RyConnection::onRequestHeaderFound(){
