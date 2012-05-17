@@ -26,7 +26,7 @@ background:#dddfe2;
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="RyConnectionTableView" name="tableView"/>
-      <widget class="QTabWidget" name="tollTabs">
+      <widget class="QTabWidget" name="toolTabs">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -34,7 +34,7 @@ background:#dddfe2;
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="inspectorTab">
         <attribute name="title">
@@ -95,8 +95,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>523</width>
-                   <height>164</height>
+                   <width>557</width>
+                   <height>195</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -160,7 +160,7 @@ background:#dddfe2;
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
