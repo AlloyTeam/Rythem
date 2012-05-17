@@ -26,7 +26,7 @@ function updateConfigs(){
             <select>\
                 <option value="1" disabled>Complex Host</option>\
                 <option value="2">Simple Host</option>\
-                <option value="3">Remote Content</option>\
+                <option value="3" disabled>Remote Content</option>\
                 <option value="4">Local File</option>\
                 <option value="5">Local File Merge</option>\
                 <option value="6">Local Directory</option>\
