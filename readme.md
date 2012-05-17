@@ -4,6 +4,8 @@
  
 By [Tencent AlloyTeam](http://www.AlloyTeam.com/)
 
+使用介绍：http://www.alloyteam.com/2012/05/web-front-end-tool-rythem-1/
+
 ### 功能
  
 * http代理服务 
