@@ -293,8 +293,8 @@ void RyConnection::onRequestPackageFound(){
         return;
     }
     _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
-    if(_receivingPipeData->method == "CONNECT" &&
-            _receivingPipeData->port != 80){// TODO: 80端口一定不是https?
+    if(_receivingPipeData->method == "CONNECT"/* &&
+            _receivingPipeData->port != 80*/){// TODO: 80端口一定不是https?
         _isConnectTunnel = true;
     }
     _requestState = ConnectionStatePackageFound;
