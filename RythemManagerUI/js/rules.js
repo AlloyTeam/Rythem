@@ -288,6 +288,7 @@ function updateConfigs(){
             </div>\
             <div class="rules"></div>\
         ';
+        el.setAttribute('groupId',groupConfig.id);
 
         var checkbox 	= el.querySelector('summary > input.groupEnableCB');
         this.__groupName = groupName;
@@ -865,8 +866,32 @@ function updateConfigs(){
     window.refreshRulesCallback = function(groupsConfigs){
         createGroups(groupsConfigs || []);
     }
-	window.callbackFromApp = function(action,data){
+    window.callbackFromApp = function(action,data){
 		switch(action){
+        case 'newRule':
+            var el = document.elementFromPoint(data.pos.x,data.pos.y);
+            console.info(data.pos.x,data.pos.y,data.url)
+            while(el.tagName!="BODY"){
+                console.info(el.tagName);
+                if(el.tagName == "DETAILS")break;
+                el = el.parentNode;
+            }
+            var groupId;
+            if(el.tagName != "DETAILS"){
+                //TODO: add new group?
+                if(groups.length !=0){
+                   groupId = groups[0].__groupId;
+                }else{
+                    alert("please creat an group first");
+                    return;
+                }
+            }else{
+                groupId = el.getAttribute('groupId');
+            }
+            currentGroupId = groupId;
+            showAddRulePanel();
+            document.getElementById('newRulePattern').value = data.url;
+
 		}
 	}
 

@@ -26,15 +26,21 @@ background:#dddfe2;
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="RyConnectionTableView" name="tableView"/>
-      <widget class="QTabWidget" name="toolTabs">
+      <widget class="RyTabWidget" name="toolTabs">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="inspectorTab">
         <attribute name="title">
@@ -95,8 +101,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>557</width>
-                   <height>195</height>
+                   <width>523</width>
+                   <height>164</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -129,7 +135,7 @@ background:#dddfe2;
         </attribute>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QWebView" name="webView">
+          <widget class="RyWebView" name="webView">
            <property name="url">
             <url>
              <string>about:blank</string>
@@ -160,7 +166,7 @@ background:#dddfe2;
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -277,6 +283,17 @@ background:#dddfe2;
    <class>RyConnectionTableView</class>
    <extends>QTableView</extends>
    <header>ryconnectiontableview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RyWebView</class>
+   <extends>QWebView</extends>
+   <header>widget/rywebview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RyTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>widget/rytabwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

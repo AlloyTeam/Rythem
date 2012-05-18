@@ -36,7 +36,9 @@ SOURCES += main.cpp\
     quazip/quaadler32.cpp \
     quazip/qioapi.cpp \
     quazip/JlCompress.cpp \
-    rytablesortfilterproxymodel.cpp
+    rytablesortfilterproxymodel.cpp \
+    widget/rywebview.cpp \
+    widget/rytabwidget.cpp
 
 mac:SOURCES -= qiwinhttp.cpp
 
@@ -69,7 +71,9 @@ HEADERS  += mainwindow.h \
     quazip/ioapi.h \
     quazip/crypt.h \
     rymimedata.h \
-    rytablesortfilterproxymodel.h
+    rytablesortfilterproxymodel.h \
+    widget/rywebview.h \
+    widget/rytabwidget.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
