@@ -326,7 +326,7 @@ void MainWindow::onSelectionChange(QItemSelection selected,QItemSelection){
     if(selected.indexes().isEmpty()){
         ui->actionWaterfall->setEnabled(false);
     }else{
-        if(ui->tollTabs->currentWidget() == ui->inspectorTab){
+        if(ui->toolTabs->currentWidget() == ui->inspectorTab){
             QModelIndex index = selected.indexes().first();
             onItemDoubleClicked(index);
         }
@@ -341,7 +341,7 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
         return;
     }
 
-    ui->tollTabs->setCurrentWidget(ui->inspectorTab);
+    ui->toolTabs->setCurrentWidget(ui->inspectorTab);
     ui->requestInspectorTabs->setCurrentWidget(ui->requestInspectorTextview);
 
     // TODO: test
