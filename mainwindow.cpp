@@ -9,7 +9,7 @@
 #include <QVariant>
 #include <QUrl>
 #include <QNetworkConfigurationManager>
-#include <QMAp>
+#include <QMap>
 #include <QList>
 #include <QMessageBox>
 
