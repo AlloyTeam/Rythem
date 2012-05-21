@@ -1,8 +1,8 @@
 #ifndef COMPOSER_H
 #define COMPOSER_H
 
-#include <QWidget>
-#include <QTcpSocket>
+#include <QtGui>
+#include <QtNetwork>
 #include "proxy/rypipedata.h"
 
 namespace Ui {
@@ -24,28 +24,14 @@ class Composer : public QWidget
 
     private:
         Ui::Composer *ui;
-        QTcpSocket *socket;
 
-        QString _proxyHost;
-        quint16 _proxyPort;
-
-        QList<QStringList> _requests;
-
+        QNetworkAccessManager *manager;
         RyPipeData_ptr pipeData;
 
     private slots:
-        void onConnected();
-        void onData();
-        void onError(QAbstractSocket::SocketError);
-        void onClose();
+        void onFinished(QNetworkReply *);
+        void onSendClicked();
 
-        void onConnectBtnClick();
-        void onDisConnectBtnClick();
-        void onSendBtnClick();
-        void onRequestChanged(int);
-
-        void connectToHost();
-        void sendData(const QByteArray &ba);
 };
 
 #endif // COMPOSER_H

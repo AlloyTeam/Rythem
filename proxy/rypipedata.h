@@ -142,6 +142,12 @@ class RyPipeData : public QObject
         bool isResponseChunked()const{
             return _isResponseChunked;
         }
+        const QMap<QString,QString> requestHeaders()const{
+            return _requestHeaders;
+        }
+        const QMap<QString,QString> responseHeaders()const{
+            return _responseHeaders;
+        }
 
 
     signals:
