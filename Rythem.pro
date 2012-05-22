@@ -22,7 +22,6 @@ SOURCES += main.cpp\
     rule/ryrulegroup.cpp \
     rule/ryrulemanager.cpp \
     rule/ryrulereplacecontent.cpp \
-    proxy/rywinhttp.cpp \
     proxy/ryproxyserver.cpp \
     proxy/rypipedata.cpp \
     proxy/ryconnection.cpp \
@@ -40,7 +39,6 @@ SOURCES += main.cpp\
     widget/rywebview.cpp \
     widget/rytabwidget.cpp
 
-mac:SOURCES -= qiwinhttp.cpp
 
 HEADERS  += mainwindow.h \
     rytablemodel.h \
@@ -52,7 +50,6 @@ HEADERS  += mainwindow.h \
     rule/ryrulegroup.h \
     rule/ryrulemanager.h \
     rule/ryrulereplacecontent.h \
-    proxy/rywinhttp.h \
     proxy/ryproxyserver.h \
     proxy/rypipedata.h \
     proxy/ryconnection.h \
@@ -86,9 +83,9 @@ win32:HEADERS += zlib/zutil.h \
     zlib/deflate.h \
     zlib/crc32.h
 
-mac:HEADERS -= proxy/rywinhttp.h
+win32:HEADERS  += proxy/rywinhttp.h
 
-mac:SOURCES -= proxy/rywinhttp.cpp
+win32:SOURCES  += proxy/rywinhttp.cpp
 
 FORMS    += mainwindow.ui \
     composer.ui \
