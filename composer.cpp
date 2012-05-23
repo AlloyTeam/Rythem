@@ -101,10 +101,13 @@ void Composer::onSendClicked(){
                         RyProxyServer::instance()->serverPort()
                     )
         );
-        if(pipeData->method == "GET"){
+        ui->response->setPlainText(tr("sending"));
+        if(pipeData->method.toUpper() == "GET"){
             manager->get(req);
-        }else if(pipeData->method == "POST"){
+        }else if(pipeData->method.toUpper() == "POST"){
             manager->post(req,pipeData->requestBodyRawData());
+        }else{
+            ui->response->setPlainText(tr("no support this method:%1").arg(pipeData->method));
         }
     }
 }

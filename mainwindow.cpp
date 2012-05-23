@@ -224,8 +224,8 @@ MainWindow::MainWindow(QWidget *parent) :
 #ifdef Q_WS_MAC
     // TODO: mac下需手动设置代理
     ui->ActionCapture->setEnabled(false);
-    ui->ActionCapture->setText(tr("请手动设置代理"));
-    ui->ActionCapture->setToolTip(tr("mac下需手动设置代理为127.0.0.1:8889"));
+    ui->ActionCapture->setText(tr("SetupProxyManually"));
+    ui->ActionCapture->setToolTip(tr("non-windows OS need to set proxy to:127.0.0.1:8889 manually"));
 #endif
 
 }
@@ -494,7 +494,7 @@ void MainWindow::toggleProxy(){
 #ifdef Q_WS_WIN32
     RyWinHttp::init();
     if(_isUsingCapture){
-        ui->ActionCapture->setText(tr("开始抓包"));
+        ui->ActionCapture->setText(tr("start capture"));
         proxySetting.setValue("ProxyEnable",_previousProxyInfo.enable);
         if(_previousProxyInfo.enable != 0){
             proxySetting.setValue("ProxyServer",_previousProxyInfo.proxyString);
@@ -512,7 +512,7 @@ void MainWindow::toggleProxy(){
         //}
         */
     }else{
-        ui->ActionCapture->setText(tr("停止抓包"));
+        ui->ActionCapture->setText(tr("stop capture"));
         _previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
         _previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
         _previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
@@ -556,9 +556,9 @@ void MainWindow::toggleProxy(){
 #endif
     _isUsingCapture = !_isUsingCapture;
     if(_isUsingCapture){
-        ui->ActionCapture->setText(tr("停止抓包"));
+        ui->ActionCapture->setText(tr("stop capture"));
     }else{
-        ui->ActionCapture->setText(tr("开始抓包"));
+        ui->ActionCapture->setText(tr("start capture"));
     }
 }
 
