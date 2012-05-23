@@ -6,6 +6,8 @@ By [Tencent AlloyTeam](http://www.AlloyTeam.com/)
 
 使用介绍：http://www.alloyteam.com/2012/05/web-front-end-tool-rythem-1/
 
+<strong>代码在Qt4.7.4 & Qt4.8上运行通过，低于4.7的版本有可能会出问题</strong>
+
 ### 功能
  
 * http代理服务 
