@@ -62,7 +62,7 @@ Host: www.alloyteam.com
    <item row="0" column="2">
     <widget class="QPushButton" name="sendbtn">
      <property name="text">
-      <string>send</string>
+      <string>excuse</string>
      </property>
     </widget>
    </item>
