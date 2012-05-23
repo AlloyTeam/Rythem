@@ -15,6 +15,8 @@
 
 #include <QThread>
 
+#include <QTranslator>
+
 using namespace rule;
 
 
@@ -53,6 +55,11 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
+    QTranslator translator;
+    bool isLoadSuccess = translator.load("rythem_zh_CN");
+    if(!isLoadSuccess)qDebug()<<"error";
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
+    a.installTranslator(&translator);
 
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);
