@@ -179,6 +179,7 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError){
 }
 
 void RyConnection::onResponseConnected(){
+    //qDebug()<<"responseConnected";
     if(_sendingPerformance.responseConnected==-1){
         _sendingPerformance.responseConnected = QDateTime::currentMSecsSinceEpoch();
     }
@@ -206,6 +207,10 @@ void RyConnection::onResponseConnected(){
     }
 }
 void RyConnection::onResponseReadyRead(){
+    if(closed){
+        qDebug()<<"closed already";
+        return;
+    }
     if(_sendingPerformance.responseBegin == -1){
         _sendingPerformance.responseBegin = QDateTime::currentMSecsSinceEpoch();
     }
@@ -310,6 +315,7 @@ void RyConnection::onRequestHeaderFound(){
 
 void RyConnection::onRequestPackageFound(){
     if(closed){
+        qDebug()<<"closed";
         return;
     }
     _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
@@ -463,57 +469,96 @@ void RyConnection::doRequestToNetwork(){
         //qDebug()<<"doRequestToNetwork : no any more pipe pending";
         return;
     }
-    QString host = _sendingPipeData->host;
-    quint16 port = _sendingPipeData->port;
-    //qDebug()<<"doRequestToNetwork"<<_sendingPipeData->fullUrl<<host<<port;
-    //qDebug()<<host<<port;
 
-    RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
-    QList<QSharedPointer<RyRule> > matchResult;
-    matchResult = manager->getMatchRules(_sendingPipeData->fullUrl);
-    if(matchResult.size()>0){
-        _sendingPipeData->isMatchingRule = true;
-    }else{
-        _sendingPipeData->isMatchingRule = false;
+    QString oldHost = _connectingHost;
+    quint64 oldPort = _connectingPort;
+
+    _connectingHost = _sendingPipeData->host;
+    _connectingPort = _sendingPipeData->port;
+    if(checkRule(_sendingPipeData)){
+        return;
     }
-    for(int i=0,l=matchResult.size();i<l;++i){
-        QSharedPointer<RyRule> rule = matchResult.at(i);
-        qDebug()<<"rule found"<<rule->toJSON();
-        if(rule->type() == RyRule::COMPLEX_ADDRESS_REPLACE ||
-                rule->type() == RyRule::SIMPLE_ADDRESS_REPLACE){
-            host = rule->replace();
-            _sendingPipeData->replacedHost = host;
+    if(checkLocalWebServer(_sendingPipeData)){
+        return;
+    }
+
+
+
+    //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
+    //qDebug()<<"to connect:"<<host<<port;
+    _fullUrl = _sendingPipeData->fullUrl;
+    if(!_responseSocket ||
+        _connectingHost.toLower() != oldHost ||
+        _connectingPort != oldPort){
+
+        getNewResponseSocket(_sendingPipeData);
+    }else{
+        //qDebug()<<"reuse old socket";
+    }
+
+
+    QAbstractSocket::SocketState responseState = _responseSocket->state();
+    if(responseState == QAbstractSocket::UnconnectedState
+            || responseState == QAbstractSocket::ClosingState){
+        //qDebug()<<"responseSocket is not open"
+        //        <<"connect to "<<host<<port
+        //        <<responseState
+        //        <<_responseSocket->readAll();
+        _responseState = ConnectionStateConnecting;
+
+
+#ifdef Q_OS_WIN
+        // TODO add mac pac support
+        QList<QNetworkProxy> proxylist = RyWinHttp::queryProxy(QNetworkProxyQuery(QUrl(_sendingPipeData->fullUrl)));
+        for(int i=0,l=proxylist.length();i<l;++i){
+            QNetworkProxy p = proxylist.at(i);
+            if(p.hostName() == RyProxyServer::instance()->serverAddress().toString()
+                    && p.port() == RyProxyServer::instance()->serverPort()){
+                qWarning()<<"warining: proxy is your self!";
+                continue;
+            }
+            _responseSocket->setProxy(p);
+            //qDebug()<<"proxy="<<p.hostName()<<p.port();
+        }
+ #endif
+        /*
+        QPair<QString,int> serverAndPort = queryProxy(_sendingPipeData->fullUrl);
+        if(serverAndPort.first == RyProxyServer::instance()->serverAddress().toString()
+                && serverAndPort.second == RyProxyServer::instance()->serverPort()){
+            qWarning()<<"warining: proxy is your self!";
         }else{
-            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
-            //qDebug()<<headerAndBody.second;
-            //qDebug()<<headerAndBody.first;
-            bool isOk;
-            QByteArray ba = headerAndBody.first;
-            _sendingPipeData->parseResponse(&ba,&isOk);
-            if(isOk){
-                _requestSocket->write(headerAndBody.first);
-                _requestSocket->flush();
-                onResponseHeaderFound();
-                ba = headerAndBody.second;
-                _sendingPipeData->appendResponseBody(&ba);
-                _requestSocket->write(headerAndBody.second);
-                _requestSocket->flush();
-                onResponsePackageFound();
-                return;
-            }else{
-                break;
+            if(!serverAndPort.first.isEmpty()){
+                _responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,serverAndPort.first,serverAndPort.second));
             }
         }
+        */
+        //qDebug()<<"connecting to "<<_connectingHost;
+        _responseSocket->connectToHost(_connectingHost,_connectingPort);
+    }else{
+        //qDebug()<<"state = "<<_responseSocket->state();
+        if(responseState == QAbstractSocket::ConnectedState){
+            onResponseConnected();
+        }else{
+            //qDebug()<<"responseSocket not open yet"<<responseState;
+            _responseSocket->blockSignals(true);
+            _responseSocket->disconnectFromHost();
+            _responseSocket->abort();
+            _responseSocket->blockSignals(false);
+            connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+            _responseSocket->connectToHost(_connectingHost,_connectingPort);
+        }
     }
+}
 
-
+bool RyConnection::checkLocalWebServer(RyPipeData_ptr& pipe){
+    QString host = pipe->host;
+    quint16 port = pipe->port;
     // check if is request to self
-
     //qDebug()<<host<<QString::number(port);
     if(host == RyProxyServer::instance()->serverAddress().toString()
             && port == RyProxyServer::instance()->serverPort()){
         // TODO: move these mapping to global util
-        qDebug()<<"simple http"<<_sendingPipeData->path;
+        qDebug()<<"simple http"<<pipe->path;
         QMap<QString,QString> contentTypeMapping;
         contentTypeMapping["jpg"] = "image/jpeg";
         contentTypeMapping["js"] = "application/javascript";
@@ -532,7 +577,7 @@ void RyConnection::doRequestToNetwork(){
         QString contentType = "text/html";
 
         QByteArray byteToWrite;
-        QString filePath = _sendingPipeData->path;
+        QString filePath = pipe->path;
         //remove ?xxx
         int queryIndex = filePath.indexOf('?');
         if(queryIndex != -1) filePath = filePath.left(queryIndex);
@@ -574,168 +619,87 @@ void RyConnection::doRequestToNetwork(){
         //qDebug()<<"byteToWrite"<<byteToWrite;
         _requestSocket->write(byteToWrite);
         _requestSocket->flush();
-        _sendingPipeData->parseResponse(&byteToWrite);
+        pipe->parseResponse(&byteToWrite);
         onResponseHeaderFound();
         onResponsePackageFound();
-        return;
+        return true;
     }
+    return false;
+}
 
+bool RyConnection::checkRule(RyPipeData_ptr& pipe){
 
-    //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
-    //qDebug()<<"to connect:"<<host<<port;
-    _fullUrl = _sendingPipeData->fullUrl;
-    bool isGettingSocketFromServer = true;
-    if(_responseSocket){
-        if(_connectingHost.toLower() == host.toLower() &&
-                _connectingPort == port){
-            //qDebug()<<"old responeSocket";
-            // do nothing
-            // just reuse previous response socket
-            isGettingSocketFromServer = false;
-        }else{
-            /*
-            qDebug()<<"dif host: to connect:"
-                    << host
-                    << " socket connecting:"
-                    << _responseSocket->peerName()
-                    << _responseState;
-            */
-            // cache previous response socket and disconnect all signals/slots
-            _responseSocket->disconnect(this);
-
-            /*
-            RyProxyServer::instance()->cacheSocket(
-                        _connectingHost,
-                        _connectingPort,
-                        _responseSocket);
-
-            */
-            _connectingHost = host;
-            _connectingPort = port;
-
-            //   get new socket
-            /*
-            QMetaObject::invokeMethod(
-                                  RyProxyServer::instance(),
-                                  "getSocket",
-                                  Qt::BlockingQueuedConnection,
-                                  Q_RETURN_ARG(QTcpSocket *,_responseSocket),
-                                  Q_ARG(QString ,host),
-                                  Q_ARG(quint16,port),
-                                  Q_ARG(bool *,&_isSocketFromCache),
-                                  Q_ARG(QThread*,QThread::currentThread()));
-            */
-            // 暂时不缓存socket
-            _responseSocket->abort();
-            _responseSocket->blockSignals(true);
-            delete _responseSocket;
-            _responseSocket = NULL;
-            _responseSocket = new QTcpSocket(this);
-
-
-            connect(_responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadyRead()));
-            connect(_responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
-            connect(_responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),
-                    SLOT(onResponseError(QAbstractSocket::SocketError)));
-            //qDebug()<<"move to thread..";
-            _responseSocket->moveToThread(thread());
-            //qDebug()<<"after move to thread..";
-        }
+    RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
+    QList<QSharedPointer<RyRule> > matchResult;
+    matchResult = manager->getMatchRules(_sendingPipeData->fullUrl);
+    if(matchResult.size()>0){
+        _sendingPipeData->isMatchingRule = true;
     }else{
-        //qDebug()<<"new connection"<<host<<port<<" handle"<<handle();
-        // get new socket
-
-        _connectingHost = host;
-        _connectingPort = port;
-        /*
-        QMetaObject::invokeMethod(
-                              RyProxyServer::instance(),
-                              "getSocket",
-                              Qt::BlockingQueuedConnection,
-                              Q_RETURN_ARG(QTcpSocket *,_responseSocket),
-                              Q_ARG(QString ,host),
-                              Q_ARG(quint16,port),
-                              Q_ARG(bool *,&_isSocketFromCache),
-                              Q_ARG(QThread*,QThread::currentThread()));
-        */
-        _responseSocket = new QTcpSocket(this);
-
-        //_responseSocket = new QTcpSocket(this);
-        connect(_responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadyRead()));
-        connect(_responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
-        connect(_responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),
-                SLOT(onResponseError(QAbstractSocket::SocketError)));
-        //qDebug()<<"move to thread..";
-        //_responseSocket->moveToThread(thread());
-        //qDebug()<<"after move to thread..";
+        _sendingPipeData->isMatchingRule = false;
     }
+    for(int i=0,l=matchResult.size();i<l;++i){
+        QSharedPointer<RyRule> rule = matchResult.at(i);
+        qDebug()<<"rule found"<<rule->toJSON();
+        if(rule->type() == RyRule::COMPLEX_ADDRESS_REPLACE ||
+                rule->type() == RyRule::SIMPLE_ADDRESS_REPLACE){
+            _connectingHost = rule->replace();
+            _sendingPipeData->replacedHost = _connectingHost;
+        }else{
+            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
+            //qDebug()<<headerAndBody.second;
+            //qDebug()<<headerAndBody.first;
+            bool isOk;
+            QByteArray ba = headerAndBody.first;
+            _sendingPipeData->parseResponse(&ba,&isOk);
+            if(isOk){
+                _requestSocket->write(headerAndBody.first);
+                _requestSocket->flush();
+                onResponseHeaderFound();
+                ba = headerAndBody.second;
+                _sendingPipeData->appendResponseBody(&ba);
+                _requestSocket->write(headerAndBody.second);
+                _requestSocket->flush();
+                onResponsePackageFound();
+                return true;
+            }else{
+                break;
+            }
+        }
+    }
+    return false;
+}
 
-    if(isGettingSocketFromServer){
-        //qDebug()<<"responseSocket from proxyserver";
+void RyConnection::getNewResponseSocket(RyPipeData_ptr&){
+    if(_responseSocket){
         _responseSocket->blockSignals(true);
-        _responseSocket->disconnectFromHost();
+        _responseSocket->disconnect(this);
         _responseSocket->abort();
         _responseSocket->blockSignals(false);
-        connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+        delete _responseSocket;
+        _responseSocket = NULL;
     }
+    _responseSocket = new QTcpSocket(this);
 
-    QAbstractSocket::SocketState responseState = _responseSocket->state();
-    if(responseState == QAbstractSocket::UnconnectedState
-            || responseState == QAbstractSocket::ClosingState){
-        //qDebug()<<"responseSocket is not open"
-        //        <<"connect to "<<host<<port
-        //        <<responseState
-        //        <<_responseSocket->readAll();
-        _responseState = ConnectionStateConnecting;
-
-
-#ifdef Q_OS_WIN
-        // TODO add mac pac support
-        QList<QNetworkProxy> proxylist = RyWinHttp::queryProxy(QNetworkProxyQuery(QUrl(_sendingPipeData->fullUrl)));
-        for(int i=0,l=proxylist.length();i<l;++i){
-            QNetworkProxy p = proxylist.at(i);
-            if(p.hostName() == RyProxyServer::instance()->serverAddress().toString()
-                    && p.port() == RyProxyServer::instance()->serverPort()){
-                qWarning()<<"warining: proxy is your self!";
-                continue;
-            }
-            _responseSocket->setProxy(p);
-            //qDebug()<<"proxy="<<p.hostName()<<p.port();
-        }
- #endif
-        /*
-        QPair<QString,int> serverAndPort = queryProxy(_sendingPipeData->fullUrl);
-        if(serverAndPort.first == RyProxyServer::instance()->serverAddress().toString()
-                && serverAndPort.second == RyProxyServer::instance()->serverPort()){
-            qWarning()<<"warining: proxy is your self!";
-        }else{
-            if(!serverAndPort.first.isEmpty()){
-                _responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,serverAndPort.first,serverAndPort.second));
-            }
-        }
-        */
-        _responseSocket->connectToHost(host,port);
-    }else{
-        if(responseState == QAbstractSocket::ConnectedState){
-            onResponseConnected();
-        }else{
-            qDebug()<<"responseSocket not open yet"<<responseState;
-            if(isGettingSocketFromServer){
-                connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
-            }
-        }
-    }
+    connect(_responseSocket,SIGNAL(readyRead()),SLOT(onResponseReadyRead()));
+    connect(_responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
+    connect(_responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),
+            SLOT(onResponseError(QAbstractSocket::SocketError)));
+    connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
 }
+
 RyPipeData_ptr RyConnection::nextPipe(){
     QMutexLocker locker(&pipeDataListMutex);
     Q_UNUSED(locker)
     if(_pipeList.length()>0){
-        return _pipeList.takeAt(0);
+        RyPipeData_ptr thePipeData = _pipeList.takeAt(0);
+        //qDebug()<<"taking "<<thePipeData->fullUrl;
+        return thePipeData;
     }
     locker.unlock();
     return RyPipeData_ptr();
 }
 void RyConnection::appendPipe(RyPipeData_ptr thePipeData){
+    //qDebug()<<"appending "<<thePipeData->fullUrl;
     _pipeList.append(thePipeData);
 
 }
