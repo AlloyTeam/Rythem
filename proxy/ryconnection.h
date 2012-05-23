@@ -92,6 +92,10 @@ class RyConnection:public QObject{
         void parseResponse();
         void doRequestToNetwork();
 
+        bool checkLocalWebServer(RyPipeData_ptr&);
+        bool checkRule(RyPipeData_ptr&);
+        void getNewResponseSocket(RyPipeData_ptr&);
+
         RyPipeData_ptr nextPipe();
         void appendPipe(RyPipeData_ptr);
 
