@@ -40,11 +40,11 @@ background:#dddfe2;
         <bool>true</bool>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="inspectorTab">
         <attribute name="title">
-         <string>查看器</string>
+         <string>Inspector</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
@@ -54,7 +54,7 @@ background:#dddfe2;
            </property>
            <widget class="QTabWidget" name="requestInspectorTabs">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="requestInspectorTextview">
              <attribute name="title">
@@ -68,13 +68,13 @@ background:#dddfe2;
             </widget>
             <widget class="QWidget" name="tab_7">
              <attribute name="title">
-              <string>webForms</string>
+              <string>FormView</string>
              </attribute>
             </widget>
            </widget>
            <widget class="QTabWidget" name="responseInspectorTabs">
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="responseInspectorTextView">
              <attribute name="title">
@@ -101,8 +101,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>523</width>
-                   <height>164</height>
+                   <width>43</width>
+                   <height>40</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -131,7 +131,7 @@ background:#dddfe2;
        </widget>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
-         <string>替换规则</string>
+         <string>Rules</string>
         </attribute>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
@@ -147,7 +147,7 @@ background:#dddfe2;
        </widget>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
-         <string>composer</string>
+         <string>Composer</string>
         </attribute>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
@@ -198,10 +198,10 @@ background:#dddfe2;
      <normalon>:/remove.png</normalon>:/remove.png</iconset>
    </property>
    <property name="text">
-    <string>清除</string>
+    <string>Clear All</string>
    </property>
    <property name="toolTip">
-    <string>清除所有</string>
+    <string>Clear All</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -217,7 +217,10 @@ background:#dddfe2;
      <normalon>:/static/img16.png</normalon>:/static/img13.png</iconset>
    </property>
    <property name="text">
-    <string>开始抓包</string>
+    <string>Begein Capture</string>
+   </property>
+   <property name="toolTip">
+    <string>Begein Capture</string>
    </property>
   </action>
   <action name="actionWaterfall">
@@ -229,10 +232,10 @@ background:#dddfe2;
      <normaloff>:/static/img11.png</normaloff>:/static/img11.png</iconset>
    </property>
    <property name="text">
-    <string>瀑布图</string>
+    <string>water fall</string>
    </property>
    <property name="toolTip">
-    <string>瀑布图</string>
+    <string>water fall</string>
    </property>
   </action>
   <action name="actionLongCache">
@@ -244,10 +247,10 @@ background:#dddfe2;
      <normaloff>:/static/img10.png</normaloff>:/static/img10.png</iconset>
    </property>
    <property name="text">
-    <string>长缓存</string>
+    <string>long cache</string>
    </property>
    <property name="toolTip">
-    <string>被替换内容设置长时间缓存</string>
+    <string>set sessions matching rule with long cache</string>
    </property>
    <property name="visible">
     <bool>true</bool>

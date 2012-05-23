@@ -138,7 +138,9 @@ OTHER_FILES += \
     static/img2.png \
     static/img1.png \
     logo.rc \
-    remove.png
+    remove.png \
+    rythem_zh_CN.ts \
+    rythem_zh_CN.qm
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")
@@ -150,4 +152,8 @@ CONFIG(release){
 RC_FILE = logo.rc
 
 ICON = Rythem2.icns
+
+TRANSLATIONS = rythem_zh_CN.ts
+CODECFORTR = UTF-8
+
 
