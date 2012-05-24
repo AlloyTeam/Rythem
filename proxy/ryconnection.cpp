@@ -532,7 +532,8 @@ void RyConnection::doRequestToNetwork(){
             }
         }
         */
-        //qDebug()<<"connecting to "<<_connectingHost;
+        qDebug()<<"connecting to "<<_connectingHost;
+        connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
         _responseSocket->connectToHost(_connectingHost,_connectingPort);
     }else{
         //qDebug()<<"state = "<<_responseSocket->state();
@@ -684,7 +685,7 @@ void RyConnection::getNewResponseSocket(RyPipeData_ptr&){
     connect(_responseSocket,SIGNAL(aboutToClose()),SLOT(onResponseClose()));
     connect(_responseSocket,SIGNAL(error(QAbstractSocket::SocketError)),
             SLOT(onResponseError(QAbstractSocket::SocketError)));
-    connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+    //connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
 }
 
 RyPipeData_ptr RyConnection::nextPipe(){
