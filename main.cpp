@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     appPath =  qApp->applicationDirPath();
 
     QTranslator translator;
-    bool isLoadSuccess = translator.load("rythem_zh_CN");
+    bool isLoadSuccess = translator.load(appPath+"/rythem_zh_CN");
     if(!isLoadSuccess)qDebug()<<"error";
     QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
     a.installTranslator(&translator);
