@@ -423,7 +423,8 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
 
 void MainWindow::onMessageFromOtherInstance(){
     setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-    this->activateWindow();
+    raise();
+    activateWindow();
 }
 
 void MainWindow::onWaterfallActionTriggered(){
