@@ -59,7 +59,7 @@ public slots:
         void onItemDoubleClicked(QModelIndex);
         void onSelectionChange(QItemSelection selected,QItemSelection deselected);
         void onWaterfallActionTriggered();
-
+        void onMessageFromOtherInstance();
 
 public:
 	typedef struct __proxyInfo{

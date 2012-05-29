@@ -421,6 +421,10 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
     data.clear();
 }
 
+void MainWindow::onMessageFromOtherInstance(){
+    setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    this->activateWindow();
+}
 
 void MainWindow::onWaterfallActionTriggered(){
     QModelIndexList list = ui->tableView->selectionModel()->selectedRows();
