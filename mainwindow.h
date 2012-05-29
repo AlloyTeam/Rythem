@@ -59,7 +59,7 @@ public slots:
         void onItemDoubleClicked(QModelIndex);
         void onSelectionChange(QItemSelection selected,QItemSelection deselected);
         void onWaterfallActionTriggered();
-
+        void onMessageFromOtherInstance();
 
 public:
 	typedef struct __proxyInfo{
@@ -70,6 +70,7 @@ public:
 	}ProxyInfo;
     RyTableModel *pipeTableModel;
     RyTableSortFilterProxyModel *sortFilterProxyModel;
+    void checkNewVersion();
 
 
 private:
@@ -102,6 +103,7 @@ private slots:
     void importSessions();
     void onActionRemoveAll();
     void on_actionDebug_triggered();
+    void on_actionCheckNew_triggered();
 };
 
 #endif // MAINWINDOW_H

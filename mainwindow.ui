@@ -101,8 +101,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>43</width>
-                   <height>40</height>
+                   <width>523</width>
+                   <height>164</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -189,6 +189,7 @@ background:#dddfe2;
    <addaction name="actionLongCache"/>
    <addaction name="separator"/>
    <addaction name="actionDebug"/>
+   <addaction name="actionCheckNew"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRemoveAll">
@@ -266,6 +267,18 @@ background:#dddfe2;
    </property>
    <property name="toolTip">
     <string>debug</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionCheckNew">
+   <property name="icon">
+    <iconset resource="httpfiles.qrc">
+     <normaloff>:/static/img8.png</normaloff>:/static/img8.png</iconset>
+   </property>
+   <property name="text">
+    <string>CheckNew</string>
    </property>
   </action>
  </widget>
