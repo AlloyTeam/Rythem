@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     quazip/JlCompress.cpp \
     rytablesortfilterproxymodel.cpp \
     widget/rywebview.cpp \
-    widget/rytabwidget.cpp
+    widget/rytabwidget.cpp \
+    singleapplication.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -70,7 +71,8 @@ HEADERS  += mainwindow.h \
     rymimedata.h \
     rytablesortfilterproxymodel.h \
     widget/rywebview.h \
-    widget/rytabwidget.h
+    widget/rytabwidget.h \
+    singleapplication.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
