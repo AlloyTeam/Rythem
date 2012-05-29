@@ -1,0 +1,4 @@
+#!/bin/sh
+pwd
+cp $1/qt_zh_CN.qm $2/Rythem.app/Contents/MacOS/
+cp $1/rythem_zh_CN.qm $2/Rythem.app/Contents/MacOS/

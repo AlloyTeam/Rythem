@@ -140,7 +140,9 @@ OTHER_FILES += \
     logo.rc \
     remove.png \
     rythem_zh_CN.ts \
-    rythem_zh_CN.qm
+    rythem_zh_CN.qm \
+    deploy.txt \
+    qt_zh_CN.qm
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")
