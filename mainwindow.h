@@ -70,6 +70,7 @@ public:
 	}ProxyInfo;
     RyTableModel *pipeTableModel;
     RyTableSortFilterProxyModel *sortFilterProxyModel;
+    void checkNewVerion();
 
 
 private:
@@ -102,6 +103,7 @@ private slots:
     void importSessions();
     void onActionRemoveAll();
     void on_actionDebug_triggered();
+    void on_actionCheckNew_triggered();
 };
 
 #endif // MAINWINDOW_H

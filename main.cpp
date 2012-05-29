@@ -20,7 +20,7 @@
 
 using namespace rule;
 
-
+QString version = "0.1.0";
 QString appPath = "";
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     //QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
     MainWindow w;
-
+    a.connect(&a,SIGNAL(messageAvailable(QString)),&w,SLOT(raise()));
     RyProxyServer* server = RyProxyServer::instance();
 
 
