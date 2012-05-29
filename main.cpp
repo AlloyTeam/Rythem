@@ -20,7 +20,7 @@
 
 using namespace rule;
 
-
+QString version = "0.1.0";
 QString appPath = "";
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
     if(a.isRunning()){
         a.sendMessage("from other instance");
         return 0;
+
     }
 
     a.setQuitOnLastWindowClosed(false);
@@ -90,6 +91,8 @@ int main(int argc, char *argv[])
     //QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
     MainWindow w;
+    //a.connect(&a,SIGNAL(messageAvailable(QString)),&w,SLOT(raise()));
+    a.connect(&a,SIGNAL(messageAvailable(QString)),&w,SLOT(onMessageFromOtherInstance()));
 
     RyProxyServer* server = RyProxyServer::instance();
 

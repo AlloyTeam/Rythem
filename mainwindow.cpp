@@ -42,6 +42,8 @@
 
 #include "rytablesortfilterproxymodel.h"
 
+extern QString version;
+
 QByteArray gzipDecompress(QByteArray data){
     if (data.size() <= 4) {
         qWarning("gUncompress: Input data is truncated");
@@ -237,6 +239,12 @@ MainWindow::~MainWindow()
     delete _jsBridge;
     delete ui;
 }
+
+
+void MainWindow::checkNewVersion(){
+
+}
+
 void MainWindow::createMenus(){
     _fileMenu = menuBar()->addMenu(tr("&File"));
     _importSessionsAct = _fileMenu->addAction(tr("&import session..."));
@@ -413,6 +421,11 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
     data.clear();
 }
 
+void MainWindow::onMessageFromOtherInstance(){
+    setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    raise();
+    activateWindow();
+}
 
 void MainWindow::onWaterfallActionTriggered(){
     QModelIndexList list = ui->tableView->selectionModel()->selectedRows();
@@ -627,3 +640,8 @@ void MainWindow::onActionRemoveAll(){
 void MainWindow::on_actionDebug_triggered(){
     qDebug()<<RyRuleManager::instance()->toJson(true);
 }
+
+void MainWindow::on_actionCheckNew_triggered(){
+    checkNewVersion();
+}
+
