@@ -55,11 +55,19 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
+
+    // load app translate file
     QTranslator translator;
     bool isLoadSuccess = translator.load(appPath+"/rythem_zh_CN");
-    if(!isLoadSuccess)qDebug()<<"error";
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
+    if(!isLoadSuccess)qDebug()<<" load language error";
     a.installTranslator(&translator);
+
+    // load system translate file
+    QTranslator translator2;
+    translator2.load(appPath+"/qt_zh_CN");
+    a.installTranslator(&translator2);
+
 
 #ifdef DEBUGTOFILE
     qInstallMsgHandler(myMessageHandler);
