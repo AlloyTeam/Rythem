@@ -16,6 +16,7 @@
 #include <QThread>
 
 #include <QTranslator>
+#include "singleapplication.h"
 
 using namespace rule;
 
@@ -51,7 +52,12 @@ void myMessageHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
+    SingleApplication a(argc, argv, "a");
+    if(a.isRunning()){
+        a.sendMessage("from other instance");
+        return 0;
+    }
+
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
