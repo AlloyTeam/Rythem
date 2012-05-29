@@ -241,7 +241,7 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::checkNewVerion(){
+void MainWindow::checkNewVersion(){
 
 }
 

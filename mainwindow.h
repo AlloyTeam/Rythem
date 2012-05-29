@@ -70,7 +70,7 @@ public:
 	}ProxyInfo;
     RyTableModel *pipeTableModel;
     RyTableSortFilterProxyModel *sortFilterProxyModel;
-    void checkNewVerion();
+    void checkNewVersion();
 
 
 private:
