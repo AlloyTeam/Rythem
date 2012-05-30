@@ -12,6 +12,8 @@
 #include <QScriptEngine>
 #include <QScriptValue>
 #include <QItemSelection>
+#include <QMutex>
+#include <QMutexLocker>
 
 #include "rule/ryrulemanager.h"
 #include "proxy/ryproxyserver.h"
@@ -90,6 +92,8 @@ private:
     QAction *_captureAct;
     QAction *_hideConnectTunnelAct;
     QItemSelectionModel *_itemSelectModel;
+
+    QMutex proxyMutex;
 protected:
     void closeEvent(QCloseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
