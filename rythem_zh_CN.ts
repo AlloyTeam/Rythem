@@ -98,97 +98,102 @@ Host: www.alloyteam.com
         <translation type="unfinished">发送器</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="201"/>
-        <location filename="mainwindow.ui" line="204"/>
+        <location filename="mainwindow.ui" line="202"/>
+        <location filename="mainwindow.ui" line="205"/>
         <source>Clear All</source>
         <translation type="unfinished">清除</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="220"/>
-        <location filename="mainwindow.ui" line="223"/>
+        <location filename="mainwindow.ui" line="221"/>
+        <location filename="mainwindow.ui" line="224"/>
         <source>Begein Capture</source>
         <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="235"/>
-        <location filename="mainwindow.ui" line="238"/>
+        <location filename="mainwindow.ui" line="236"/>
+        <location filename="mainwindow.ui" line="239"/>
         <source>water fall</source>
         <translation type="unfinished">瀑布图</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="250"/>
+        <location filename="mainwindow.ui" line="251"/>
         <source>long cache</source>
         <translation type="unfinished">长缓存</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="253"/>
+        <location filename="mainwindow.ui" line="254"/>
         <source>set sessions matching rule with long cache</source>
         <translation type="unfinished">符合替换规则的请示，返回内容设置长时间缓存</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="265"/>
+        <location filename="mainwindow.ui" line="266"/>
         <source>Debug</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="268"/>
+        <location filename="mainwindow.ui" line="269"/>
         <source>debug</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="227"/>
+        <location filename="mainwindow.ui" line="281"/>
+        <source>CheckNew</source>
+        <translation type="unfinished">检查更新</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="231"/>
         <source>SetupProxyManually</source>
         <translation type="unfinished">请手动设置代理</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="228"/>
+        <location filename="mainwindow.cpp" line="232"/>
         <source>non-windows OS need to set proxy to:127.0.0.1:8889 manually</source>
         <translation type="unfinished">非windows系统需手动设置代理为 127.0.0.1:8889</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="241"/>
+        <location filename="mainwindow.cpp" line="253"/>
         <source>&amp;File</source>
         <translation type="unfinished">文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="242"/>
+        <location filename="mainwindow.cpp" line="254"/>
         <source>&amp;import session...</source>
         <translation type="unfinished">导入会放(&amp;i)...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="243"/>
+        <location filename="mainwindow.cpp" line="255"/>
         <source>hide image requests</source>
         <translation type="unfinished">隐藏图片请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="245"/>
+        <location filename="mainwindow.cpp" line="257"/>
         <source>hide 304s</source>
         <translation type="unfinished">隐藏304</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="247"/>
+        <location filename="mainwindow.cpp" line="259"/>
         <source>show matching sessions only</source>
         <translation type="unfinished">只显示匹配规则的请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="249"/>
+        <location filename="mainwindow.cpp" line="261"/>
         <source>hide connect tunnels</source>
         <translation type="unfinished">隐藏Connect遂道</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="257"/>
+        <location filename="mainwindow.cpp" line="269"/>
         <source>select file to open</source>
         <translation type="unfinished">选择文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="497"/>
-        <location filename="mainwindow.cpp" line="561"/>
+        <location filename="mainwindow.cpp" line="518"/>
+        <location filename="mainwindow.cpp" line="582"/>
         <source>start capture</source>
         <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="515"/>
-        <location filename="mainwindow.cpp" line="559"/>
+        <location filename="mainwindow.cpp" line="536"/>
+        <location filename="mainwindow.cpp" line="580"/>
         <source>stop capture</source>
         <translation type="unfinished">停止抓包</translation>
     </message>
@@ -262,6 +267,25 @@ Host: www.alloyteam.com
         <location filename="rytablemodel.cpp" line="82"/>
         <source>unknown..2</source>
         <translation type="unfinished">未知内容..2</translation>
+    </message>
+</context>
+<context>
+    <name>RyUpdateChecker</name>
+    <message>
+        <location filename="ryupdatechecker.cpp" line="68"/>
+        <source>got new version</source>
+        <translation type="unfinished">有可用新版本</translation>
+    </message>
+    <message>
+        <location filename="ryupdatechecker.cpp" line="69"/>
+        <source>old version:%1
+new version:%2
+update:%3
+changeLog:%4</source>
+        <translation type="unfinished">当前版本:%1
+更新版本:%2
+更新URL :%3
+更新日志:%4</translation>
     </message>
 </context>
 <context>
