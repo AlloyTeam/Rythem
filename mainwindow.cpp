@@ -42,6 +42,8 @@
 
 #include "rytablesortfilterproxymodel.h"
 
+#include "ryupdatechecker.h"
+
 extern QString version;
 
 QByteArray gzipDecompress(QByteArray data){
@@ -222,15 +224,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
     connect(ui->actionRemoveAll,SIGNAL(triggered()),this,SLOT(onActionRemoveAll()));
     connect(ui->actionWaterfall, SIGNAL(triggered()), this, SLOT(onWaterfallActionTriggered()));
-/*
+
 #ifdef Q_WS_MAC
     // TODO: mac下需手动设置代理
     ui->ActionCapture->setEnabled(false);
     ui->ActionCapture->setText(tr("SetupProxyManually"));
     ui->ActionCapture->setToolTip(tr("non-windows OS need to set proxy to:127.0.0.1:8889 manually"));
 #endif
-*/
 
+    checker = new RyUpdateChecker(this);
+    checkNewVersion();
 }
 
 MainWindow::~MainWindow()
@@ -243,7 +246,7 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::checkNewVersion(){
-
+    checker->check();
 }
 
 void MainWindow::createMenus(){

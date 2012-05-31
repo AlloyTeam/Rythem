@@ -17,7 +17,7 @@
 
 #include "rule/ryrulemanager.h"
 #include "proxy/ryproxyserver.h"
-
+#include "ryupdatechecker.h"
 
 #include <QScriptEngine>
 
@@ -92,6 +92,8 @@ private:
     QAction *_captureAct;
     QAction *_hideConnectTunnelAct;
     QItemSelectionModel *_itemSelectModel;
+
+    RyUpdateChecker *checker;
 
     QMutex proxyMutex;
 protected:
