@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     rytablesortfilterproxymodel.cpp \
     widget/rywebview.cpp \
     widget/rytabwidget.cpp \
-    singleapplication.cpp
+    singleapplication.cpp \
+    ryupdatechecker.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -72,7 +73,8 @@ HEADERS  += mainwindow.h \
     rytablesortfilterproxymodel.h \
     widget/rywebview.h \
     widget/rytabwidget.h \
-    singleapplication.h
+    singleapplication.h \
+    ryupdatechecker.h
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \

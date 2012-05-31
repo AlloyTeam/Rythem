@@ -254,7 +254,7 @@ background:#dddfe2;
     <string>set sessions matching rule with long cache</string>
    </property>
    <property name="visible">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionDebug">
@@ -279,6 +279,9 @@ background:#dddfe2;
    </property>
    <property name="text">
     <string>CheckNew</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

@@ -42,6 +42,8 @@
 
 #include "rytablesortfilterproxymodel.h"
 
+#include "ryupdatechecker.h"
+
 extern QString version;
 
 QByteArray gzipDecompress(QByteArray data){
@@ -230,6 +232,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->ActionCapture->setToolTip(tr("non-windows OS need to set proxy to:127.0.0.1:8889 manually"));
 #endif
 
+    checker = new RyUpdateChecker(this);
+    checkNewVersion();
 }
 
 MainWindow::~MainWindow()
@@ -242,7 +246,7 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::checkNewVersion(){
-
+    checker->check();
 }
 
 void MainWindow::createMenus(){
@@ -452,6 +456,7 @@ void MainWindow::onWaterfallActionTriggered(){
 
 
 void MainWindow::toggleProxy(){
+    QMutexLocker locker(&proxyMutex);
 #ifdef Q_WS_MAC
     /*
     CFDictionaryRef dict = SCDynamicStoreCopyProxies(NULL);
@@ -492,16 +497,19 @@ void MainWindow::toggleProxy(){
     }
     if(i!=services.end()){
         QMap<QString,QVariant> proxies = theService["Proxies"].toMap();
-        qDebug()<<"proxies="<<proxies;
-        qDebug()<<proxies.value("HTTPEnable");
+        //qDebug()<<"proxies="<<proxies;
+        //qDebug()<<proxies.value("HTTPEnable");
         proxies["HTTPEnable"]=0;
         theService["Proxies"] = proxies;
         services[theServiceKey]=theService;
-        qDebug()<<theService;
+        //qDebug()<<theService;
     }
-    qDebug()<<services[theServiceKey];
+    //qDebug()<<services[theServiceKey];
     plist.setValue("NetworkServices",services);
-    plist.sync();//doesn't work.. plist readonly
+    if(plist.isWritable()){
+        qDebug()<<"writable";
+        plist.sync();//doesn't work.. plist readonly
+    }
 #endif
 
 #ifdef Q_WS_WIN32
