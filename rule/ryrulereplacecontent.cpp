@@ -252,12 +252,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(boo
     QString fileName;
     fileName = _url.mid(_url.indexOf(pattern)+pattern.length());
     //qDebug()<<fileName;
-    if(fileName.indexOf("?")!=-1){
-        fileName = fileName.left(fileName.indexOf("?"));
-    }
-    if(fileName.indexOf("#")!=-1){
-        fileName = fileName.left(fileName.indexOf("#"));
-    }
+
 #ifdef Q_OS_WIN
     if(replace.endsWith("\\")){
         replace.remove(replace.length()-1,1);
@@ -274,6 +269,47 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(boo
         fileName.prepend("/");
     }
     fileName.prepend(replace);
+
+    //目录级替换支持淘宝的combo url - By xhowhy
+    if(fileName.indexOf("??")!=-1){
+        QStringList pathAndFile = fileName.split("??");
+        QString path = pathAndFile[0];
+        fileName = pathAndFile[1];
+        //去除时间戳
+        fileName = fileName.left(fileName.indexOf("?"));
+        mimeType = RyRule::getMimeType(QFileInfo(fileName).suffix().toLower(),"text/plain");
+        QStringList files = fileName.split(",");
+        for(int i = 0; i < files.size(); i++){
+            QString pf = path + files[i];
+            file.setFileName(pf);
+
+            if(file.open(QFile::ReadOnly)){
+                body.append(QString("/*\r\nfile:%1 */\r\n").arg(pf));
+                body.append(file.readAll());
+            }else{
+                body.append(QString("/*\r\nfile:%1 not found\r\n").arg(pf));
+            }
+            file.close();
+        }
+
+        contentLength = body.size();
+        header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n%4\r\n")
+                           .arg("200 OK")
+                           .arg(mimeType)
+                           .arg(contentLength)
+                           .arg(cacheControl));
+        ret.first = header;
+        ret.second = body;
+        return ret;
+    }
+
+    if(fileName.indexOf("?")!=-1){
+        fileName = fileName.left(fileName.indexOf("?"));
+    }
+    if(fileName.indexOf("#")!=-1){
+        fileName = fileName.left(fileName.indexOf("#"));
+    }
+
     //qDebug()<<fileName;
     file.setFileName(fileName);
     if(file.open(QFile::ReadOnly)){

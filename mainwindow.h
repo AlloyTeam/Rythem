@@ -110,6 +110,7 @@ private slots:
     void onActionRemoveAll();
     void on_actionDebug_triggered();
     void on_actionCheckNew_triggered();
+    void loadConfigPage();
 };
 
 #endif // MAINWINDOW_H

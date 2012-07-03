@@ -202,15 +202,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     addJsObject();
     connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
-    ui->webView->load(QUrl("http://127.0.0.1:8889/manager/RythemManagerUI/rules.html"));
+    //修复proxy服务器过完启动导致配置页面空白的问题 延迟一秒加载
+    QTimer::singleShot(1000, this, SLOT(loadConfigPage()));
 
     // should use slot to do this
     //ui->composer->setupProxy(RyProxyServer::instance()->serverAddress().toString(),
     //                         RyProxyServer::instance()->serverPort());
     ui->composer->setupProxy("127.0.0.1",
                              8889);
-
-
     _itemSelectModel = ui->tableView->selectionModel();
 
     connect(ui->tableView,SIGNAL(doubleClicked(QModelIndex)),SLOT(onItemDoubleClicked(QModelIndex)));
@@ -651,5 +650,9 @@ void MainWindow::on_actionDebug_triggered(){
 
 void MainWindow::on_actionCheckNew_triggered(){
     checkNewVersion();
+}
+
+void MainWindow::loadConfigPage(){
+    ui->webView->load(QUrl("http://127.0.0.1:8889/manager/RythemManagerUI/rules.html"));
 }
 
