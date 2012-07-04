@@ -70,6 +70,10 @@ public:
 
     // for Q+ offline-app
     void toggleLongCache();
+
+    const QList<QSharedPointer<RyRuleProject> > getProjects()const{
+        return _projects;
+    }
 private:
 
     QString _configFileName;

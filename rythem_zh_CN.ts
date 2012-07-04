@@ -151,49 +151,49 @@ Host: www.alloyteam.com
         <translation type="unfinished">非windows系统需手动设置代理为 127.0.0.1:8889</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="253"/>
+        <location filename="mainwindow.cpp" line="255"/>
         <source>&amp;File</source>
         <translation type="unfinished">文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="254"/>
+        <location filename="mainwindow.cpp" line="256"/>
         <source>&amp;import session...</source>
         <translation type="unfinished">导入会放(&amp;i)...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="255"/>
+        <location filename="mainwindow.cpp" line="257"/>
         <source>hide image requests</source>
         <translation type="unfinished">隐藏图片请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="257"/>
+        <location filename="mainwindow.cpp" line="259"/>
         <source>hide 304s</source>
         <translation type="unfinished">隐藏304</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="259"/>
+        <location filename="mainwindow.cpp" line="261"/>
         <source>show matching sessions only</source>
         <translation type="unfinished">只显示匹配规则的请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="261"/>
+        <location filename="mainwindow.cpp" line="263"/>
         <source>hide connect tunnels</source>
         <translation type="unfinished">隐藏Connect遂道</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="269"/>
+        <location filename="mainwindow.cpp" line="271"/>
         <source>select file to open</source>
         <translation type="unfinished">选择文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="518"/>
-        <location filename="mainwindow.cpp" line="582"/>
+        <location filename="mainwindow.cpp" line="520"/>
+        <location filename="mainwindow.cpp" line="584"/>
         <source>start capture</source>
         <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="536"/>
-        <location filename="mainwindow.cpp" line="580"/>
+        <location filename="mainwindow.cpp" line="538"/>
+        <location filename="mainwindow.cpp" line="582"/>
         <source>stop capture</source>
         <translation type="unfinished">停止抓包</translation>
     </message>

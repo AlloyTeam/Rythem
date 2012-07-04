@@ -233,7 +233,9 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     checker = new RyUpdateChecker(this);
-    checkNewVersion();
+    QTimer timer;
+    timer.singleShot(1000,checker,SLOT(check()));
+    //checkNewVersion();
 }
 
 MainWindow::~MainWindow()
