@@ -176,7 +176,8 @@ QList<QSharedPointer<RyRule> > RyRuleGroup::getMatchRules(const QString& url){
         }
         if(isMatch){
             //qDebug()<<"match\n"<<rule->toJSON(true,0);
-            ret.append(rule);
+            //后添加的Rule优先级高过之前的 append->prepend
+            ret.prepend(rule);
         }
     }
     return ret;
