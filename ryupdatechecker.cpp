@@ -5,7 +5,7 @@
 RyUpdateChecker::RyUpdateChecker(QObject *parent) :
     QObject(parent){
     _isChecking = false;
-    manager.setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8889));
+    //manager.setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,"127.0.0.1",8889));
 }
 
 void RyUpdateChecker::check(QString url, QString currentVersion){
