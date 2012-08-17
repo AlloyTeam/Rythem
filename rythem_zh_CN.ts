@@ -141,59 +141,59 @@ Host: www.alloyteam.com
         <translation type="unfinished">检查更新</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="231"/>
+        <location filename="mainwindow.cpp" line="361"/>
         <source>SetupProxyManually</source>
         <translation type="unfinished">请手动设置代理</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="232"/>
+        <location filename="mainwindow.cpp" line="362"/>
         <source>non-windows OS need to set proxy to:127.0.0.1:8889 manually</source>
         <translation type="unfinished">非windows系统需手动设置代理为 127.0.0.1:8889</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="253"/>
+        <location filename="mainwindow.cpp" line="383"/>
         <source>&amp;File</source>
         <translation type="unfinished">文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="254"/>
+        <location filename="mainwindow.cpp" line="384"/>
         <source>&amp;import session...</source>
         <translation type="unfinished">导入会放(&amp;i)...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="255"/>
+        <location filename="mainwindow.cpp" line="385"/>
         <source>hide image requests</source>
         <translation type="unfinished">隐藏图片请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="257"/>
+        <location filename="mainwindow.cpp" line="387"/>
         <source>hide 304s</source>
         <translation type="unfinished">隐藏304</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="259"/>
+        <location filename="mainwindow.cpp" line="389"/>
         <source>show matching sessions only</source>
         <translation type="unfinished">只显示匹配规则的请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="261"/>
+        <location filename="mainwindow.cpp" line="391"/>
         <source>hide connect tunnels</source>
         <translation type="unfinished">隐藏Connect遂道</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="269"/>
+        <location filename="mainwindow.cpp" line="399"/>
         <source>select file to open</source>
         <translation type="unfinished">选择文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="518"/>
-        <location filename="mainwindow.cpp" line="583"/>
+        <location filename="mainwindow.cpp" line="648"/>
+        <location filename="mainwindow.cpp" line="674"/>
         <source>start capture</source>
         <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="536"/>
-        <location filename="mainwindow.cpp" line="581"/>
+        <location filename="mainwindow.cpp" line="657"/>
+        <location filename="mainwindow.cpp" line="672"/>
         <source>stop capture</source>
         <translation type="unfinished">停止抓包</translation>
     </message>
