@@ -322,11 +322,21 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(boo
     mimeType = RyRule::getMimeType(QFileInfo(file).suffix().toLower(),"text/plain");
     file.close();
     contentLength = body.size();// \r\nCache-Control:max-age=315360000
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n%4\r\n")
-                       .arg(status)
-                       .arg(mimeType)
-                       .arg(contentLength)
-                       .arg(cacheControl));
+    if(mimeType == "audio/mpeg"){
+        header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nAccept-Ranges: bytes \r\nContent-Range:bytes 0-%5/%5 \r\nContent-Length: %3 \r\n%4\r\n")
+                           .arg(status)
+                           .arg(mimeType)
+                           .arg(contentLength)
+                           .arg(cacheControl)
+                           .arg(contentLength));
+    }else{
+        header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n%4\r\n")
+                           .arg(status)
+                           .arg(mimeType)
+                           .arg(contentLength)
+                           .arg(cacheControl));
+    }
+
     ret.first = header;
     ret.second = body;
     return ret;

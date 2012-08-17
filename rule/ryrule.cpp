@@ -18,6 +18,8 @@ QString RyRule::getMimeType(const QString &key, const QString &defaultMimeType){
         RyRule::_mimeTypeMap.insert("png",	"image/png");
         RyRule::_mimeTypeMap.insert("bmp",	"image/bmp");
         RyRule::_mimeTypeMap.insert("gif",	"image/gif");
+        RyRule::_mimeTypeMap.insert("mp3",	"audio/mpeg");
+        RyRule::_mimeTypeMap.insert("wav",	"audio/wav");
         RyRule::_mimeTypeMap.insert("manifest","text/cache-manifest");
     }
     return RyRule::_mimeTypeMap.value(key,defaultMimeType);

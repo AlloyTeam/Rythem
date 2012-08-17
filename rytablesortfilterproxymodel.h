@@ -16,7 +16,7 @@ public:
         No304Filter = 0x02,
         CustomFilter = 0x04,
         OnlyMatchingFilter = 0x08,
-        HideTunnelFilter = 0x16
+        HideTunnelFilter = 0x10
     };
 
     explicit RyTableSortFilterProxyModel(QObject *parent = 0);

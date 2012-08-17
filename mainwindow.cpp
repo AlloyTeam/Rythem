@@ -2,20 +2,11 @@
 #include "ui_mainwindow.h"
 #include "waterfallwindow.h"
 
-#include <QTcpServer>
-#include "proxy/rypipedata.h"
-#include "proxy/ryproxyserver.h"
-#include <QSettings>
-#include <QVariant>
-#include <QUrl>
-#include <QNetworkConfigurationManager>
-#include <QMap>
-#include <QList>
-#include <QMessageBox>
 
 #ifdef Q_WS_WIN32
-#include "wininet.h"
+#include "WinInet.h"
 #include "winnetwk.h"
+#include "windows.h"
 #include "proxy/rywinhttp.h"
 #endif
 #ifdef Q_WS_MAC
@@ -24,24 +15,15 @@
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
 #endif
 
-#include <QtCore>
-#include <QItemSelectionModel>
-
-
 #ifdef Q_OS_WIN32
 #include "zlib/zlib.h"
 #else
 #include <zlib.h>
 #endif
 
-#include <QMovie>
-#include <QPixmap>
-
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
-
 #include "rytablesortfilterproxymodel.h"
-
 #include "ryupdatechecker.h"
 
 extern QString version;
@@ -94,6 +76,61 @@ QByteArray gzipDecompress(QByteArray data){
     inflateEnd(&strm);
     return result;
 }
+#ifdef Q_OS_WIN32
+bool setProxy(const QSettings& proxySetting){
+    // 感谢maconel的帮助！
+
+    QString proxyAutoConfigURL = proxySetting.value("AutoConfigURL","0").toString();
+    int enable = proxySetting.value("ProxyEnable").toInt();
+    QString proxyString =proxySetting.value("ProxyServer").toString();
+
+
+    // init options
+    INTERNET_PER_CONN_OPTION_LIST connOptionList;
+    INTERNET_PER_CONN_OPTION connOptions[5];
+    memset(&connOptionList, 0, sizeof(connOptionList));
+    memset(&connOptions, 0, sizeof(connOptions));
+    DWORD size = 0;
+    size = sizeof(connOptionList);
+    connOptions[0].dwOption = INTERNET_PER_CONN_FLAGS;
+    connOptions[1].dwOption = INTERNET_PER_CONN_PROXY_SERVER;
+    connOptions[2].dwOption = INTERNET_PER_CONN_PROXY_BYPASS;
+    connOptions[3].dwOption = INTERNET_PER_CONN_AUTOCONFIG_URL;
+    connOptions[4].dwOption = INTERNET_PER_CONN_AUTODISCOVERY_FLAGS;
+    connOptionList.dwSize = sizeof(connOptionList);
+    connOptionList.pszConnection = NULL;
+    connOptionList.dwOptionCount = sizeof(connOptions) / sizeof(connOptions[0]);
+    connOptionList.dwOptionError = 0;
+    connOptionList.pOptions = connOptions;
+
+    // direct
+    if(0 == enable){
+        connOptions[0].Value.dwValue |= PROXY_TYPE_DIRECT;
+    }
+    // auto proxy config
+    if(proxyAutoConfigURL != "0"){
+        connOptions[0].Value.dwValue |= PROXY_TYPE_AUTO_PROXY_URL;
+        connOptions[3].Value.pszValue = (WCHAR*)proxyAutoConfigURL.toStdWString().data();
+    }
+    // TODO: auto detect
+    //connOptions[0].Value.dwValue |= PROXY_TYPE_AUTO_DETECT;
+    if(1 == enable){
+        connOptions[0].Value.dwValue |= PROXY_TYPE_PROXY;
+        connOptions[1].Value.pszValue = (WCHAR*)proxyString.toStdWString().data();
+        //TODO pass domains
+        //connOptions[2].Value.pszValue = L"localhost;127.0.0.1;<local>";
+    }
+
+    if (!InternetSetOption(NULL, INTERNET_OPTION_PER_CONNECTION_OPTION, &connOptionList, size)){
+        qDebug()<<QString("fail %1").arg(GetLastError());
+        return false;
+    }
+    InternetSetOption(NULL, INTERNET_OPTION_SETTINGS_CHANGED, NULL, NULL);
+    InternetSetOption(NULL, INTERNET_OPTION_REFRESH, NULL, NULL);
+    return true;
+}
+#endif
+
 // RyJsBridge
 RyJsBridge::RyJsBridge(){
 
@@ -524,57 +561,19 @@ void MainWindow::toggleProxy(){
         if( _previousProxyInfo.isUsingPac != "0"){
             proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
         }
-
-        /*
-        // hard code just for some crash issue
-        proxySetting.setValue("ProxyEnable",1);
-        proxySetting.setValue("ProxyServer","proxy.tencent.com:8080");
-        //if( previousProxyInfo.isUsingPac != "0"){
-            proxySetting.setValue("AutoConfigURL","http://txp-01.tencent.com/lvsproxy.pac");
-        //}
-        */
     }else{
         ui->ActionCapture->setText(tr("stop capture"));
         _previousProxyInfo.isUsingPac = proxySetting.value("AutoConfigURL","0").toString();
         _previousProxyInfo.enable = proxySetting.value("ProxyEnable").toInt();
         _previousProxyInfo.proxyString =proxySetting.value("ProxyServer").toString();
-        //qDebug()<<previousProxyInfo.proxyString;
-        ///qDebug()<<previousProxyInfo.isUsingPac;
-        //http=127.0.0.1:8081;https=127.0.0.1:8081;ftp=127.0.0.1:8081
-
-
-        //initPac(previousProxyInfo.isUsingPac,previousProxyInfo.enable?previousProxyInfo.proxyString:"");
         QString proxyServer="127.0.0.1:8889";
-        /*
-        if(_previousProxyInfo.enable){
-            if(_previousProxyInfo.proxyString.indexOf(";")!=-1){
-                proxyServer = QString("http=")+proxyServer;
-                QStringList proxies = _previousProxyInfo.proxyString.split(";");
-                for(int i=0;i<proxies.length();++i){
-                    QStringList tmp = proxies[i].split("=");
-                    if(tmp.at(0).toLower()=="http"){
-                        proxies[i] = proxyServer;
-                        break;
-                    }
-                }
-                proxyServer = proxies.join(";");
-            }else{
-                // since https has been supported remove code b
-                //proxyServer = QString("http=%1;ftp=%2;https=%2").arg(proxyServer).arg(_previousProxyInfo.proxyString);
-            }
-        }else{
-            proxyServer = "http="+proxyServer;
-        }
-        */
-        //qDebug()<<proxyServer<<previousProxyInfo.isUsingPac;
         proxySetting.remove("AutoConfigURL");
-        //proxySetting.setValue("AutoConfigURL",_previousProxyInfo.isUsingPac);
         proxySetting.setValue("ProxyEnable",QVariant(1));
         proxySetting.setValue("ProxyServer",proxyServer);
     }
-    proxySetting.sync();
-	::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
-    ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+    if(!setProxy(proxySetting)){// hack..
+        _isUsingCapture = !_isUsingCapture;
+    }
 #endif
     _isUsingCapture = !_isUsingCapture;
     if(_isUsingCapture){

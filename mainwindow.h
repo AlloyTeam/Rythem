@@ -1,25 +1,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+
+#include <QtCore>
+#include <QtGui>
+#include <QtNetwork>
+#include <QtWebKit>
 #include "rytablemodel.h"
 #include "proxy/rypipedata.h"
-#include <QSettings>
-#include <QWebFrame>
-#include <QFileDialog>
-#include <QDebug>
-
-#include <QScriptEngine>
-#include <QScriptValue>
-#include <QItemSelection>
-#include <QMutex>
-#include <QMutexLocker>
 
 #include "rule/ryrulemanager.h"
 #include "proxy/ryproxyserver.h"
 #include "ryupdatechecker.h"
-
-#include <QScriptEngine>
 
 using namespace rule;
 

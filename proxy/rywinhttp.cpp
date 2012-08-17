@@ -8,8 +8,6 @@
 
 
 
-
-
 //=== from source code
 
 // We don't want to include winhttp.h because that's not
