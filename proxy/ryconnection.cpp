@@ -532,7 +532,7 @@ void RyConnection::doRequestToNetwork(){
             }
         }
         */
-        qDebug()<<"connecting to "<<_connectingHost;
+        //qDebug()<<"connecting to "<<_connectingHost;
         connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
         _responseSocket->connectToHost(_connectingHost,_connectingPort);
     }else{
