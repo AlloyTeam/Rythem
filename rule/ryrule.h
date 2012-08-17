@@ -2,7 +2,7 @@
 #define RYRULE_H
 
 #include <QtCore>
-#include <QtWebKit>
+#include <QtNetwork>
 #include <QtScript>
 
 #include <QDebug>

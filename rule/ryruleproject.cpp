@@ -77,7 +77,7 @@ void RyRuleProject::init(QString localAddress,
         }
     }
 }
-bool RyRuleProject::RyRuleProject::addRemoteRuleGroups(){
+bool RyRuleProject::addRemoteRuleGroups(){
     //qDebug()<<"getting remote rule"<<_remoteAddress;
     //QTimer timeout;
     QNetworkAccessManager manager;
