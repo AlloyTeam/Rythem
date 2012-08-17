@@ -14,7 +14,7 @@
 #include <QMessageBox>
 
 #ifdef Q_WS_WIN32
-#include "wininet.h"
+#include "WinInet.h"
 #include "winnetwk.h"
 #include "proxy/rywinhttp.h"
 #endif
@@ -572,8 +572,9 @@ void MainWindow::toggleProxy(){
         proxySetting.setValue("ProxyServer",proxyServer);
     }
     proxySetting.sync();
-	::InternetSetOption(0,39, INT_PTR(0),INT_PTR(0));
-    ::InternetSetOption(0, 37,INT_PTR(0), INT_PTR(0));
+    int settingCode = ::InternetSetOption(0,INTERNET_OPTION_SETTINGS_CHANGED, INT_PTR(0),INT_PTR(0));
+    int refreshCode = ::InternetSetOption(0, INTERNET_OPTION_REFRESH,INT_PTR(0), INT_PTR(0));
+    qDebug()<<QString("setting:%1 refresh:%2").arg(settingCode).arg(refreshCode);
 #endif
     _isUsingCapture = !_isUsingCapture;
     if(_isUsingCapture){

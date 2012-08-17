@@ -187,13 +187,13 @@ Host: www.alloyteam.com
     </message>
     <message>
         <location filename="mainwindow.cpp" line="518"/>
-        <location filename="mainwindow.cpp" line="582"/>
+        <location filename="mainwindow.cpp" line="583"/>
         <source>start capture</source>
         <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="536"/>
-        <location filename="mainwindow.cpp" line="580"/>
+        <location filename="mainwindow.cpp" line="581"/>
         <source>stop capture</source>
         <translation type="unfinished">停止抓包</translation>
     </message>
