@@ -15,7 +15,7 @@
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
 #endif
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 #include "zlib/zlib.h"
 #else
 #include <zlib.h>
@@ -77,7 +77,7 @@ QByteArray gzipDecompress(QByteArray data){
     inflateEnd(&strm);
     return result;
 }
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 bool setProxy(const QSettings& proxySetting){
     // 感谢maconel的帮助！
 
@@ -345,7 +345,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::checkNewVersion(){
 
-    this->toggleCapture();
+#ifdef Q_OS_WIN
+    toggleCapture();
+#endif
 #ifdef Q_OS_MAC
     int n = QSysInfo::MacintoshVersion;
     if(n >= 10 && !appPath.startsWith("/Applications/Rythem.app")){
