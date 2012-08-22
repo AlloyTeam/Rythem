@@ -283,12 +283,12 @@ Host: www.alloyteam.com
 <context>
     <name>RyUpdateChecker</name>
     <message>
-        <location filename="ryupdatechecker.cpp" line="69"/>
+        <location filename="ryupdatechecker.cpp" line="74"/>
         <source>got new version</source>
         <translation>有可用新版本</translation>
     </message>
     <message>
-        <location filename="ryupdatechecker.cpp" line="70"/>
+        <location filename="ryupdatechecker.cpp" line="75"/>
         <source>old version:%1
 new version:%2
 update:%3
