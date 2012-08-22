@@ -159,7 +159,9 @@ Host: www.alloyteam.com
 
  otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)</source>
         <oldsource>Please drag to Applications dir first  otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)</oldsource>
-        <translation>请将Rythem移至 Applications 目录下运行\n\n否则在创建替换规则时 Rythem 会崩溃</translation>
+        <translation>请将Rythem移至 Applications 目录下运行
+
+否则在创建替换规则时 Rythem 会崩溃</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="359"/>
@@ -283,12 +285,12 @@ Host: www.alloyteam.com
 <context>
     <name>RyUpdateChecker</name>
     <message>
-        <location filename="ryupdatechecker.cpp" line="74"/>
+        <location filename="ryupdatechecker.cpp" line="75"/>
         <source>got new version</source>
         <translation>有可用新版本</translation>
     </message>
     <message>
-        <location filename="ryupdatechecker.cpp" line="75"/>
+        <location filename="ryupdatechecker.cpp" line="76"/>
         <source>old version:%1
 new version:%2
 update:%3
