@@ -27,6 +27,7 @@
 #include "ryupdatechecker.h"
 
 extern QString version;
+extern QString appPath;
 
 QByteArray gzipDecompress(QByteArray data){
     if (data.size() <= 4) {
@@ -328,7 +329,7 @@ MainWindow::MainWindow(QWidget *parent) :
 */
     checker = new RyUpdateChecker(this);
     QTimer timer;
-    timer.singleShot(1000,checker,SLOT(check()));
+    timer.singleShot(1000,this,SLOT(checkNewVersion()));
     //checkNewVersion();
 }
 
@@ -342,6 +343,15 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::checkNewVersion(){
+#ifdef Q_OS_MAC
+    int n = QSysInfo::MacintoshVersion;
+    if(n >= 10 && !appPath.startsWith("/Applications/Rythem.app")){
+        QMessageBox::information(this,
+                                 tr("-"),
+                                 tr("Please drag to Applications dir first \n\n otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)"),
+                                 QMessageBox::Ok);
+    }
+#endif
     checker->check();
 }
 

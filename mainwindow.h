@@ -54,6 +54,7 @@ public slots:
         void onSelectionChange(QItemSelection selected,QItemSelection deselected);
         void onWaterfallActionTriggered();
         void onMessageFromOtherInstance();
+        void checkNewVersion();
 
 public:
 	typedef struct __proxyInfo{
@@ -64,7 +65,6 @@ public:
 	}ProxyInfo;
     RyTableModel *pipeTableModel;
     RyTableSortFilterProxyModel *sortFilterProxyModel;
-    void checkNewVersion();
 
 
 private:
