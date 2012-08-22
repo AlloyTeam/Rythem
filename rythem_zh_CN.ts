@@ -21,7 +21,7 @@
 Host: www.alloyteam.com
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="composer.ui" line="55"/>
@@ -50,7 +50,7 @@ Host: www.alloyteam.com
     <message>
         <location filename="mainwindow.ui" line="14"/>
         <source>Rythem</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="47"/>
@@ -86,7 +86,7 @@ Host: www.alloyteam.com
     <message>
         <location filename="mainwindow.ui" line="141"/>
         <source>about:blank</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="150"/>
@@ -124,12 +124,12 @@ Host: www.alloyteam.com
     <message>
         <location filename="mainwindow.ui" line="266"/>
         <source>Debug</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="269"/>
         <source>debug</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="281"/>
@@ -137,59 +137,78 @@ Host: www.alloyteam.com
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="268"/>
         <source>SetupProxyManually</source>
-        <translation>请手动设置代理</translation>
+        <translation type="obsolete">请手动设置代理</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="269"/>
         <source>non-windows OS need to set proxy to:127.0.0.1:8889 manually</source>
-        <translation>非windows系统需手动设置代理为 127.0.0.1:8889</translation>
+        <translation type="obsolete">非windows系统需手动设置代理为 127.0.0.1:8889</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="292"/>
+        <location filename="mainwindow.cpp" line="355"/>
+        <source>-</source>
+        <translation>-</translation>
+    </message>
+    <message>
+        <source>haha</source>
+        <translation type="obsolete">请了</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="356"/>
+        <source>Please drag to Applications dir first 
+
+ otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)</source>
+        <oldsource>Please drag to Applications dir first  otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)</oldsource>
+        <translation>请将Rythem移至 Applications 目录下运行
+
+否则在创建替换规则时 Rythem 会崩溃</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="364"/>
         <source>&amp;File</source>
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="293"/>
+        <location filename="mainwindow.cpp" line="365"/>
         <source>&amp;import session...</source>
         <translation>导入会放(&amp;i)...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="294"/>
+        <location filename="mainwindow.cpp" line="366"/>
         <source>hide image requests</source>
         <translation>隐藏图片请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="296"/>
+        <location filename="mainwindow.cpp" line="368"/>
         <source>hide 304s</source>
         <translation>隐藏304</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="298"/>
+        <location filename="mainwindow.cpp" line="370"/>
         <source>show matching sessions only</source>
         <translation>只显示匹配规则的请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="300"/>
+        <location filename="mainwindow.cpp" line="372"/>
         <source>hide connect tunnels</source>
         <translation>隐藏Connect遂道</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="308"/>
+        <location filename="mainwindow.cpp" line="380"/>
         <source>select file to open</source>
         <translation>选择文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="557"/>
         <location filename="mainwindow.cpp" line="583"/>
+        <location filename="mainwindow.cpp" line="612"/>
+        <location filename="mainwindow.cpp" line="613"/>
         <source>start capture</source>
         <translation>开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="566"/>
-        <location filename="mainwindow.cpp" line="581"/>
+        <location filename="mainwindow.cpp" line="592"/>
+        <location filename="mainwindow.cpp" line="608"/>
+        <location filename="mainwindow.cpp" line="609"/>
         <source>stop capture</source>
         <translation>停止抓包</translation>
     </message>
@@ -268,12 +287,12 @@ Host: www.alloyteam.com
 <context>
     <name>RyUpdateChecker</name>
     <message>
-        <location filename="ryupdatechecker.cpp" line="68"/>
+        <location filename="ryupdatechecker.cpp" line="74"/>
         <source>got new version</source>
         <translation>有可用新版本</translation>
     </message>
     <message>
-        <location filename="ryupdatechecker.cpp" line="69"/>
+        <location filename="ryupdatechecker.cpp" line="75"/>
         <source>old version:%1
 new version:%2
 update:%3
@@ -294,7 +313,7 @@ changeLog:%4</source>
     <message>
         <location filename="waterfallwindow.ui" line="22"/>
         <source>qrc:/web/waterfall/RythemTimes/index.html</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>

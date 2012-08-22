@@ -27,7 +27,12 @@ bool RyUpdateChecker::isLargeThanCurrent(const QString &otherVersion,bool* isOk)
     }
     if(isOk)*isOk=true;
     for(int i=0,l=currentVersionList.size();i<l;++i){
-        if(currentVersionList.at(i).toInt()  < otherVersionList.at(i).toInt() ){
+        qDebug()<<QString::number(currentVersionList.at(i).toInt())<<QString::number(otherVersionList.at(i).toInt());
+        int currentV = currentVersionList.at(i).toInt();
+        int onlineV = otherVersionList.at(i).toInt();
+        if( onlineV < currentV ){
+            return false;
+        }else if(onlineV > currentV){
             return true;
         }
     }
@@ -61,6 +66,7 @@ void RyUpdateChecker::finished(QNetworkReply *reply){
     }
 
     QByteArray updateUrlba = reply->readLine();
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf-8"));
     QByteArray updateLogba = reply->readAll();
     qDebug()<<updateUrlba<<updateUrlba<<versionBa;
 
