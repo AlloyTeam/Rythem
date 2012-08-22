@@ -15,7 +15,7 @@
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
 #endif
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 #include "zlib/zlib.h"
 #else
 #include <zlib.h>
@@ -27,6 +27,7 @@
 #include "ryupdatechecker.h"
 
 extern QString version;
+extern QString appPath;
 
 QByteArray gzipDecompress(QByteArray data){
     if (data.size() <= 4) {
@@ -76,7 +77,7 @@ QByteArray gzipDecompress(QByteArray data){
     inflateEnd(&strm);
     return result;
 }
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 bool setProxy(const QSettings& proxySetting){
     // 感谢maconel的帮助！
 
@@ -327,8 +328,9 @@ MainWindow::MainWindow(QWidget *parent) :
 */
     checker = new RyUpdateChecker(this);
     QTimer timer;
-    timer.singleShot(1000,checker,SLOT(check()));
+    timer.singleShot(1000,this,SLOT(checkNewVersion()));
     //checkNewVersion();
+
 }
 
 MainWindow::~MainWindow()
@@ -341,6 +343,19 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::checkNewVersion(){
+
+#ifdef Q_OS_WIN
+    toggleCapture();
+#endif
+#ifdef Q_OS_MAC
+    int n = QSysInfo::MacintoshVersion;
+    if(n >= 10 && !appPath.startsWith("/Applications/Rythem.app")){
+        QMessageBox::information(this,
+                                 tr("-"),
+                                 tr("Please drag to Applications dir first \n\n otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)"),
+                                 QMessageBox::Ok);
+    }
+#endif
     checker->check();
 }
 
@@ -588,9 +603,13 @@ void MainWindow::toggleProxy(){
 #endif
     _isUsingCapture = !_isUsingCapture;
     if(_isUsingCapture){
+        ui->ActionCapture->setChecked(true);
         ui->ActionCapture->setText(tr("stop capture"));
+        ui->ActionCapture->setToolTip(tr("stop capture"));
     }else{
+        ui->ActionCapture->setChecked(false);
         ui->ActionCapture->setText(tr("start capture"));
+        ui->ActionCapture->setToolTip(tr("start capture"));
     }
 }
 
