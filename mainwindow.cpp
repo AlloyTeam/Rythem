@@ -130,7 +130,64 @@ bool setProxy(const QSettings& proxySetting){
     return true;
 }
 #endif
+#ifdef Q_OS_MAC
 
+QString getServiceName(){
+    QProcess process;
+    // get current primary interface
+    process.start("scutil");
+    process.waitForStarted();
+    process.write("show State:/Network/Global/IPv4\nquit\n");
+    process.waitForFinished();
+    QByteArray ba = process.readAllStandardOutput();
+    QString output = ba;
+
+    QString key = "PrimaryInterface : ";
+    int i = output.indexOf(key,0);
+    int j = output.indexOf('\n',i);
+    if(i == -1 || j == -1){
+        return QString();
+    }
+    QString interface = output.mid(i+key.length(),j - i - key.length());
+
+    // get service name
+    process.start("networksetup -listnetworkserviceorder");
+    process.waitForFinished();
+    QByteArray ba2 = process.readAllStandardOutput();
+    QString output2 = ba2;
+
+    QRegExp regNetworkservice(QString("\\(\\d+\\) ([^\\n]*)\\n\\(Hardware Port: ([^,]*), Device: %1\\)").arg(interface));
+    int got = regNetworkservice.indexIn(output2);
+    if(got == -1){
+        qDebug()<<"not found";
+        return QString();
+    }
+    return regNetworkservice.cap(1);
+}
+bool setProxyState(bool enable){
+    QProcess process;
+    QString service = getServiceName();
+    process.start(QString("networksetup -setwebproxystate %1 %2").arg(service).arg(enable?QString("on"):QString("off")));
+    process.waitForFinished();
+    process.close();
+    return true;
+}
+
+bool setProxyForService(const QString& host, const int port){
+    QProcess process;
+    // get current primary interface
+    QString service = getServiceName();
+    process.start(QString("networksetup -setwebproxy %1 %2 %3").arg(service).arg(host).arg(port));
+    QEventLoop eventLoop;
+    eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
+    eventLoop.exec();
+    QString output = process.readAllStandardOutput();
+    if(output.isEmpty()){
+        return true;
+    }
+    return false;
+}
+#endif
 // RyJsBridge
 RyJsBridge::RyJsBridge(){
 
@@ -260,14 +317,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
     connect(ui->actionRemoveAll,SIGNAL(triggered()),this,SLOT(onActionRemoveAll()));
     connect(ui->actionWaterfall, SIGNAL(triggered()), this, SLOT(onWaterfallActionTriggered()));
-
+/*
 #ifdef Q_WS_MAC
     // TODO: mac下需手动设置代理
     ui->ActionCapture->setEnabled(false);
     ui->ActionCapture->setText(tr("SetupProxyManually"));
     ui->ActionCapture->setToolTip(tr("non-windows OS need to set proxy to:127.0.0.1:8889 manually"));
 #endif
-
+*/
     checker = new RyUpdateChecker(this);
     QTimer timer;
     timer.singleShot(1000,checker,SLOT(check()));
@@ -496,57 +553,11 @@ void MainWindow::onWaterfallActionTriggered(){
 void MainWindow::toggleProxy(){
     QMutexLocker locker(&proxyMutex);
 #ifdef Q_WS_MAC
-    /*
-    CFDictionaryRef dict = SCDynamicStoreCopyProxies(NULL);
-    if(!dict){
-        qDebug()<<"no proxy";
-    }
-    */
 
-
-    QNetworkConfigurationManager mgr;
-    QList<QNetworkConfiguration> activeConfigs = mgr.allConfigurations(QNetworkConfiguration::Active);
-    QList<QString> activeNames;
-    foreach(QNetworkConfiguration cf,activeConfigs){
-        //qDebug()<<"new work activated:"<<cf.type()<<cf.state()<<cf.name()<<cf.bearerTypeName()<<cf.identifier();
-
-        activeNames.append(cf.name());
-    }
-    ///Library/Preferences/SystemConfiguration
-    QSettings::setPath(QSettings::NativeFormat,QSettings::SystemScope,"/Library/Preferences/SystemConfiguration/");
-    QSettings plist("/Library/Preferences/SystemConfiguration/preferences.plist",QSettings::NativeFormat);
-
-    QMap<QString,QVariant> services = plist.value("NetworkServices").toMap();
-    QMap<QString,QVariant>::Iterator i;
-    QString theServiceKey;
-    QMap<QString,QVariant> theService;
-    QMap<QString,QVariant> interface;
-
-    for(i = services.begin();i!=services.end();i++){
-        //qDebug()<<i.key();
-        theService = i.value().toMap();
-        theServiceKey = i.key();
-        interface = theService["Interface"].toMap();
-        //qDebug()<<"interface"<<interface;
-        if(activeNames.contains(interface.value("DeviceName").toString())){
-            qDebug()<<"got it.."<<theService["Proxies"].toMap().value("HTTPEnable");
-            break;
-        }
-    }
-    if(i!=services.end()){
-        QMap<QString,QVariant> proxies = theService["Proxies"].toMap();
-        //qDebug()<<"proxies="<<proxies;
-        //qDebug()<<proxies.value("HTTPEnable");
-        proxies["HTTPEnable"]=0;
-        theService["Proxies"] = proxies;
-        services[theServiceKey]=theService;
-        //qDebug()<<theService;
-    }
-    //qDebug()<<services[theServiceKey];
-    plist.setValue("NetworkServices",services);
-    if(plist.isWritable()){
-        qDebug()<<"writable";
-        plist.sync();//doesn't work.. plist readonly
+    if(_isUsingCapture){
+        setProxyState(false);
+    }else{
+        setProxyForService(QString("127.0.0.1"),8889);
     }
 #endif
 
