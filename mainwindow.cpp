@@ -331,6 +331,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QTimer timer;
     timer.singleShot(1000,this,SLOT(checkNewVersion()));
     //checkNewVersion();
+
 }
 
 MainWindow::~MainWindow()
@@ -343,6 +344,8 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::checkNewVersion(){
+
+    this->toggleCapture();
 #ifdef Q_OS_MAC
     int n = QSysInfo::MacintoshVersion;
     if(n >= 10 && !appPath.startsWith("/Applications/Rythem.app")){
@@ -599,9 +602,13 @@ void MainWindow::toggleProxy(){
 #endif
     _isUsingCapture = !_isUsingCapture;
     if(_isUsingCapture){
+        ui->ActionCapture->setChecked(true);
         ui->ActionCapture->setText(tr("stop capture"));
+        ui->ActionCapture->setToolTip(tr("stop capture"));
     }else{
+        ui->ActionCapture->setChecked(false);
         ui->ActionCapture->setText(tr("start capture"));
+        ui->ActionCapture->setToolTip(tr("start capture"));
     }
 }
 
