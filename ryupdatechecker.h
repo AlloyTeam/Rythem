@@ -17,13 +17,13 @@ signals:
 
 public slots:
 #ifdef Q_WS_MAC
-    void check(QString url="http://iptton.sinaapp.com/rythem_update.php?mac",QString currentVersion="0.1.05.31");
+    void check(QString url="http://iptton.alloyteam.com/rythem_update.php?mac",QString currentVersion="0.1.05.31");
 #endif
 #ifdef Q_WS_WIN32
-    void check(QString url="http://iptton.sinaapp.com/rythem_update.php?windows",QString currentVersion="0.1.05.31");
+    void check(QString url="http://iptton.alloyteam.com/rythem_update.php?windows",QString currentVersion="0.1.05.31");
 #endif
 #ifdef Q_WS_X11
-    void check(QString url="http://iptton.sinaapp.com/rythem_update.php?x11",QString currentVersion="0.1.05.31");
+    void check(QString url="http://iptton.alloyteam.com/rythem_update.php?x11",QString currentVersion="0.1.05.31");
 #endif
 
 private slots:
