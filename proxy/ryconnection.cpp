@@ -95,7 +95,6 @@ void RyConnection::onRequestReadyRead(){
         _receivingPerformance.requestBegin = QDateTime::currentMSecsSinceEpoch();
     }
     QByteArray newContent = _requestSocket->readAll();
-    //qDebug()<<"requestReadyRead"<<newContent;
     if(_isConnectTunnel){
         // https隧道,直接透传不解析
         // TODO: decrypt https tunnel
@@ -321,6 +320,7 @@ void RyConnection::onRequestPackageFound(){
     _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
     if(_receivingPipeData->method == "CONNECT"/* &&
             _receivingPipeData->port != 80*/){// TODO: 80端口一定不是https?
+        qDebug()<<"is connect:"<<QString(_receivingPipeData->requestHeaderRawData());
         _isConnectTunnel = true;
     }
     _requestState = ConnectionStatePackageFound;
@@ -518,7 +518,6 @@ void RyConnection::doRequestToNetwork(){
                 continue;
             }
             _responseSocket->setProxy(p);
-            //qDebug()<<"proxy="<<p.hostName()<<p.port();
         }
  #endif
         /*

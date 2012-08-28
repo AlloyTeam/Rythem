@@ -345,7 +345,7 @@ MainWindow::~MainWindow()
 void MainWindow::checkNewVersion(){
 
 #ifdef Q_OS_WIN
-    toggleCapture();
+    //toggleCapture();
 #endif
 #ifdef Q_OS_MAC
     int n = QSysInfo::MacintoshVersion;
