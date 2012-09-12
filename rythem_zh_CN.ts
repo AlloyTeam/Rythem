@@ -145,72 +145,72 @@ Host: www.alloyteam.com
         <translation type="obsolete">非windows系统需手动设置代理为 127.0.0.1:8889</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="354"/>
+        <location filename="mainwindow.cpp" line="380"/>
         <source>-</source>
-        <translation>-</translation>
+        <translation type="unfinished">-</translation>
     </message>
     <message>
         <source>haha</source>
         <translation type="obsolete">请了</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="355"/>
+        <location filename="mainwindow.cpp" line="381"/>
         <source>Please drag to Applications dir first 
 
  otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)</source>
         <oldsource>Please drag to Applications dir first  otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)</oldsource>
-        <translation>请将Rythem移至 Applications 目录下运行
+        <translation type="unfinished">请将Rythem移至 Applications 目录下运行
 
 否则在创建替换规则时 Rythem 会崩溃</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="363"/>
+        <location filename="mainwindow.cpp" line="389"/>
         <source>&amp;File</source>
-        <translation>文件(&amp;F)</translation>
+        <translation type="unfinished">文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="364"/>
+        <location filename="mainwindow.cpp" line="390"/>
         <source>&amp;import session...</source>
-        <translation>导入会放(&amp;i)...</translation>
+        <translation type="unfinished">导入会放(&amp;i)...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="365"/>
+        <location filename="mainwindow.cpp" line="391"/>
         <source>hide image requests</source>
-        <translation>隐藏图片请求</translation>
+        <translation type="unfinished">隐藏图片请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="367"/>
+        <location filename="mainwindow.cpp" line="393"/>
         <source>hide 304s</source>
-        <translation>隐藏304</translation>
+        <translation type="unfinished">隐藏304</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="369"/>
+        <location filename="mainwindow.cpp" line="395"/>
         <source>show matching sessions only</source>
-        <translation>只显示匹配规则的请求</translation>
+        <translation type="unfinished">只显示匹配规则的请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="371"/>
+        <location filename="mainwindow.cpp" line="397"/>
         <source>hide connect tunnels</source>
-        <translation>隐藏Connect遂道</translation>
+        <translation type="unfinished">隐藏Connect遂道</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="379"/>
+        <location filename="mainwindow.cpp" line="405"/>
         <source>select file to open</source>
-        <translation>选择文件</translation>
+        <translation type="unfinished">选择文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="582"/>
-        <location filename="mainwindow.cpp" line="611"/>
-        <location filename="mainwindow.cpp" line="612"/>
+        <location filename="mainwindow.cpp" line="667"/>
+        <location filename="mainwindow.cpp" line="696"/>
+        <location filename="mainwindow.cpp" line="697"/>
         <source>start capture</source>
-        <translation>开始抓包</translation>
+        <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="591"/>
-        <location filename="mainwindow.cpp" line="607"/>
-        <location filename="mainwindow.cpp" line="608"/>
+        <location filename="mainwindow.cpp" line="676"/>
+        <location filename="mainwindow.cpp" line="692"/>
+        <location filename="mainwindow.cpp" line="693"/>
         <source>stop capture</source>
-        <translation>停止抓包</translation>
+        <translation type="unfinished">停止抓包</translation>
     </message>
 </context>
 <context>

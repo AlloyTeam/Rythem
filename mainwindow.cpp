@@ -10,6 +10,7 @@
 #include "proxy/rywinhttp.h"
 #endif
 #ifdef Q_WS_MAC
+#include "proxy/proxyautoconfig.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
@@ -165,6 +166,16 @@ QString getServiceName(){
     }
     return regNetworkservice.cap(1);
 }
+bool setAutoProxyState(bool enable){
+    qDebug()<<"disable poxy state....";
+    QProcess process;
+    QString service = getServiceName();
+    process.start(QString("networksetup -setautoproxystate %1 %2").arg(service).arg(enable?QString("on"):QString("off")));
+    process.waitForFinished();
+    process.close();
+    return true;
+}
+
 bool setProxyState(bool enable){
     QProcess process;
     QString service = getServiceName();
@@ -172,6 +183,20 @@ bool setProxyState(bool enable){
     process.waitForFinished();
     process.close();
     return true;
+}
+bool setAutoProxyUrl(const QString& url){
+    QProcess process;
+    // get current primary interface
+    QString service = getServiceName();
+    process.start(QString("networksetup -setautoproxyurl %1 %2").arg(service).arg(url));
+    QEventLoop eventLoop;
+    eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
+    eventLoop.exec();
+    QString output = process.readAllStandardOutput();
+    if(output.isEmpty()){
+        return true;
+    }
+    return false;
 }
 
 bool setProxyForService(const QString& host, const int port){
@@ -331,6 +356,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer.singleShot(1000,this,SLOT(checkNewVersion()));
     //checkNewVersion();
 
+    ProxyAutoConfig::instance()->setConfigByUrl("http://txp-01.tencent.com/lvsproxy.pac");
 }
 
 MainWindow::~MainWindow()
@@ -568,12 +594,71 @@ void MainWindow::onWaterfallActionTriggered(){
 void MainWindow::toggleProxy(){
     QMutexLocker locker(&proxyMutex);
 #ifdef Q_WS_MAC
-
     if(_isUsingCapture){
-        setProxyState(false);
+        if(_previousProxyInfo.isUsingPac == "1"){
+            setAutoProxyUrl(_previousProxyInfo.pacUrl);
+        }else{
+            setProxyState(false);
+        }
     }else{
+
+        QNetworkConfigurationManager mgr;
+        QList<QNetworkConfiguration> activeConfigs = mgr.allConfigurations(QNetworkConfiguration::Active);
+        QList<QString> activeNames;
+        foreach(QNetworkConfiguration cf,activeConfigs){
+            activeNames.append(cf.name());
+        }
+        ///Library/Preferences/SystemConfiguration
+        QSettings::setPath(QSettings::NativeFormat,QSettings::SystemScope,"/Library/Preferences/SystemConfiguration/");
+        QSettings plist("/Library/Preferences/SystemConfiguration/preferences.plist",QSettings::NativeFormat);
+
+        QMap<QString,QVariant> services = plist.value("NetworkServices").toMap();
+        QMap<QString,QVariant>::Iterator i;
+        QString theServiceKey;
+        QMap<QString,QVariant> theService;
+        QMap<QString,QVariant> interface;
+
+
+        for(i = services.begin();i!=services.end();i++){
+            //qDebug()<<i.key();
+            theService = i.value().toMap();
+            theServiceKey = i.key();
+            interface = theService["Interface"].toMap();
+            //qDebug()<<"interface"<<interface;
+            if(activeNames.contains(interface.value("DeviceName").toString())){
+                //qDebug()<<"got it.."<<theService["Proxies"].toMap().value("HTTPEnable");
+                //qDebug()<<theService["Proxies"].toMap().value("ProxyAutoConfigEnable");
+                //ProxyAutoConfigURLString HTTPEnable HTTPProxy HTTPPort
+                //qDebug()<<theService["Proxies"].toMap();
+                break;
+            }
+        }
+        if(i!=services.end()){
+            QMap<QString,QVariant> proxies = theService["Proxies"].toMap();
+            qDebug()<<"proxies="<<proxies;
+            qDebug()<<proxies.value("HTTPEnable");
+            proxies["HTTPEnable"]=0;
+            theService["Proxies"] = proxies;
+            services[theServiceKey]=theService;
+            _previousProxyInfo.isUsingPac = (proxies.value("ProxyAutoConfigEnable").toInt() == 1)?"1":"0";
+            if(proxies.value("ProxyAutoConfigEnable").toInt() == 1){
+                _previousProxyInfo.pacUrl = proxies.value("ProxyAutoConfigURLString").toString();
+            }
+            //TODO https http ftp
+            if(proxies.value("HTTPEnable").toInt() == 1){
+                _previousProxyInfo.proxyString = proxies.value("HTTPProxy").toString() + proxies.value("HTTPPort").toString();
+            }else{
+                _previousProxyInfo.enable = false;
+            }
+            qDebug()<<theService;
+        }
+        if(_previousProxyInfo.isUsingPac == "1"){
+            ProxyAutoConfig::instance()->setConfigByUrl(_previousProxyInfo.pacUrl);
+            setAutoProxyState(false);
+        }
         setProxyForService(QString("127.0.0.1"),8889);
     }
+
 #endif
 
 #ifdef Q_WS_WIN32

@@ -5,6 +5,9 @@
 #ifdef WIN32
 #include "rywinhttp.h"
 #endif
+#ifdef Q_OS_MAC
+#include "proxy/proxyautoconfig.h"
+#endif
 
 #include "rule/ryrulemanager.h"
 using namespace rule;
@@ -519,7 +522,23 @@ void RyConnection::doRequestToNetwork(){
             }
             _responseSocket->setProxy(p);
         }
- #endif
+#endif
+#ifdef Q_OS_MAC
+        ProxyAutoConfig *pac = ProxyAutoConfig::instance();
+        QString retVal;
+        QMetaObject::invokeMethod(pac, "findProxyForUrl", Qt::DirectConnection,
+                                   Q_RETURN_ARG(QString, retVal),
+                                   Q_ARG(QString, _sendingPipeData->fullUrl),
+                                   Q_ARG(QString, _sendingPipeData->host));
+        QStringList l = retVal.split(" ");
+        if(l.length() > 1){
+            QString hostAndPort = l.at(1);
+            QStringList hAndP = hostAndPort.split(":");
+            qDebug()<<hostAndPort;
+            _responseSocket->setProxy( QNetworkProxy(QNetworkProxy::HttpProxy,hAndP.at(0),hAndP.at(1).toInt()) );
+        }
+        qDebug()<<"proxyis"<<retVal;
+#endif
         /*
         QPair<QString,int> serverAndPort = queryProxy(_sendingPipeData->fullUrl);
         if(serverAndPort.first == RyProxyServer::instance()->serverAddress().toString()

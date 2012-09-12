@@ -87,6 +87,9 @@ win32:HEADERS += zlib/zutil.h \
     zlib/deflate.h \
     zlib/crc32.h
 
+mac:HEADERS += proxy/proxyautoconfig.h
+mac:SOURCES += proxy/proxyautoconfig.cpp
+
 win32:HEADERS  += proxy/rywinhttp.h
 
 win32:SOURCES  += proxy/rywinhttp.cpp
