@@ -645,7 +645,13 @@ bool RyConnection::checkRule(RyPipeData_ptr& pipe){
             _connectingHost = rule->replace();
             _sendingPipeData->replacedHost = _connectingHost;
         }else{
-            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
+            bool isResouceFound = true;
+            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl,&isResouceFound);
+            // TODO check settings if go through when local replace match but got 404
+            if(rule->type() == RyRule::LOCAL_DIR_REPLACE && !isResouceFound){
+                return false;
+            }
+
             //qDebug()<<headerAndBody.second;
             //qDebug()<<headerAndBody.first;
             bool isOk;

@@ -18,26 +18,27 @@ RyRuleReplaceContent::~RyRuleReplaceContent(){
 
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(const QString& url,bool setLongCache){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(const QString& url,bool setLongCache,bool *isResouceFound){
     setUrl(url);
-    return getReplaceContent(setLongCache);
+    return getReplaceContent(setLongCache,isResouceFound);
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(bool setLongCache){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(bool setLongCache,bool *isResouceFound){
     switch(_rule->type()){
     case RyRule::LOCAL_FILE_REPLACE:
-        return getLocalReplaceContent(setLongCache);
+        return getLocalReplaceContent(setLongCache,isResouceFound);
         break;
     case RyRule::LOCAL_FILES_REPLACE:
-        return getLocalMergeReplaceContent(setLongCache);
+        return getLocalMergeReplaceContent(setLongCache,isResouceFound);
         break;
     case RyRule::LOCAL_DIR_REPLACE:
-        return getLocalDirReplaceContent(setLongCache);
+        return getLocalDirReplaceContent(setLongCache,isResouceFound);
         break;
     case RyRule::REMOTE_CONTENT_REPLACE:
-        return getRemoteReplaceContent(setLongCache);
+        return getRemoteReplaceContent(setLongCache,isResouceFound);
         break;
     default:// error.
+        if(isResouceFound!=0)*isResouceFound = false;
         qWarning()<<"this type of rule has no content to replace";
         return QPair<QByteArray,QByteArray>(QByteArray("HTTP/1.1 404 NOT FOUND \r\nServer: Rythem\r\nContent-Length: 55\r\n\r\n"),
                                             QByteArray("error rythem connot handle this type of replacement now"));
@@ -45,7 +46,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(bool setLon
     }
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(bool ){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(bool setLongCache,bool *isResouceFound){
     QPair<QByteArray,QByteArray> ret;
     QByteArray header,body;
 
@@ -62,6 +63,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(bool 
     //bool isRequestDone = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).isValid();
     if(!isOk){
         body.append("<center>remote address unresponsable</center>");
+        if(isResouceFound!=0)*isResouceFound = false;
         header.append(QString("HTTP/1.1 503 Serveice Unavailable\r\n"
                          "Server: Rythem \r\n"
                          "Content-Type: text/html \r\n"
@@ -92,7 +94,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getRemoteReplaceContent(bool 
     return ret;
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(bool setLongCache){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(bool setLongCache,bool *isResouceFound){
     QPair<QByteArray,QByteArray> ret;
     //open local file for read
     QString status;
@@ -117,6 +119,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(bool s
         status = "200 OK";
         body = file.readAll();
     }else{
+        if(isResouceFound!=0)*isResouceFound = false;
         status = "404 Not Found";
         body.append(QString("file %1 not found").arg(replace));
     }
@@ -139,7 +142,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(bool s
     return ret;
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(bool setLongCache){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(bool setLongCache,bool *isResouceFound){
     QPair<QByteArray,QByteArray> ret;
     //open local file for read
     QString status;
@@ -196,6 +199,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(b
     }
     file.close();
     if(mergeContentHasError){
+        if(isResouceFound!=0)*isResouceFound = false;
         mimeType = "text/plain";
         status = "404 NOT FOUND";
         body.append(QString("merge file with wrong format:").append(replace).append(mergeFileContent));
@@ -230,7 +234,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(b
     return ret;
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(bool setLongCache){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(bool setLongCache,bool *isResouceFound){
     QPair<QByteArray,QByteArray> ret;
     //open local file for read
     QString status;
@@ -316,6 +320,7 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(boo
         status = "200 OK";
         body = file.readAll();
     }else{
+        if(isResouceFound!=0)*isResouceFound = false;
         status = "404 Not Found";
         body.append(QString("file:%1 not found").arg(fileName));
     }

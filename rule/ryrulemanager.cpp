@@ -264,9 +264,9 @@ QList<QSharedPointer<RyRule> > RyRuleManager::getMatchRules(const QString& url){
 }
 
 //返回header body
-QPair<QByteArray,QByteArray> RyRuleManager::getReplaceContent(QSharedPointer<RyRule> rule,const QString& url){
+QPair<QByteArray,QByteArray> RyRuleManager::getReplaceContent(QSharedPointer<RyRule> rule,const QString& url,bool *isResouceFound){
     RyRuleReplaceContent rc(rule,url);
-    return rc.getReplaceContent(_longCache);
+    return rc.getReplaceContent(_longCache,isResouceFound);
 }
 
 QString RyRuleManager::toJson(bool format)const{
