@@ -39,7 +39,6 @@ function setAutoProxyUrl(){
 }
 
 function onlyATest(){
-#dont use sudo
 	tmp=`networksetup -getwebproxy Wi-Fi | grep "Enabled.*\([YesNo]\)$"`
 	#echo "after"
 	#echo $tmp
