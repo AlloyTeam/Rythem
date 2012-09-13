@@ -166,53 +166,38 @@ QString getServiceName(){
     }
     return regNetworkservice.cap(1);
 }
-bool setAutoProxyState(bool enable){
-    qDebug()<<"disable poxy state....";
-    QProcess process;
+
+bool execScript(const QString &script){
     QString service = getServiceName();
-    process.start(QString("networksetup -setautoproxystate %1 %2").arg(service).arg(enable?QString("on"):QString("off")));
-    process.waitForFinished();
-    process.close();
-    return true;
+    QProcess process;
+    qDebug()<<"script"<<script.arg(service);
+    QStringList args = script.arg(service).split(" ");
+    //process.start(QString("sudo "),args);
+    process.start(script.arg(service));
+    QEventLoop eventLoop;
+    eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
+    eventLoop.exec();
+
+    qDebug()<<"output:\n"<<QString(process.readAllStandardOutput())<<QString(process.readAllStandardError());
+    return process.exitCode() == 0;
 }
 
 bool setProxyState(bool enable){
-    QProcess process;
-    QString service = getServiceName();
-    process.start(QString("networksetup -setwebproxystate %1 %2").arg(service).arg(enable?QString("on"):QString("off")));
-    process.waitForFinished();
-    process.close();
-    return true;
+    return execScript(QString("./setupproxy setHttpAndHttpsProxyState %1 %2").arg("%1",(enable?"on":"off")));
 }
+
 bool setAutoProxyUrl(const QString& url){
-    QProcess process;
-    // get current primary interface
-    QString service = getServiceName();
-    process.start(QString("networksetup -setautoproxyurl %1 %2").arg(service).arg(url));
-    QEventLoop eventLoop;
-    eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
-    eventLoop.exec();
-    QString output = process.readAllStandardOutput();
-    if(output.isEmpty()){
-        return true;
-    }
-    return false;
+    return execScript(QString("./setupproxy setAutoProxyUrl %1 %2").arg("%1",url));
 }
 
 bool setProxyForService(const QString& host, const int port){
-    QProcess process;
-    // get current primary interface
-    QString service = getServiceName();
-    process.start(QString("networksetup -setwebproxy %1 %2 %3").arg(service).arg(host).arg(port));
-    QEventLoop eventLoop;
-    eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
-    eventLoop.exec();
-    QString output = process.readAllStandardOutput();
-    if(output.isEmpty()){
-        return true;
-    }
-    return false;
+    return execScript(QString("./setupproxy setHttpAndHttpsProxy %1 %2 %3").arg(QString("%1"),host,QString::number(port)));
 }
+bool disableAutoProxyAndSetProxyForService(const QString& host, const int port){
+    bool a = execScript(QString("./setupproxy setAutoProxyState %1 off"));
+    return a & setProxyForService(host,port);
+}
+
 #endif
 // RyJsBridge
 RyJsBridge::RyJsBridge(){
@@ -356,7 +341,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer.singleShot(1000,this,SLOT(checkNewVersion()));
     //checkNewVersion();
 
-    ProxyAutoConfig::instance()->setConfigByUrl("http://txp-01.tencent.com/lvsproxy.pac");
+    //ProxyAutoConfig::instance()->setConfigByUrl("http://txp-01.tencent.com/lvsproxy.pac");
 }
 
 MainWindow::~MainWindow()
@@ -594,11 +579,16 @@ void MainWindow::onWaterfallActionTriggered(){
 void MainWindow::toggleProxy(){
     QMutexLocker locker(&proxyMutex);
 #ifdef Q_WS_MAC
+    bool setProxySuccess = false;
     if(_isUsingCapture){
         if(_previousProxyInfo.isUsingPac == "1"){
-            setAutoProxyUrl(_previousProxyInfo.pacUrl);
+            setProxySuccess = setAutoProxyUrl(_previousProxyInfo.pacUrl);
+        }
+        if(!_previousProxyInfo.enable){
+            // TODO
+            setProxySuccess = setProxySuccess && setProxyState(false);
         }else{
-            setProxyState(false);
+            //setProxySuccess = setProxyForService(_previousProxyInfo.proxyString)
         }
     }else{
 
@@ -652,11 +642,17 @@ void MainWindow::toggleProxy(){
             }
             qDebug()<<theService;
         }
+        execScript(QString("./setupproxy onlyATest %1 %2").arg("%1",( _previousProxyInfo.isUsingPac=="1"?"on":"off")));
         if(_previousProxyInfo.isUsingPac == "1"){
             ProxyAutoConfig::instance()->setConfigByUrl(_previousProxyInfo.pacUrl);
-            setAutoProxyState(false);
+            setProxySuccess = disableAutoProxyAndSetProxyForService(QString("127.0.0.1"),8889);
+        }else{
+            setProxySuccess = setProxyForService(QString("127.0.0.1"),8889);
         }
-        setProxyForService(QString("127.0.0.1"),8889);
+    }
+
+    if(!setProxySuccess){// hack..
+        _isUsingCapture = !_isUsingCapture;
     }
 
 #endif

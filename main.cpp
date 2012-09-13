@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
     }
 
 
+
     ProxyAutoConfig::instance();
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();

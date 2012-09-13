@@ -149,7 +149,8 @@ OTHER_FILES += \
     rythem_zh_CN.ts \
     rythem_zh_CN.qm \
     deploy.txt \
-    qt_zh_CN.qm
+    qt_zh_CN.qm \
+    setupproxy
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

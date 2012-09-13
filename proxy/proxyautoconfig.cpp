@@ -31,10 +31,10 @@ void ProxyAutoConfig::setConfigByUrl(const QString &url){
     if(currentPacUrl == url)return;
     currentPacUrl = url;
     QNetworkAccessManager manager;
-    qDebug()<<"url"<<url;
+    //qDebug()<<"url"<<url;
     QTimer timer;
     QEventLoop _loop;
-    timer.singleShot(5000,&_loop,SLOT(quit()));//5秒内
+    timer.singleShot(10000,&_loop,SLOT(quit()));//5秒内
     QNetworkProxyFactory::setUseSystemConfiguration(true);
     manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),&_loop,SLOT(quit()));
     QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
@@ -45,7 +45,7 @@ void ProxyAutoConfig::setConfigByUrl(const QString &url){
 
 void ProxyAutoConfig::setConfig( const QString &config )
 {
-    qDebug()<<config;
+    //qDebug()<<config;
     _isSettup = true;
     connect(engine,SIGNAL(signalHandlerException(QScriptValue)),SLOT(onException()));
     engine->evaluate( config );
@@ -150,7 +150,7 @@ QString ProxyAutoConfig::findProxyForUrl( const QString &url, const QString &hos
     QScriptValue global = engine->globalObject();
     QScriptValue fun = global.property("FindProxyForURL");
     if ( !fun.isFunction() ) {
-	return QString("DIRECT");
+        return QString("DIRECT");
     }
 
     QScriptValueList args;
