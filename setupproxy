@@ -40,14 +40,20 @@ function setAutoProxyUrl(){
 
 function onlyATest(){
 #dont use sudo
-	sudo networksetup -setautoproxystate $1 $2
-	if test $? -eq 0
+	tmp=`networksetup -getwebproxy Wi-Fi | grep "Enabled.*\([YesNo]\)$"`
+	#echo "after"
+	#echo $tmp
+	enable="on"
+	if test "$tmp" = "Enabled: No";
 	then
-		echo "success"
-	else
+		enable="off"
+	fi
+	#echo $enable
+	sudo networksetup -setautoproxystate $1 $enable
+	if test $? -gt 0; then
+		#echo $?
 		#cause pwd prompt
-		networksetup -setautoproxystate $1 $2
-		exit $?
+		networksetup -setautoproxystate $1 $enable
 	fi
 }
 if [ "$#" -lt "2" ] 
@@ -61,6 +67,7 @@ else
 
 	if test $? -eq 0
 	then
+		onlyATest $*
 		${cmd} $*
 		exit $?
 	else
