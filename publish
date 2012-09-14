@@ -1,6 +1,6 @@
 #!/bin/sh
 # generate dmg pkg
-macdeployqt $1Rythem.app -dmg
+macdeployqt $1/Rythem.app -dmg
 hdiutil convert Rythem.dmg -format UDSP -o Rythem-rw.dmg
 tmp=`hdiutil attach Rythem-rw.dmg.sparseimage`;
 echo "tmp = $tmp"
