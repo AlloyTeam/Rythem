@@ -1,2 +1,15 @@
 #!/bin/sh
 # generate dmg pkg
+macdeployqt $1Rythem.app -dmg
+hdiutil convert Rythem.dmg -format UDSP -o Rythem-rw.dmg
+tmp=`hdiutil attach Rythem-rw.dmg.sparseimage`;
+echo "tmp = $tmp"
+dev=`echo "$tmp" | awk 'END{print $1}'`
+targetDir=`echo "$tmp" | awk 'END{print $NF}'`
+cd $targetDir
+pwd
+ln -s /Applications $targetDir/Applications
+#/usr/bin/drutil eject $targetDir
+hdiutil detach -force $dev
+hdiutil convert Rythem-rw.dmg.sparseimage -format UDZO -o Rythem-release.dmg
+mv -f Rythem-release.dmg ~/
