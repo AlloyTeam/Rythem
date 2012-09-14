@@ -167,12 +167,12 @@ QString getServiceName(){
     return regNetworkservice.cap(1);
 }
 
+
 bool execScript(const QString &script){
     QString service = getServiceName();
     QProcess process;
     qDebug()<<"script"<<script.arg(service);
     QStringList args = script.arg(service).split(" ");
-    //process.start(QString("sudo "),args);
     process.start(script.arg(service));
     QEventLoop eventLoop;
     eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
@@ -197,6 +197,18 @@ bool disableAutoProxyAndSetProxyForService(const QString& host, const int port){
     bool a = execScript(QString("./setupproxy setAutoProxyState %1 off"));
     return a & setProxyForService(host,port);
 }
+
+bool setPAC(const QString& url){
+    return execScript(QString("networksetup -setautoproxyurl %1 %2").arg("%1",url));
+}
+bool setMyPAC(){
+    return setPAC(QString("file://local%1/rythem.pac").arg(appPath));
+}
+
+bool disableMyPac(){
+    return execScript(QString("networksetup -setautoproxystate %1 off"));
+}
+
 
 #endif
 // RyJsBridge
@@ -582,13 +594,9 @@ void MainWindow::toggleProxy(){
     bool setProxySuccess = false;
     if(_isUsingCapture){
         if(_previousProxyInfo.isUsingPac == "1"){
-            setProxySuccess = setAutoProxyUrl(_previousProxyInfo.pacUrl);
-        }
-        if(!_previousProxyInfo.enable){
-            // TODO
-            setProxySuccess = setProxySuccess && setProxyState(false);
+            setProxySuccess = setPAC(_previousProxyInfo.pacUrl);
         }else{
-            //setProxySuccess = setProxyForService(_previousProxyInfo.proxyString)
+            disableMyPac();
         }
     }else{
 
@@ -640,15 +648,13 @@ void MainWindow::toggleProxy(){
             }else{
                 _previousProxyInfo.enable = false;
             }
-            qDebug()<<theService;
+            //qDebug()<<theService;
         }
-        execScript(QString("./setupproxy onlyATest %1 %2").arg("%1",( _previousProxyInfo.isUsingPac=="1"?"on":"off")));
+        //execScript(QString("./setupproxy onlyATest %1 %2").arg("%1",( _previousProxyInfo.isUsingPac=="1"?"on":"off")));
         if(_previousProxyInfo.isUsingPac == "1"){
             ProxyAutoConfig::instance()->setConfigByUrl(_previousProxyInfo.pacUrl);
-            setProxySuccess = disableAutoProxyAndSetProxyForService(QString("127.0.0.1"),8889);
-        }else{
-            setProxySuccess = setProxyForService(QString("127.0.0.1"),8889);
         }
+        setProxySuccess = setMyPAC();;
     }
 
     if(!setProxySuccess){// hack..
