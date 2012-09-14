@@ -6,10 +6,15 @@ tmp=`hdiutil attach Rythem-rw.dmg.sparseimage`;
 echo "tmp = $tmp"
 dev=`echo "$tmp" | awk 'END{print $1}'`
 targetDir=`echo "$tmp" | awk 'END{print $NF}'`
+tmpDir=`pwd`
 cd $targetDir
 pwd
 ln -s /Applications $targetDir/Applications
+echo "introduce: http://www.alloyteam.com/2012/05/web-front-end-tool-rythem-1/" > $targetDir/readme.txt
 #/usr/bin/drutil eject $targetDir
 hdiutil detach -force $dev
 hdiutil convert Rythem-rw.dmg.sparseimage -format UDZO -o Rythem-release.dmg
 mv -f Rythem-release.dmg ~/
+rm $tmpDir/Rythem-rw.dmg.sparseimage
+rm $tmpDir/Rythem.dmg
+

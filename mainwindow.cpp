@@ -701,7 +701,9 @@ void MainWindow::toggleProxy(){
 }
 
 void MainWindow::toggleCapture(){
+    ui->ActionCapture->setEnabled(false);
     toggleProxy();
+    ui->ActionCapture->setEnabled(true);
 }
 
 
