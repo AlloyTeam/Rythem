@@ -198,15 +198,39 @@ bool disableAutoProxyAndSetProxyForService(const QString& host, const int port){
     return a & setProxyForService(host,port);
 }
 
+
+bool execProxysetting(const QString &pacUrl=QString()){
+    QProcess process;
+    QString service = getServiceName();
+    QString script = "proxysetting";
+    if(pacUrl.isEmpty()){
+        script = QString("./proxysetting --disablepac %1").arg(service);
+    }else{
+        script = QString("./proxysetting --setpac %1 %2").arg(service,pacUrl);
+    }
+    qDebug()<<script;
+    process.start(script);
+    QEventLoop eventLoop;
+    eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
+    eventLoop.exec();
+
+    qDebug()<<"output:\n"<<QString(process.readAllStandardOutput())<<QString(process.readAllStandardError())
+           <<QString("\nretcode:%1\n").arg(process.exitCode());
+    return process.exitCode() == 0;
+}
+
 bool setPAC(const QString& url){
-    return execScript(QString("networksetup -setautoproxyurl %1 %2").arg("%1",url));
+    return execProxysetting(url);
+    //return execScript(QString("networksetup -setautoproxyurl %1 %2").arg("%1",url));
 }
 bool setMyPAC(){
-    return setPAC(QString("file://local%1/rythem.pac").arg(appPath));
+    return setPAC("http://127.0.0.1:8889/rythem_pac");
+    //return setPAC(QString("file://local%1/rythem_pac").arg(appPath));
 }
 
 bool disableMyPac(){
-    return execScript(QString("networksetup -setautoproxystate %1 off"));
+    return execProxysetting();
+    //return execScript(QString("networksetup -setautoproxystate %1 off"));
 }
 
 
@@ -290,7 +314,8 @@ QString RyJsBridge::getConfigs(){
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _isUsingCapture(false)
+    _isUsingCapture(false),
+    isFirstTimeToggle(true)
 
 #ifdef Q_OS_WIN
     ,proxySetting("\\HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\",QSettings::NativeFormat)
@@ -587,7 +612,6 @@ void MainWindow::onWaterfallActionTriggered(){
     }
 }
 
-
 void MainWindow::toggleProxy(){
     QMutexLocker locker(&proxyMutex);
 #ifdef Q_WS_MAC
@@ -596,65 +620,35 @@ void MainWindow::toggleProxy(){
         if(_previousProxyInfo.isUsingPac == "1"){
             setProxySuccess = setPAC(_previousProxyInfo.pacUrl);
         }else{
-            disableMyPac();
+            setProxySuccess = disableMyPac();
         }
     }else{
-
-        QNetworkConfigurationManager mgr;
-        QList<QNetworkConfiguration> activeConfigs = mgr.allConfigurations(QNetworkConfiguration::Active);
-        QList<QString> activeNames;
-        foreach(QNetworkConfiguration cf,activeConfigs){
-            activeNames.append(cf.name());
-        }
-        ///Library/Preferences/SystemConfiguration
-        QSettings::setPath(QSettings::NativeFormat,QSettings::SystemScope,"/Library/Preferences/SystemConfiguration/");
-        QSettings plist("/Library/Preferences/SystemConfiguration/preferences.plist",QSettings::NativeFormat);
-
-        QMap<QString,QVariant> services = plist.value("NetworkServices").toMap();
-        QMap<QString,QVariant>::Iterator i;
-        QString theServiceKey;
-        QMap<QString,QVariant> theService;
-        QMap<QString,QVariant> interface;
-
-
-        for(i = services.begin();i!=services.end();i++){
-            //qDebug()<<i.key();
-            theService = i.value().toMap();
-            theServiceKey = i.key();
-            interface = theService["Interface"].toMap();
-            //qDebug()<<"interface"<<interface;
-            if(activeNames.contains(interface.value("DeviceName").toString())){
-                //qDebug()<<"got it.."<<theService["Proxies"].toMap().value("HTTPEnable");
-                //qDebug()<<theService["Proxies"].toMap().value("ProxyAutoConfigEnable");
-                //ProxyAutoConfigURLString HTTPEnable HTTPProxy HTTPPort
-                //qDebug()<<theService["Proxies"].toMap();
-                break;
+        if(isFirstTimeToggle){
+            isFirstTimeToggle = false;
+            CFDictionaryRef proxies = SCDynamicStoreCopyProxies(NULL);
+            CFShow(proxies);
+            int isPacEnabled = 0;
+            if (proxies){
+                CFNumberRef pacEnabled;
+                //kSCPropNetProxiesHTTPSProxy
+                if ((pacEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigEnable))){
+                    if (CFNumberGetValue(pacEnabled, kCFNumberIntType, &pacEnabled) && pacEnabled){
+                        isPacEnabled = 1;
+                        _previousProxyInfo.isUsingPac = QString("1");
+                        CFStringRef CFPacUrl = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigURLString);
+                        _previousProxyInfo.pacUrl = QString::fromUtf8( CFStringGetCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
+                    }
+                }
             }
-        }
-        if(i!=services.end()){
-            QMap<QString,QVariant> proxies = theService["Proxies"].toMap();
-            qDebug()<<"proxies="<<proxies;
-            qDebug()<<proxies.value("HTTPEnable");
-            proxies["HTTPEnable"]=0;
-            theService["Proxies"] = proxies;
-            services[theServiceKey]=theService;
-            _previousProxyInfo.isUsingPac = (proxies.value("ProxyAutoConfigEnable").toInt() == 1)?"1":"0";
-            if(proxies.value("ProxyAutoConfigEnable").toInt() == 1){
-                _previousProxyInfo.pacUrl = proxies.value("ProxyAutoConfigURLString").toString();
-            }
-            //TODO https http ftp
-            if(proxies.value("HTTPEnable").toInt() == 1){
-                _previousProxyInfo.proxyString = proxies.value("HTTPProxy").toString() + proxies.value("HTTPPort").toString();
+            //qDebug()<<QString("pacEnabeld %1").arg(isPacEnabled);
+            if(isPacEnabled){
+                qDebug()<<_previousProxyInfo.pacUrl;
+                ProxyAutoConfig::instance()->setConfigByUrl(_previousProxyInfo.pacUrl);
             }else{
-                _previousProxyInfo.enable = false;
+                // TODO check http&https proxy
             }
-            //qDebug()<<theService;
         }
-        //execScript(QString("./setupproxy onlyATest %1 %2").arg("%1",( _previousProxyInfo.isUsingPac=="1"?"on":"off")));
-        if(_previousProxyInfo.isUsingPac == "1"){
-            ProxyAutoConfig::instance()->setConfigByUrl(_previousProxyInfo.pacUrl);
-        }
-        setProxySuccess = setMyPAC();;
+        setProxySuccess = setMyPAC();
     }
 
     if(!setProxySuccess){// hack..
