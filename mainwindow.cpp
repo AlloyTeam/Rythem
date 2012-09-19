@@ -204,13 +204,14 @@ bool execProxysetting(const QString &pacUrl=QString()){
     QString service = getServiceName();
     QString script = "proxysetting";
     if(pacUrl.isEmpty()){
-        script = QString("./proxysetting --disablepac %1").arg(service);
+        script = QString(appPath+"/proxysetting --disablepac %1").arg(service);
     }else{
-        script = QString("./proxysetting --setpac %1 %2").arg(service,pacUrl);
+        script = QString(appPath+"/proxysetting --setpac %1 %2").arg(service,pacUrl);
     }
     qDebug()<<script;
     process.start(script);
     QEventLoop eventLoop;
+    eventLoop.connect(&process,SIGNAL(error(QProcess::ProcessError)),&eventLoop,SLOT(quit()));
     eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
     eventLoop.exec();
 
@@ -397,7 +398,7 @@ void MainWindow::checkNewVersion(){
 #endif
 #ifdef Q_OS_MAC
     int n = QSysInfo::MacintoshVersion;
-    if(n >= 10 && !appPath.startsWith("/Applications/Rythem.app")){
+    if(n >= 10 && appPath.startsWith("/Volumes")){
         QMessageBox::information(this,
                                  tr("-"),
                                  tr("Please drag to Applications dir first \n\n otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)"),
