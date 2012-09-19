@@ -50,4 +50,6 @@ hdiutil convert Rythem-rw.dmg -format UDZO -o Rythem-release.dmg
 mv -f Rythem-release.dmg ~/
 rm $1/Rythem-rw.dmg
 rm $1/Rythem.dmg
+# remove
+rm -rf Rythem.app
 
