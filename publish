@@ -1,21 +1,47 @@
 #!/bin/sh
 # generate dmg pkg
-macdeployqt $1/Rythem.app -dmg
-hdiutil convert Rythem.dmg -format UDSP -o Rythem-rw.dmg
-tmp=`hdiutil attach Rythem-rw.dmg.sparseimage`;
+
+
+macdeployqt Rythem.app -dmg
+
+# convert to read-write image
+hdiutil convert Rythem.dmg -format UDRW -o Rythem-rw.dmg
+
+# open read-write image
+tmp=`hdiutil attach Rythem-rw.dmg`;
 echo "tmp = $tmp"
+
+# get the opened image's device path and file path
 dev=`echo "$tmp" | awk 'END{print $1}'`
-targetDir=`echo "$tmp" | awk 'END{print $NF}'`
+
+# targetDir should be "/Volumne/Rythem 1" or "/Volumn/Rythem"
+# if target Dir is number, it should be "/Volumne/Rythem 1"
+targetDir=`echo "$tmp" | awk 'END{
+                match($NF,/^[0-9]+$/)
+        if( RLENGTH -eq -1 ){
+            print $NF;
+        }else{
+            print $(NF-1),$NF;
+        }
+    }'`
+echo $targetDir
+
+# save current directory and jump to opened image file path
 tmpDir=`pwd`
-cd $targetDir
-pwd
+cd "$targetDir"
+
+# link /Applications to the image
 ln -s /Applications Applications
-echo "introduce: http://www.alloyteam.com/2012/05/web-front-end-tool-rythem-1/" > $targetDir/readme.txt
+
+# make introduce file
+cp $2/readme.md ./
+
+# back
 cd $tmpDir
-#/usr/bin/drutil eject $targetDir
-hdiutil convert Rythem-rw.dmg.sparseimage -format UDZO -o Rythem-release.dmg
-mv -f Rythem-release.dmg ~/
 hdiutil detach -force $dev
-#rm $tmpDir/Rythem-rw.dmg.sparseimage
-#rm $tmpDir/Rythem.dmg
+rm -f Rythem-release.dmg
+hdiutil convert Rythem-rw.dmg -format UDZO -o Rythem-release.dmg
+mv -f Rythem-release.dmg ~/
+rm $1/Rythem-rw.dmg
+rm $1/Rythem.dmg
 
