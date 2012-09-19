@@ -274,12 +274,12 @@ Host: www.alloyteam.com
 <context>
     <name>RyTableModel</name>
     <message>
-        <location filename="rytablemodel.cpp" line="79"/>
+        <location filename="rytablemodel.cpp" line="81"/>
         <source>unknown..%1</source>
         <translation>未知..%1</translation>
     </message>
     <message>
-        <location filename="rytablemodel.cpp" line="82"/>
+        <location filename="rytablemodel.cpp" line="84"/>
         <source>unknown..2</source>
         <translation>未知内容..2</translation>
     </message>
