@@ -22,6 +22,7 @@ public:
     static ProxyAutoConfig *instance();
     ~ProxyAutoConfig();
 
+
     /**
      * add by iptton#gmail.com
      *
@@ -29,6 +30,11 @@ public:
      * @param url
      */
     void setConfigByUrl(const QString &url);
+    /*
+     * set fall back proxy, if no pac setted ,use this
+     */
+    void setHttpProxy(const QString &http);
+    void setHttpsProxy(const QString &https);
 
     /**
      * Call this to set the script to be executed. Note that the argument should be
@@ -65,6 +71,8 @@ private:
 
 private:
     QScriptEngine *engine;
+    QString httpProxy;
+    QString httpsProxy;
 private slots:
     void onException();
 };

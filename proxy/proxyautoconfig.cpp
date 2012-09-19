@@ -42,6 +42,12 @@ void ProxyAutoConfig::setConfigByUrl(const QString &url){
     QString script = QString(reply->readAll());
     setConfig(script);
 }
+void ProxyAutoConfig::setHttpProxy(const QString &http){
+    httpProxy = http;
+}
+void ProxyAutoConfig::setHttpsProxy(const QString &https){
+    httpsProxy = https;
+}
 
 void ProxyAutoConfig::setConfig( const QString &config )
 {
@@ -144,6 +150,11 @@ QScriptValue ProxyAutoConfig::dnsResolve( QScriptContext *context, QScriptEngine
 QString ProxyAutoConfig::findProxyForUrl( const QString &url, const QString &host )
 {
     if(!_isSettup){
+        if(!httpProxy.isEmpty() && url.startsWith("http://")){
+            return httpProxy;
+        }else if(!httpsProxy.isEmpty() && url.startsWith("https://")){
+            return httpsProxy;
+        }
         return "DIRECT";
     }
     QMutexLocker locker(&_queryMutex);

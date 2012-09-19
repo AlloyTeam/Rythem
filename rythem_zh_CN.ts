@@ -199,16 +199,16 @@ Host: www.alloyteam.com
         <translation type="unfinished">选择文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="664"/>
-        <location filename="mainwindow.cpp" line="693"/>
-        <location filename="mainwindow.cpp" line="694"/>
+        <location filename="mainwindow.cpp" line="691"/>
+        <location filename="mainwindow.cpp" line="720"/>
+        <location filename="mainwindow.cpp" line="721"/>
         <source>start capture</source>
         <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="673"/>
-        <location filename="mainwindow.cpp" line="689"/>
-        <location filename="mainwindow.cpp" line="690"/>
+        <location filename="mainwindow.cpp" line="700"/>
+        <location filename="mainwindow.cpp" line="716"/>
+        <location filename="mainwindow.cpp" line="717"/>
         <source>stop capture</source>
         <translation type="unfinished">停止抓包</translation>
     </message>
