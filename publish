@@ -32,10 +32,13 @@ tmpDir=`pwd`
 # make background
 # todo http://stackoverflow.com/questions/96882/how-do-i-create-a-nice-looking-dmg-for-mac-os-x-using-command-line-tools
 
-# link /Applications to the image
-ln -s /Applications Applications
+cd "$targetDir"
 # make introduce file
 cp $2/readme.md ./
+
+# link /Applications to the image
+ln -s /Applications Applications
+
 # make icon
 cp $2/Rythem2.icns ./.VolumeIcon.icns
 
