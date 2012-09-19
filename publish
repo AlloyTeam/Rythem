@@ -8,7 +8,7 @@ macdeployqt Rythem.app -dmg
 hdiutil convert Rythem.dmg -format UDRW -o Rythem-rw.dmg
 
 # open read-write image
-tmp=`hdiutil attach Rythem-rw.dmg`;
+tmp=`hdiutil attach -readwrite -noverify -noautoopen Rythem-rw.dmg`;
 echo "tmp = $tmp"
 
 # get the opened image's device path and file path
@@ -28,13 +28,16 @@ echo $targetDir
 
 # save current directory and jump to opened image file path
 tmpDir=`pwd`
-cd "$targetDir"
+
+# make background
+# todo http://stackoverflow.com/questions/96882/how-do-i-create-a-nice-looking-dmg-for-mac-os-x-using-command-line-tools
 
 # link /Applications to the image
 ln -s /Applications Applications
-
 # make introduce file
 cp $2/readme.md ./
+# make icon
+cp $2/Rythem2.icns ./.VolumeIcon.icns
 
 # back
 cd $tmpDir

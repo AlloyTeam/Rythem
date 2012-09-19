@@ -379,7 +379,16 @@ MainWindow::MainWindow(QWidget *parent) :
     timer.singleShot(1000,this,SLOT(checkNewVersion()));
     //checkNewVersion();
 
-    //ProxyAutoConfig::instance()->setConfigByUrl("http://txp-01.tencent.com/lvsproxy.pac");
+#ifdef Q_OS_MAC
+    if(appPath.startsWith("/Volumes")){
+        ui->ActionCapture->setEnabled(false);
+        ui->ActionCapture->setToolTip("to ENABLE this.Pls move Rythem to /Applications directory");
+        QMessageBox::information(this,
+                                 tr("-"),
+                                 tr("Please drag to Applications dir first \n\n otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)"),
+                                 QMessageBox::Ok);
+    }
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -395,15 +404,6 @@ void MainWindow::checkNewVersion(){
 
 #ifdef Q_OS_WIN
     //toggleCapture();
-#endif
-#ifdef Q_OS_MAC
-    int n = QSysInfo::MacintoshVersion;
-    if(n >= 10 && appPath.startsWith("/Volumes")){
-        QMessageBox::information(this,
-                                 tr("-"),
-                                 tr("Please drag to Applications dir first \n\n otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)"),
-                                 QMessageBox::Ok);
-    }
 #endif
     checker->check();
 }
