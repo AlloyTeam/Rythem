@@ -5,7 +5,7 @@
 #include <QtNetwork>
 
 #ifdef Q_OS_MAC
-#define CURRENT_VERSION "0.5.09.19"
+#define CURRENT_VERSION "0.5.09.21"
 #endif
 #ifdef Q_OS_WIN
 #define CURRENT_VERSION "0.5.08.28"
