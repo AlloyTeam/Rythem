@@ -653,7 +653,7 @@ void MainWindow::toggleProxy(){
                 CFNumberRef httpEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPEnable);
                 CFNumberRef httpsEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSEnable);
                 int tmp;
-                if (CFNumberGetValue(httpEnabled, kCFNumberIntType, &tmp) && tmp){
+                if (httpEnabled && CFNumberGetValue(httpEnabled, kCFNumberIntType, &tmp) && tmp){
                     CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPProxy);
                     CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPPort);
                     QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
@@ -663,7 +663,7 @@ void MainWindow::toggleProxy(){
                     //qDebug()<<proxyStr;
                     ProxyAutoConfig::instance()->setHttpProxy(proxyStr);
                 }
-                if (CFNumberGetValue(httpsEnabled, kCFNumberIntType, &tmp) && tmp){
+                if (httpsEnabled && CFNumberGetValue(httpsEnabled, kCFNumberIntType, &tmp) && tmp){
                     CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSProxy);
                     CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSPort);
                     QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
