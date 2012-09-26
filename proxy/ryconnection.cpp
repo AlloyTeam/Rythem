@@ -5,6 +5,9 @@
 #ifdef WIN32
 #include "rywinhttp.h"
 #endif
+#ifdef Q_OS_MAC
+#include "proxy/proxyautoconfig.h"
+#endif
 
 #include "rule/ryrulemanager.h"
 using namespace rule;
@@ -95,7 +98,6 @@ void RyConnection::onRequestReadyRead(){
         _receivingPerformance.requestBegin = QDateTime::currentMSecsSinceEpoch();
     }
     QByteArray newContent = _requestSocket->readAll();
-    //qDebug()<<"requestReadyRead"<<newContent;
     if(_isConnectTunnel){
         // https隧道,直接透传不解析
         // TODO: decrypt https tunnel
@@ -321,6 +323,7 @@ void RyConnection::onRequestPackageFound(){
     _receivingPerformance.requestDone = QDateTime::currentMSecsSinceEpoch();
     if(_receivingPipeData->method == "CONNECT"/* &&
             _receivingPipeData->port != 80*/){// TODO: 80端口一定不是https?
+        qDebug()<<"is connect:"<<QString(_receivingPipeData->requestHeaderRawData());
         _isConnectTunnel = true;
     }
     _requestState = ConnectionStatePackageFound;
@@ -518,9 +521,24 @@ void RyConnection::doRequestToNetwork(){
                 continue;
             }
             _responseSocket->setProxy(p);
-            //qDebug()<<"proxy="<<p.hostName()<<p.port();
         }
- #endif
+#endif
+#ifdef Q_OS_MAC
+        ProxyAutoConfig *pac = ProxyAutoConfig::instance();
+        QString retVal;
+        QMetaObject::invokeMethod(pac, "findProxyForUrl", Qt::DirectConnection,
+                                   Q_RETURN_ARG(QString, retVal),
+                                   Q_ARG(QString, _sendingPipeData->fullUrl),
+                                   Q_ARG(QString, _sendingPipeData->host));
+        QStringList l = retVal.split(" ");
+        if(l.length() > 1){
+            QString hostAndPort = l.at(1);
+            QStringList hAndP = hostAndPort.split(":");
+            qDebug()<<hostAndPort;
+            _responseSocket->setProxy( QNetworkProxy(QNetworkProxy::HttpProxy,hAndP.at(0),hAndP.at(1).toInt()) );
+        }
+        qDebug()<<"proxyis"<<retVal;
+#endif
         /*
         QPair<QString,int> serverAndPort = queryProxy(_sendingPipeData->fullUrl);
         if(serverAndPort.first == RyProxyServer::instance()->serverAddress().toString()
@@ -646,7 +664,13 @@ bool RyConnection::checkRule(RyPipeData_ptr& pipe){
             _connectingHost = rule->replace();
             _sendingPipeData->replacedHost = _connectingHost;
         }else{
-            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl);
+            bool isResouceFound = true;
+            QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl,&isResouceFound);
+            // TODO check settings if go through when local replace match but got 404
+            if(rule->type() == RyRule::LOCAL_DIR_REPLACE && !isResouceFound){
+                return false;
+            }
+
             //qDebug()<<headerAndBody.second;
             //qDebug()<<headerAndBody.first;
             bool isOk;

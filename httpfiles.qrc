@@ -38,4 +38,7 @@
         <file>static/img16.png</file>
         <file>remove.png</file>
     </qresource>
+    <qresource prefix="/web">
+        <file>rythem_pac</file>
+    </qresource>
 </RCC>

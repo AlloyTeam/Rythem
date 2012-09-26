@@ -3,3 +3,7 @@ lupdate $1/Rythem.pro
 lrelease $1/Rythem.pro
 cp -f $1/qt_zh_CN.qm $2/Rythem.app/Contents/MacOS/
 cp -f $1/rythem_zh_CN.qm $2/Rythem.app/Contents/MacOS/
+cp -f $1/setupproxy $2/Rythem.app/Contents/MacOS/
+#cp -f $1/rythem_pac $2/Rythem.app/Contents/MacOS/
+rm -f $2/Rythem.app/Contents/MacOS/proxysetting
+g++ $1/proxysetting.c  -framework Security   -o $2/Rythem.app/Contents/MacOS/proxysetting

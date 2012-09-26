@@ -1,0 +1,3 @@
+#! /bin/sh -e
+curl $1 > rythem_new
+mv -f rythem_new /Applications/Rythem.app/Contents/MacOS/Rythem

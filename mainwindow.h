@@ -86,6 +86,7 @@ private:
     QItemSelectionModel *_itemSelectModel;
 
     RyUpdateChecker *checker;
+    bool isFirstTimeToggle;
 
     QMutex proxyMutex;
 protected:

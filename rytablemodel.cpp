@@ -17,7 +17,7 @@ int RyTableModel::rowCount( const QModelIndex & ) const{
     return pipesVector.count();
 }
 int RyTableModel::columnCount(const QModelIndex &) const{
-    return 10;
+    return 11;
 }
 
 QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
@@ -63,6 +63,8 @@ QString rypipeDataGetDataByColumn(RyPipeData_ptr p, int column){
             qDebug()<<QString::number(p->performances.responseDone)<<QString::number(p->performances.requestBegin);
             return QString::number(p->performances.responseDone - p->performances.requestBegin);
         */
+        case 10:
+            return QString::number(p->performances.requestBegin);
         default:
             return QString("-");
     }
@@ -112,7 +114,7 @@ QVariant RyTableModel::headerData(int section, Qt::Orientation orientation, int 
 
     //TODO
     QStringList headers;
-    headers<<"#"<<"#2(socket)"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching"<<"all time";
+    headers<<"#"<<"#2(socket)"<<"Result"<<"Protocol"<<"Host"<<"ServerIP"<<"URL"<<"Body"<<"Caching"<<"all time"<<"begin time";
 
     if (orientation == Qt::Horizontal) {
         if(section< headers.size() ){

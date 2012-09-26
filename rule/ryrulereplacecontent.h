@@ -12,16 +12,16 @@ class RyRuleReplaceContent{
 public:
     RyRuleReplaceContent(QSharedPointer<RyRule> rule, const QString& url="");
     ~RyRuleReplaceContent();
-    QPair<QByteArray,QByteArray> getReplaceContent(const QString& url,bool setLongCache=false);
-    QPair<QByteArray,QByteArray> getReplaceContent(bool setLongCache=false);
+    QPair<QByteArray,QByteArray> getReplaceContent(const QString& url,bool setLongCache=false,bool *isResouceFound=0);
+    QPair<QByteArray,QByteArray> getReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
     void setUrl(const QString&);
     void setRule(QSharedPointer<RyRule>);
 private:
 
-    QPair<QByteArray,QByteArray> getRemoteReplaceContent(bool setLongCache=false);
-    QPair<QByteArray,QByteArray> getLocalReplaceContent(bool setLongCache=false);
-    QPair<QByteArray,QByteArray> getLocalMergeReplaceContent(bool setLongCache=false);
-    QPair<QByteArray,QByteArray> getLocalDirReplaceContent(bool setLongCache=false);
+    QPair<QByteArray,QByteArray> getRemoteReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
+    QPair<QByteArray,QByteArray> getLocalReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
+    QPair<QByteArray,QByteArray> getLocalMergeReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
+    QPair<QByteArray,QByteArray> getLocalDirReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
 
     QNetworkAccessManager manager;
     QString _url;

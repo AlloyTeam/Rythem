@@ -15,7 +15,7 @@ void RyUpdateChecker::check(QString url, QString currentVersion){
     _isChecking = true;
     this->_currentVersion  = currentVersion;
     connect(&manager,SIGNAL(finished(QNetworkReply*)),SLOT(finished(QNetworkReply*)));
-    manager.get(QNetworkRequest(QUrl(url)));
+    manager.get(QNetworkRequest(QUrl(url.append("=")+currentVersion)));
 }
 
 bool RyUpdateChecker::isLargeThanCurrent(const QString &otherVersion,bool* isOk){
