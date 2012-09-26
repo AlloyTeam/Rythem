@@ -65,7 +65,7 @@ public:
     //由于可能同时命中host及远程替换两种rule，此处需返回List
     QList<QSharedPointer<RyRule> > getMatchRules(const QString& url);
     //返回header body
-    QPair<QByteArray,QByteArray> getReplaceContent(QSharedPointer<RyRule> rule,const QString& url="");
+    QPair<QByteArray,QByteArray> getReplaceContent(QSharedPointer<RyRule> rule,const QString& url="",bool *isResouceFound=0);
     QString toJson(bool format=false)const;
 
     // for Q+ offline-app

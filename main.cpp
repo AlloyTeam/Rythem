@@ -18,12 +18,20 @@
 #include <QTranslator>
 #include "singleapplication.h"
 
+#ifdef Q_OS_MAC
+#include "proxy/proxyautoconfig.h"
+#endif
+
+#include <QtNetwork>
+QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query);
+
 using namespace rule;
 
 QString version = "0.1.0";
 QString appPath = "";
 void myMessageHandler(QtMsgType type, const char *msg)
 {
+
     QString fileName = appPath+QString("/log-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()/(1000*60*60*24));
     QFile outFile;
     outFile.setFileName(fileName);
@@ -59,6 +67,9 @@ int main(int argc, char *argv[])
 
     }
 
+
+
+    ProxyAutoConfig::instance();
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 

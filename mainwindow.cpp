@@ -10,6 +10,7 @@
 #include "proxy/rywinhttp.h"
 #endif
 #ifdef Q_WS_MAC
+#include "proxy/proxyautoconfig.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
@@ -165,29 +166,75 @@ QString getServiceName(){
     }
     return regNetworkservice.cap(1);
 }
-bool setProxyState(bool enable){
-    QProcess process;
-    QString service = getServiceName();
-    process.start(QString("networksetup -setwebproxystate %1 %2").arg(service).arg(enable?QString("on"):QString("off")));
-    process.waitForFinished();
-    process.close();
-    return true;
-}
 
-bool setProxyForService(const QString& host, const int port){
-    QProcess process;
-    // get current primary interface
+
+bool execScript(const QString &script){
     QString service = getServiceName();
-    process.start(QString("networksetup -setwebproxy %1 %2 %3").arg(service).arg(host).arg(port));
+    QProcess process;
+    qDebug()<<"script"<<script.arg(service);
+    QStringList args = script.arg(service).split(" ");
+    process.start(script.arg(service));
     QEventLoop eventLoop;
     eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
     eventLoop.exec();
-    QString output = process.readAllStandardOutput();
-    if(output.isEmpty()){
-        return true;
-    }
-    return false;
+
+    qDebug()<<"output:\n"<<QString(process.readAllStandardOutput())<<QString(process.readAllStandardError());
+    return process.exitCode() == 0;
 }
+
+bool setProxyState(bool enable){
+    return execScript(QString("./setupproxy setHttpAndHttpsProxyState %1 %2").arg("%1",(enable?"on":"off")));
+}
+
+bool setAutoProxyUrl(const QString& url){
+    return execScript(QString("./setupproxy setAutoProxyUrl %1 %2").arg("%1",url));
+}
+
+bool setProxyForService(const QString& host, const int port){
+    return execScript(QString("./setupproxy setHttpAndHttpsProxy %1 %2 %3").arg(QString("%1"),host,QString::number(port)));
+}
+bool disableAutoProxyAndSetProxyForService(const QString& host, const int port){
+    bool a = execScript(QString("./setupproxy setAutoProxyState %1 off"));
+    return a & setProxyForService(host,port);
+}
+
+
+bool execProxysetting(const QString &pacUrl=QString()){
+    QProcess process;
+    QString service = getServiceName();
+    QString script = "proxysetting";
+    if(pacUrl.isEmpty()){
+        script = QString(appPath+"/proxysetting --disablepac %1").arg(service);
+    }else{
+        script = QString(appPath+"/proxysetting --setpac %1 %2").arg(service,pacUrl);
+    }
+    qDebug()<<script;
+    process.start(script);
+    QEventLoop eventLoop;
+    eventLoop.connect(&process,SIGNAL(error(QProcess::ProcessError)),&eventLoop,SLOT(quit()));
+    eventLoop.connect(&process,SIGNAL(finished(int)),&eventLoop,SLOT(quit()));
+    eventLoop.exec();
+
+    qDebug()<<"output:\n"<<QString(process.readAllStandardOutput())<<QString(process.readAllStandardError())
+           <<QString("\nretcode:%1\n").arg(process.exitCode());
+    return process.exitCode() == 0;
+}
+
+bool setPAC(const QString& url){
+    return execProxysetting(url);
+    //return execScript(QString("networksetup -setautoproxyurl %1 %2").arg("%1",url));
+}
+bool setMyPAC(){
+    return setPAC("http://127.0.0.1:8889/rythem_pac");
+    //return setPAC(QString("file://local%1/rythem_pac").arg(appPath));
+}
+
+bool disableMyPac(){
+    return execProxysetting();
+    //return execScript(QString("networksetup -setautoproxystate %1 off"));
+}
+
+
 #endif
 // RyJsBridge
 RyJsBridge::RyJsBridge(){
@@ -268,7 +315,8 @@ QString RyJsBridge::getConfigs(){
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _isUsingCapture(false)
+    _isUsingCapture(false),
+    isFirstTimeToggle(true)
 
 #ifdef Q_OS_WIN
     ,proxySetting("\\HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\",QSettings::NativeFormat)
@@ -331,6 +379,16 @@ MainWindow::MainWindow(QWidget *parent) :
     timer.singleShot(1000,this,SLOT(checkNewVersion()));
     //checkNewVersion();
 
+#ifdef Q_OS_MAC
+    if(appPath.startsWith("/Volumes")){
+        ui->ActionCapture->setEnabled(false);
+        ui->ActionCapture->setToolTip("to ENABLE this.Pls move Rythem to /Applications directory");
+        QMessageBox::information(this,
+                                 tr("-"),
+                                 tr("Please drag to Applications dir first \n\n otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)"),
+                                 QMessageBox::Ok);
+    }
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -345,16 +403,7 @@ MainWindow::~MainWindow()
 void MainWindow::checkNewVersion(){
 
 #ifdef Q_OS_WIN
-    toggleCapture();
-#endif
-#ifdef Q_OS_MAC
-    int n = QSysInfo::MacintoshVersion;
-    if(n >= 10 && !appPath.startsWith("/Applications/Rythem.app")){
-        QMessageBox::information(this,
-                                 tr("-"),
-                                 tr("Please drag to Applications dir first \n\n otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)"),
-                                 QMessageBox::Ok);
-    }
+    //toggleCapture();
 #endif
     checker->check();
 }
@@ -564,16 +613,76 @@ void MainWindow::onWaterfallActionTriggered(){
     }
 }
 
-
 void MainWindow::toggleProxy(){
     QMutexLocker locker(&proxyMutex);
 #ifdef Q_WS_MAC
-
+    bool setProxySuccess = false;
     if(_isUsingCapture){
-        setProxyState(false);
+        if(_previousProxyInfo.isUsingPac == "1"){
+            setProxySuccess = setPAC(_previousProxyInfo.pacUrl);
+        }else{
+            setProxySuccess = disableMyPac();
+        }
     }else{
-        setProxyForService(QString("127.0.0.1"),8889);
+        if(isFirstTimeToggle){
+            isFirstTimeToggle = false;
+            CFDictionaryRef proxies = SCDynamicStoreCopyProxies(NULL);
+            //CFShow(proxies);
+            int isPacEnabled = 0;
+            //CFStringRef CFPacUrl = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigURLString);
+            //if(CFPacUrl){
+            //    _previousProxyInfo.pacUrl = QString::fromUtf8( CFStringGetCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
+            //}
+            if (proxies){
+                CFNumberRef pacEnabled;
+                //kSCPropNetProxiesHTTPSProxy
+                if ((pacEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigEnable))){
+                    if (CFNumberGetValue(pacEnabled, kCFNumberIntType, &pacEnabled) && pacEnabled){
+                        isPacEnabled = 1;
+                        _previousProxyInfo.isUsingPac = QString("1");
+                        CFStringRef CFPacUrl = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigURLString);
+                        _previousProxyInfo.pacUrl = QString::fromUtf8( CFStringGetCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
+                    }
+                }
+            }
+            //qDebug()<<QString("pacEnabeld %1").arg(isPacEnabled);
+            if(isPacEnabled){
+                qDebug()<<_previousProxyInfo.pacUrl;
+                ProxyAutoConfig::instance()->setConfigByUrl(_previousProxyInfo.pacUrl);
+            }else{
+                CFNumberRef httpEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPEnable);
+                CFNumberRef httpsEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSEnable);
+                int tmp;
+                if (httpEnabled && CFNumberGetValue(httpEnabled, kCFNumberIntType, &tmp) && tmp){
+                    CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPProxy);
+                    CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPPort);
+                    QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
+                    UInt64 portQ=20;
+                    CFNumberGetValue(port, kCFNumberSInt64Type, &portQ);
+                    QString proxyStr = QString("Proxy %1:%2").arg(hostQ).arg(portQ);
+                    //qDebug()<<proxyStr;
+                    ProxyAutoConfig::instance()->setHttpProxy(proxyStr);
+                }
+                if (httpsEnabled && CFNumberGetValue(httpsEnabled, kCFNumberIntType, &tmp) && tmp){
+                    CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSProxy);
+                    CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSPort);
+                    QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
+                    UInt64 portQ=20;
+                    CFNumberGetValue(port, kCFNumberSInt64Type, &portQ);
+                    QString proxyStr = QString("Proxy %1:%2").arg(hostQ).arg(portQ);
+                    ProxyAutoConfig::instance()->setHttpProxy(proxyStr);
+                }
+
+            }
+            CFRelease(proxies);
+        }
+        setProxySuccess = setMyPAC();
     }
+
+    if(!setProxySuccess){// hack..
+        _isUsingCapture = !_isUsingCapture;
+    }
+
 #endif
 
 #ifdef Q_WS_WIN32
@@ -614,7 +723,9 @@ void MainWindow::toggleProxy(){
 }
 
 void MainWindow::toggleCapture(){
+    ui->ActionCapture->setEnabled(false);
     toggleProxy();
+    ui->ActionCapture->setEnabled(true);
 }
 
 

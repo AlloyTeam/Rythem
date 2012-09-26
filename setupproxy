@@ -1,0 +1,78 @@
+#! /bin/bash -e
+# usage
+#  setupproxy [serviceName] [cmd] <other arguments>
+#      cmd:
+#           setHttpAndHttpsProxy
+#           setHttpProxy
+#           setHttpsProxy
+#           setHttpAndHttpsProxyState
+#           setHttpProxyState
+# 
+#
+function setHttpProxy(){
+	sudo networksetup -setwebproxy $1 $2 $3
+}
+function setHttpsProxy(){
+	sudo networksetup -setsecurewebproxy $1 $2 $3
+}
+function setHttpAndHttpsProxy(){
+	setHttpProxy $1 $2 $3
+	setHttpsProxy $1 $2 $3
+}
+
+function setHttpProxyState(){
+	sudo networksetup -setwebproxystate $1 $2
+}
+function setHttpsProxyState(){
+	sudo networksetup -setsecurewebproxystate $1 $2
+}
+function setHttpAndHttpsProxyState(){
+	setHttpProxyState $1 $2 $3
+	setHttpsProxyState $1 $2 $3
+}
+
+function setAutoProxyState(){
+	sudo networksetup -setautoproxystate $1 $2
+}
+function setAutoProxyUrl(){
+	sudo networksetup -setautoproxyurl $1 $2
+}
+
+function onlyATest(){
+	tmp=`networksetup -getwebproxy Wi-Fi | grep "Enabled.*\([YesNo]\)$"`
+	#echo "after"
+	#echo $tmp
+	enable="on"
+	if test "$tmp" = "Enabled: No";
+	then
+		enable="off"
+	fi
+	#echo $enable
+	sudo networksetup -setautoproxystate $1 $enable
+	if test $? -gt 0; then
+		#echo $?
+		#cause pwd prompt
+		networksetup -setautoproxystate $1 $enable
+	fi
+}
+if [ "$#" -lt "2" ] 
+then
+	echo "arguments need more"
+	exit 1
+else
+        cmd=$1
+        shift 1;
+	declare -F ${cmd} > /dev/null
+
+	if test $? -eq 0
+	then
+        onlyATest $*
+		${cmd} $*
+		exit $?
+	else
+		echo "no such function ${cmd}"
+		exit 1
+	fi
+    exit 0
+fi
+

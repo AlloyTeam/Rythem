@@ -4,11 +4,18 @@
  
 By [AlloyTeam](http://www.AlloyTeam.com/)
 
-使用介绍：http://www.alloyteam.com/2012/05/web-front-end-tool-rythem-1/
+使用介绍：[a](http://www.alloyteam.com/2012/05/web-front-end-tool-rythem-1/)
 
 代码阅读建议：https://github.com/AlloyTeam/Rythem/wiki
 
 <strong>代码在Qt4.7.4 & Qt4.8上运行通过，低于4.7的版本有可能会出问题</strong>
+
+MAC下开发需增加Build Steps
+<pre>
+command deploy.txt
+working directory: %{buildDir}
+Command arguments: %{sourceDir} %{buildDir}
+</pre>
 
 ### 功能
  
@@ -35,7 +42,6 @@ By [AlloyTeam](http://www.AlloyTeam.com/)
 
 * 规则管理(远程规则的更新机制）
 * 各OS/浏览器版本下稳定性测试
-* MacOS下自动设置代理
 
 
 ### 主要代码结构

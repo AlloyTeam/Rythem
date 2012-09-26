@@ -87,6 +87,9 @@ win32:HEADERS += zlib/zutil.h \
     zlib/deflate.h \
     zlib/crc32.h
 
+mac:HEADERS += proxy/proxyautoconfig.h
+mac:SOURCES += proxy/proxyautoconfig.cpp
+
 win32:HEADERS  += proxy/rywinhttp.h
 
 win32:SOURCES  += proxy/rywinhttp.cpp
@@ -101,6 +104,7 @@ mac:CONFIG += app_bundle
 
 win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation -lz
+#mac:LIBS += -lz
 
 RESOURCES += \
     httpfiles.qrc
@@ -146,7 +150,9 @@ OTHER_FILES += \
     rythem_zh_CN.ts \
     rythem_zh_CN.qm \
     deploy.txt \
-    qt_zh_CN.qm
+    qt_zh_CN.qm \
+    setupproxy \
+    publish
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

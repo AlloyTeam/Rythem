@@ -1,0 +1,55 @@
+#!/bin/sh
+# generate dmg pkg
+
+
+macdeployqt Rythem.app -dmg
+
+# convert to read-write image
+hdiutil convert Rythem.dmg -format UDRW -o Rythem-rw.dmg
+
+# open read-write image
+tmp=`hdiutil attach -readwrite -noverify -noautoopen Rythem-rw.dmg`;
+echo "tmp = $tmp"
+
+# get the opened image's device path and file path
+dev=`echo "$tmp" | awk 'END{print $1}'`
+
+# targetDir should be "/Volumne/Rythem 1" or "/Volumn/Rythem"
+# if target Dir is number, it should be "/Volumne/Rythem 1"
+targetDir=`echo "$tmp" | awk 'END{
+                match($NF,/^[0-9]+$/)
+        if( RLENGTH -eq -1 ){
+            print $NF;
+        }else{
+            print $(NF-1),$NF;
+        }
+    }'`
+echo $targetDir
+
+# save current directory and jump to opened image file path
+tmpDir=`pwd`
+
+# make background
+# todo http://stackoverflow.com/questions/96882/how-do-i-create-a-nice-looking-dmg-for-mac-os-x-using-command-line-tools
+
+cd "$targetDir"
+# make introduce file
+cp $2/readme.md ./
+
+# link /Applications to the image
+ln -s /Applications Applications
+
+# make icon
+cp $2/Rythem2.icns ./.VolumeIcon.icns
+
+# back
+cd $tmpDir
+hdiutil detach -force $dev
+rm -f Rythem-release.dmg
+hdiutil convert Rythem-rw.dmg -format UDZO -o Rythem-release.dmg
+mv -f Rythem-release.dmg ~/
+rm $1/Rythem-rw.dmg
+rm $1/Rythem.dmg
+# remove
+rm -rf Rythem.app
+
