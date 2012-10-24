@@ -162,8 +162,12 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
     }
 
     //qDebug()<<"host="<<host<<port;
+    _sigToSend.clear();
+    _sigToSendForProxy.clear();
     QString sigsToSend = method+" "+path+" "+httpVersion+"\r\n";
-    _dataToSend.append(sigsToSend);
+    _sigToSend.append(sigsToSend);
+    _sigToSendForProxy.append(method + " " + fullUrl + " " + httpVersion + "\r\n");
+    //_dataToSend.append(sigsToSend);
     parseHeaders(headerLines,&_requestHeaders);
     foreach(QString headerName,_requestHeaders.keys()){
         QString value=_requestHeaders[headerName];
@@ -254,8 +258,13 @@ bool RyPipeData::parseResponseHeader(const QByteArray& headers){
 }
 
 
-const QByteArray& RyPipeData::dataToSend()const{
-    return _dataToSend;
+const QByteArray& RyPipeData::dataToSend(bool sendToProxy)const{
+    if(sendToProxy){
+        return _sigToSendForProxy + _dataToSend;
+    }else{
+        return _sigToSend + _dataToSend;
+    }
+   // return _dataToSend;
 }
 
 bool RyPipeData::appendRequestBody(QByteArray* newData){

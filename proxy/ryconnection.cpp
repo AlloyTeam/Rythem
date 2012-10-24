@@ -204,7 +204,7 @@ void RyConnection::onResponseConnected(){
         return;
     }else{
         //qDebug()<<"to write:\n"<<_sendingPipeData->dataToSend();
-        _responseSocket->write(_sendingPipeData->dataToSend());
+        _responseSocket->write(_sendingPipeData->dataToSend(_isUsingProxy));
         _responseSocket->flush();
     }
 }
@@ -493,20 +493,17 @@ void RyConnection::doRequestToNetwork(){
     if(!_responseSocket ||
         _connectingHost.toLower() != oldHost ||
         _connectingPort != oldPort){
-
+        _isUsingProxy = false;
         getNewResponseSocket(_sendingPipeData);
     }else{
         //qDebug()<<"reuse old socket";
     }
 
-
+    bool needReconnect = true;
+    QNetworkProxy currentProxy;
     QAbstractSocket::SocketState responseState = _responseSocket->state();
     if(responseState == QAbstractSocket::UnconnectedState
             || responseState == QAbstractSocket::ClosingState){
-        //qDebug()<<"responseSocket is not open"
-        //        <<"connect to "<<host<<port
-        //        <<responseState
-        //        <<_responseSocket->readAll();
         _responseState = ConnectionStateConnecting;
 
 
@@ -520,7 +517,13 @@ void RyConnection::doRequestToNetwork(){
                 qWarning()<<"warining: proxy is your self!";
                 continue;
             }
-            _responseSocket->setProxy(p);
+            if(_isConnectTunnel){
+                _responseSocket->setProxy(p);
+            }else{
+                currentProxy.setHostName(p.hostName());
+                currentProxy.setPort(p.port());
+                _isUsingProxy = true;
+            }
         }
 #endif
 #ifdef Q_OS_MAC
@@ -535,27 +538,21 @@ void RyConnection::doRequestToNetwork(){
             QString hostAndPort = l.at(1);
             QStringList hAndP = hostAndPort.split(":");
             qDebug()<<hostAndPort;
-            _responseSocket->setProxy( QNetworkProxy(QNetworkProxy::HttpProxy,hAndP.at(0),hAndP.at(1).toInt()) );
+
+            if(_isConnectTunnel){
+                _responseSocket->setProxy( QNetworkProxy(QNetworkProxy::HttpProxy,hAndP.at(0),hAndP.at(1).toInt()) );
+            }else{
+                currentProxy.setHostName(hAndP.at(0));
+                currentProxy.setPort(hAndP.at(1).toInt());
+                _isUsingProxy = true;
+            }
         }
         qDebug()<<"proxyis"<<retVal;
 #endif
-        /*
-        QPair<QString,int> serverAndPort = queryProxy(_sendingPipeData->fullUrl);
-        if(serverAndPort.first == RyProxyServer::instance()->serverAddress().toString()
-                && serverAndPort.second == RyProxyServer::instance()->serverPort()){
-            qWarning()<<"warining: proxy is your self!";
-        }else{
-            if(!serverAndPort.first.isEmpty()){
-                _responseSocket->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy,serverAndPort.first,serverAndPort.second));
-            }
-        }
-        */
-        //qDebug()<<"connecting to "<<_connectingHost;
-        connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
-        _responseSocket->connectToHost(_connectingHost,_connectingPort);
     }else{
         //qDebug()<<"state = "<<_responseSocket->state();
         if(responseState == QAbstractSocket::ConnectedState){
+            needReconnect = false;
             onResponseConnected();
         }else{
             //qDebug()<<"responseSocket not open yet"<<responseState;
@@ -563,7 +560,13 @@ void RyConnection::doRequestToNetwork(){
             _responseSocket->disconnectFromHost();
             _responseSocket->abort();
             _responseSocket->blockSignals(false);
-            connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+        }
+    }
+    if(needReconnect){
+        connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
+        if(!_isConnectTunnel && _isUsingProxy){
+            _responseSocket->connectToHost(currentProxy.hostName(),currentProxy.port());
+        }else{
             _responseSocket->connectToHost(_connectingHost,_connectingPort);
         }
     }

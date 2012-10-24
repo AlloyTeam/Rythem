@@ -66,6 +66,7 @@ class RyConnection:public QObject{
 
         int _handle;
         bool closed;
+        bool _isUsingProxy;
 
         QString _connectingHost;
         quint16 _connectingPort;
