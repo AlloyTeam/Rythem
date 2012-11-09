@@ -101,8 +101,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>63</width>
-                   <height>32</height>
+                   <width>523</width>
+                   <height>164</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -166,7 +166,7 @@ background:#dddfe2;
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -187,6 +187,7 @@ background:#dddfe2;
    <addaction name="actionWaterfall"/>
    <addaction name="actionRemoveAll"/>
    <addaction name="actionLongCache"/>
+   <addaction name="actionLiveLoad"/>
    <addaction name="separator"/>
    <addaction name="actionDebug"/>
    <addaction name="actionCheckNew"/>
@@ -282,6 +283,24 @@ background:#dddfe2;
    </property>
    <property name="visible">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionLiveLoad">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="httpfiles.qrc">
+     <normaloff>:/static/img6.png</normaloff>:/static/img6.png</iconset>
+   </property>
+   <property name="text">
+    <string>liveLoad</string>
+   </property>
+   <property name="toolTip">
+    <string>toggle live load</string>
    </property>
   </action>
  </widget>
