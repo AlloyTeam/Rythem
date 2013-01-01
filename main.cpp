@@ -22,6 +22,10 @@
 #include "proxy/proxyautoconfig.h"
 #endif
 
+#ifdef Q_OS_LINUX
+#include "proxy/proxyautoconfig.h"
+#endif
+
 #include <QtNetwork>
 QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query);
 
@@ -69,7 +73,7 @@ int main(int argc, char *argv[])
 
 
 
-    ProxyAutoConfig::instance();
+    //ProxyAutoConfig::instance();
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
