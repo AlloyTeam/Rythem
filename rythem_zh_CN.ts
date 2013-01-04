@@ -171,7 +171,7 @@ Host: www.alloyteam.com
     <message>
         <location filename="mainwindow.cpp" line="413"/>
         <source>&amp;import session...</source>
-        <translation type="unfinished">导入会放(&amp;i)...</translation>
+        <translation type="unfinished">导入回放(&amp;i)...</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="414"/>

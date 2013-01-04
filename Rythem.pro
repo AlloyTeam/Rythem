@@ -75,6 +75,7 @@ HEADERS  += mainwindow.h \
     widget/rytabwidget.h \
     singleapplication.h \
     ryupdatechecker.h
+
 win32:HEADERS += zlib/zutil.h \
     zlib/zlib.h \
     zlib/zconf.h \
@@ -91,8 +92,10 @@ mac:HEADERS += proxy/proxyautoconfig.h
 mac:SOURCES += proxy/proxyautoconfig.cpp
 
 win32:HEADERS  += proxy/rywinhttp.h
-
 win32:SOURCES  += proxy/rywinhttp.cpp
+
+unix:HEADERS += proxy/proxyautoconfig.h
+unix:SOURCES += proxy/proxyautoconfig.cpp
 
 FORMS    += mainwindow.ui \
     composer.ui \
@@ -104,7 +107,7 @@ mac:CONFIG += app_bundle
 
 win32:LIBS += D:\QtSDK\mingw\lib\libwininet.a
 mac:LIBS += -framework SystemConfiguration -framework coreFoundation -lz
-#mac:LIBS += -lz
+unix:LIBS += -lz
 
 RESOURCES += \
     httpfiles.qrc
