@@ -3,7 +3,7 @@
 
 
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 #include <QtNetwork>
 #include <QtWebKit>
 #include "rytablemodel.h"

@@ -3,13 +3,13 @@
 #include "waterfallwindow.h"
 
 
-#ifdef Q_WS_WIN32
+#ifdef Q_OS_WIN32
 #include "WinInet.h"
 #include "winnetwk.h"
 #include "windows.h"
 #include "proxy/rywinhttp.h"
 #endif
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 #include "proxy/proxyautoconfig.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <SystemConfiguration/SystemConfiguration.h>
@@ -27,6 +27,7 @@
 #include <quazip/quazipfile.h>
 #include "rytablesortfilterproxymodel.h"
 #include "ryupdatechecker.h"
+#include <QWebFrame>
 
 extern QString version;
 extern QString appPath;
@@ -392,7 +393,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _jsBridge = new RyJsBridge();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     addJsObject();
-    connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
+    connect(ui->webView->page()->mainFrame(),&QWebFrame::javaScriptWindowObjectCleared,this,&MainWindow::addJsObject);
     //修复proxy服务器过完启动导致配置页面空白的问题 延迟一秒加载
     QTimer::singleShot(1000, this, SLOT(loadConfigPage()));
 
@@ -617,15 +618,13 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
 
 
     // show in textview
-    QTextCodec* oldCodec = QTextCodec::codecForCStrings();
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
+    //TODO for gbk
     ui->responseTextEdit->setPlainText(QString((
                                               data->responseHeaderRawData()
                                             +"\r\n\r\n"
                                             + decrypedData
                                            ).data())
                                        );
-    QTextCodec::setCodecForCStrings(oldCodec);
 
 
 

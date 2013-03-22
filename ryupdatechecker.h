@@ -26,13 +26,13 @@ signals:
     void updateError(QNetworkReply::NetworkError err);
 
 public slots:
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     void check(QString url=RYTHEM_UPDATE_URL(mac),QString currentVersion=CURRENT_VERSION);
 #endif
-#ifdef Q_WS_WIN32
+#ifdef Q_OS_WIN32
     void check(QString url=RYTHEM_UPDATE_URL(windows),QString currentVersion=CURRENT_VERSION);
 #endif
-#ifdef Q_WS_X11
+#ifdef Q_OS_X11
     void check(QString url=RYTHEM_UPDATE_URL(x11),QString currentVersion=CURRENT_VERSION);
 #endif
 

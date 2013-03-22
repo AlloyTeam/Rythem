@@ -87,10 +87,8 @@ bool RyRuleProject::addRemoteRuleGroups(){
     manager.connect(&manager,SIGNAL(finished(QNetworkReply*)),_loop,SLOT(quit()));
     reply = manager.get(QNetworkRequest(QUrl(_remoteAddress)));
     _loop->exec();
-    QTextCodec* oldCodec = QTextCodec::codecForCStrings();
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf-8"));
+    // TODO gbk
     QString content = reply->readAll();
-     QTextCodec::setCodecForCStrings(oldCodec);
     _jsonCache = content;
     qDebug()<<"remote content:"<<content;
     return addRuleGroups(content);

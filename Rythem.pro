@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network script webkit
+QT       += core gui network script webkit widgets webkitwidgets
 
 
 TARGET = Rythem

@@ -1,5 +1,5 @@
-#include <QtGui/QApplication>
-#include <QtGui/QStatusBar>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStatusBar>
 #include "mainwindow.h"
 #include <QDebug>
 
@@ -74,8 +74,6 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
-
     // load app translate file
     QTranslator translator;
     bool isLoadSuccess = translator.load(appPath+"/rythem_zh_CN");
@@ -98,9 +96,7 @@ int main(int argc, char *argv[])
     // register metatypes
     qRegisterMetaType<RyPipeData_ptr>("RyPipeData_ptr");
 
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
-    //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
-    //QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
+
 
     MainWindow w;
     //a.connect(&a,SIGNAL(messageAvailable(QString)),&w,SLOT(raise()));
