@@ -1,6 +1,0 @@
-#!/bin/sh
-cp rythem_zh_CN.qm ../Rythem-build-desktop-Qt_4_8_0__ippan____/Rythem.app/Contents/MacOS/
-cd ../Rythem-build-desktop-Qt_4_8_0__ippan____/
-macdeployqt Rythem.app -dmg
-mv Rythem.dmg ~/
-
