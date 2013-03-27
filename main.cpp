@@ -73,12 +73,11 @@ int main(int argc, char *argv[])
 
 
 #ifndef Q_OS_LINUX
-    ProxyAutoConfig::instance();
-#endif
-
 #ifdef Q_OS_MAC
     ProxyAutoConfig::instance();
 #endif
+#endif
+
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
