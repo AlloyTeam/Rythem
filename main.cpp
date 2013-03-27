@@ -108,7 +108,11 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(pipeBegin(RyPipeData_ptr)),&w,SLOT(onNewPipe(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
-    server->listen(QHostAddress("127.0.0.1"),8889);
+    bool isListenSuccess = server->listen(QHostAddress("127.0.0.1"),8889);
+    if(!isListenSuccess){
+        return 0;
+    }
+    qDebug()<<"listen success";
 
     //w.showMaximized();
     w.show();

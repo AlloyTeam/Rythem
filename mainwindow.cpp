@@ -415,14 +415,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
     connect(ui->actionRemoveAll,SIGNAL(triggered()),this,SLOT(onActionRemoveAll()));
     connect(ui->actionWaterfall, SIGNAL(triggered()), this, SLOT(onWaterfallActionTriggered()));
-/*
-#ifdef Q_WS_MAC
-    // TODO: mac下需手动设置代理
-    ui->ActionCapture->setEnabled(false);
-    ui->ActionCapture->setText(tr("SetupProxyManually"));
-    ui->ActionCapture->setToolTip(tr("non-windows OS need to set proxy to:127.0.0.1:8889 manually"));
-#endif
-*/
+
     checker = new RyUpdateChecker(this);
     QTimer timer;
     timer.singleShot(1000,this,SLOT(checkNewVersion()));
@@ -662,7 +655,7 @@ void MainWindow::onWaterfallActionTriggered(){
 
 void MainWindow::toggleProxy(){
     QMutexLocker locker(&proxyMutex);
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     bool setProxySuccess = false;
     if(_isUsingCapture){
         if(_previousProxyInfo.isUsingPac == "1"){
