@@ -66,7 +66,6 @@ void RyUpdateChecker::finished(QNetworkReply *reply){
     }
 
     QByteArray updateUrlba = reply->readLine();
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf-8"));
     QByteArray updateLogba = reply->readAll();
     qDebug()<<updateUrlba<<updateUrlba<<versionBa;
 

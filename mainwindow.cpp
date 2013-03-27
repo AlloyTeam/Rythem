@@ -3,17 +3,18 @@
 #include "waterfallwindow.h"
 
 
-#ifdef Q_WS_WIN32
+#ifdef Q_OS_WIN32
 #include "WinInet.h"
 #include "winnetwk.h"
 #include "windows.h"
 #include "proxy/rywinhttp.h"
 #endif
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 #include "proxy/proxyautoconfig.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
+#include <SystemConfiguration/SCNetworkConfiguration.h>
 #endif
 
 #ifdef Q_OS_WIN
@@ -26,6 +27,7 @@
 #include <quazip/quazipfile.h>
 #include "rytablesortfilterproxymodel.h"
 #include "ryupdatechecker.h"
+#include <QWebFrame>
 
 extern QString version;
 extern QString appPath;
@@ -135,36 +137,83 @@ bool setProxy(const QSettings& proxySetting){
 #ifdef Q_OS_MAC
 
 QString getServiceName(){
-    QProcess process;
-    // get current primary interface
-    process.start("scutil");
-    process.waitForStarted();
-    process.write("show State:/Network/Global/IPv4\nquit\n");
-    process.waitForFinished();
-    QByteArray ba = process.readAllStandardOutput();
-    QString output = ba;
+    // get primary serverId
+    char *serviceName = NULL;
+    CFStringRef primaryServiceId=NULL;
+    SCDynamicStoreRef dynamicStoreDomainState = SCDynamicStoreCreate(NULL,
+                                                                     CFSTR("myApplicationName"),
+                                                                     NULL,
+                                                                     NULL);
+    // get primary interface
 
-    QString key = "PrimaryInterface : ";
-    int i = output.indexOf(key,0);
-    int j = output.indexOf('\n',i);
-    if(i == -1 || j == -1){
+
+    if (dynamicStoreDomainState) {
+        long n = (long)CFStringGetLength(kSCDynamicStoreDomainState);
+        n += CFStringGetLength(kSCCompNetwork);
+        n += CFStringGetLength(kSCCompGlobal);
+        n += CFStringGetLength(kSCEntNetIPv4);
+        n += 3;// for three '/'
+        char *netIp4KeyStr = (char*)malloc(sizeof(char)*(n+1));
+        sprintf(netIp4KeyStr, "%s/%s/%s/%s",
+                CFStringGetCStringPtr(kSCDynamicStoreDomainState, kCFStringEncodingUTF8),
+                CFStringGetCStringPtr(kSCCompNetwork, kCFStringEncodingUTF8),
+                CFStringGetCStringPtr(kSCCompGlobal, kCFStringEncodingUTF8),
+                CFStringGetCStringPtr(kSCEntNetIPv4, kCFStringEncodingUTF8));
+
+        CFStringRef netIpv4KeyCFStr = CFStringCreateWithCString(NULL, netIp4KeyStr, kCFStringEncodingUTF8);
+        CFPropertyListRef netIpv4List =SCDynamicStoreCopyValue(dynamicStoreDomainState, netIpv4KeyCFStr);
+        if (netIpv4List) {
+            primaryServiceId = (CFStringRef)CFDictionaryGetValue((CFDictionaryRef)netIpv4List, kSCDynamicStorePropNetPrimaryService);
+        }
+        if(primaryServiceId){
+            CFRetain(primaryServiceId);
+        }
+        CFRelease(netIpv4List);
+        CFRelease(netIpv4KeyCFStr);
+        free(netIp4KeyStr);
+    }
+    if(!primaryServiceId){
         return QString();
     }
-    QString interface = output.mid(i+key.length(),j - i - key.length());
+    CFShow(primaryServiceId);
+    // Preferences.plist
+    SCPreferencesRef prefs = SCPreferencesCreate(NULL, CFSTR("SystemConfiguration"), NULL);
+    CFArrayRef services = (CFArrayRef)SCNetworkServiceCopyAll(prefs);
+    for(CFIndex i=CFArrayGetCount(services)-1;i>=0;--i){
 
-    // get service name
-    process.start("networksetup -listnetworkserviceorder");
-    process.waitForFinished();
-    QByteArray ba2 = process.readAllStandardOutput();
-    QString output2 = ba2;
+        SCNetworkServiceRef service = (SCNetworkServiceRef)CFArrayGetValueAtIndex(services,i);
+        CFTypeID typeID = SCNetworkServiceGetTypeID();
+        unsigned long tmp = (unsigned long)typeID;
+        qDebug()<<QString("%1").arg((unsigned long)SCNetworkReachabilityGetTypeID());
 
-    QRegExp regNetworkservice(QString("\\(\\d+\\) ([^\\n]*)\\n\\(Hardware Port: ([^,]*), Device: %1\\)").arg(interface));
-    int got = regNetworkservice.indexIn(output2);
-    if(got == -1){
-        qDebug()<<"not found";
+
+        CFStringRef serviceId = SCNetworkServiceGetServiceID(service);
+        CFShow(serviceId);
+        if( CFStringCompare(primaryServiceId,serviceId,0) == kCFCompareEqualTo ){
+            CFStringRef name = SCNetworkServiceGetName(service);// Wi-Fi "Bluetooth DUN" etc.
+            if(name){
+                unsigned long l = CFStringGetLength(name) + 1;
+                serviceName = (char*)malloc(l*sizeof(char));
+                sprintf(serviceName, "%s",CFStringGetCStringPtr(name, kCFStringEncodingUTF8));
+            }
+            //break;
+        }else{
+            CFStringRef name = SCNetworkServiceGetName(service);
+            if(name)
+                CFShow(name);
+            else
+                qDebug()<<"no name";
+        }
+    }
+    CFRelease(primaryServiceId);
+    if(!serviceName){
+        qDebug()<<"not primary value";
         return QString();
     }
-    return regNetworkservice.cap(1);
+    QString result(serviceName);
+    qDebug()<<"primary serviceName:"<<result;
+    free(serviceName);
+    return result;
 }
 
 
@@ -344,7 +393,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _jsBridge = new RyJsBridge();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     addJsObject();
-    connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),SLOT(addJsObject()));
+    connect(ui->webView->page()->mainFrame(),&QWebFrame::javaScriptWindowObjectCleared,this,&MainWindow::addJsObject);
     //修复proxy服务器过完启动导致配置页面空白的问题 延迟一秒加载
     QTimer::singleShot(1000, this, SLOT(loadConfigPage()));
 
@@ -569,15 +618,13 @@ void MainWindow::onItemDoubleClicked(QModelIndex topLeft){
 
 
     // show in textview
-    QTextCodec* oldCodec = QTextCodec::codecForCStrings();
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName(encoding));
+    //TODO for gbk
     ui->responseTextEdit->setPlainText(QString((
                                               data->responseHeaderRawData()
                                             +"\r\n\r\n"
                                             + decrypedData
                                            ).data())
                                        );
-    QTextCodec::setCodecForCStrings(oldCodec);
 
 
 

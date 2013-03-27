@@ -23,7 +23,7 @@ class RyPipeData : public QObject
         bool parseRequestHeader(const QByteArray&);
         bool parseResponseHeader(const QByteArray&);
 
-        const QByteArray& dataToSend()const;
+        const QByteArray& dataToSend(bool sendToProxy = false)const;
         bool appendRequestBody(QByteArray* newData);
 
         int readChunk(int chunkSize,QByteArray* chunkData,QByteArray* unChunkDes);
@@ -160,6 +160,8 @@ class RyPipeData : public QObject
         QString _path;
 
         QByteArray _dataToSend;
+        QByteArray _sigToSend;
+        QByteArray _sigToSendForProxy;
 
         QMap<QString,QString> _requestHeaders;
         QByteArray _requestHeaderRawData;

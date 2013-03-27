@@ -3,7 +3,7 @@
 
 #include <QTableView>
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 class RyConnectionTableView : public QTableView
 {

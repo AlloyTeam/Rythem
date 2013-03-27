@@ -81,7 +81,7 @@ void RyTableSortFilterProxyModel::setCustomeFilter(FilterCallBack filtercb){
 
 void RyTableSortFilterProxyModel::removeAllItem(){
     sourceModel()->removeAllItem();
-    reset();
+    QSortFilterProxyModel::clear();
 }
 
 void RyTableSortFilterProxyModel::updateItem(RyPipeData_ptr p){

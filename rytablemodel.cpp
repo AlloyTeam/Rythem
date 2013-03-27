@@ -90,9 +90,9 @@ QVariant RyTableModel::data(const QModelIndex &index, int role) const{
 
             RyPipeData_ptr d = pipesVector.at(index.row());
             if(d->isMatchingRule){
-                return Qt::cyan;
+                return QVariant((int)Qt::cyan);
             }else if(d->responseStatus.startsWith('4') || d->responseStatus.startsWith('5')){
-                return Qt::darkCyan;
+                return QVariant((int)Qt::darkCyan);
             }
         }else{
             return QVariant();
@@ -209,5 +209,5 @@ void RyTableModel::removeAllItem(){
     endResetModel();
 }
 void RyTableModel::removeItems(){
-    reset();
+    this->removeAllItem();
 }

@@ -1,7 +1,7 @@
 #ifndef COMPOSER_H
 #define COMPOSER_H
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QtNetwork>
 #include "proxy/rypipedata.h"
 
