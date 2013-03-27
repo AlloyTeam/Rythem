@@ -5,6 +5,7 @@
 macdeployqt Rythem.app -dmg
 
 # convert to read-write image
+rm Rythem-rw.dmg
 hdiutil convert Rythem.dmg -format UDRW -o Rythem-rw.dmg
 
 # open read-write image
@@ -34,13 +35,16 @@ tmpDir=`pwd`
 
 cd "$targetDir"
 # make introduce file
-cp $2/readme.md ./
+echo "copying readme.md"
+cp $1/readme.md ./
 
 # link /Applications to the image
+echo "linking to Applications"
 ln -s /Applications Applications
 
 # make icon
-cp $2/Rythem2.icns ./.VolumeIcon.icns
+echo "copying icns"
+cp $1/Rythem2.icns ./.VolumeIcon.icns
 
 # back
 cd $tmpDir
@@ -48,8 +52,8 @@ hdiutil detach -force $dev
 rm -f Rythem-release.dmg
 hdiutil convert Rythem-rw.dmg -format UDZO -o Rythem-release.dmg
 mv -f Rythem-release.dmg ~/
-rm $1/Rythem-rw.dmg
-rm $1/Rythem.dmg
+rm $2/Rythem-rw.dmg
+rm $2/Rythem.dmg
 # remove
 rm -rf Rythem.app
 
