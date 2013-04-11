@@ -41,6 +41,7 @@ class RyPipeData : public QObject
         int socketHandle;       // socket really handle
         quint64 socketConnectionId;//connection id in rythem
         QString host;
+        QString virtualHost; // for header
         QString replacedHost;
         quint16 port;
         QString method;

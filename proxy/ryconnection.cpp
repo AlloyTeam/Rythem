@@ -98,6 +98,7 @@ void RyConnection::onRequestReadyRead(){
         _receivingPerformance.requestBegin = QDateTime::currentMSecsSinceEpoch();
     }
     QByteArray newContent = _requestSocket->readAll();
+    qDebug()<<newContent;
     if(_isConnectTunnel){
         // https隧道,直接透传不解析
         // TODO: decrypt https tunnel
