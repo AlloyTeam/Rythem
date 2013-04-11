@@ -5,9 +5,9 @@ RyTableSortFilterProxyModel::RyTableSortFilterProxyModel(QObject *parent) :
     _filterFlags = NoFilter;
 }
 
-void RyTableSortFilterProxyModel::setSourceModel(RyTableModel *sourceModel){
+void RyTableSortFilterProxyModel::setSourceModel(QAbstractItemModel *sourceModel){
     QSortFilterProxyModel::setSourceModel(sourceModel);
-    _sourceModel = sourceModel;
+    _sourceModel = dynamic_cast<RyTableModel*>(sourceModel);
 }
 RyTableModel *RyTableSortFilterProxyModel::sourceModel()const{
     return _sourceModel;

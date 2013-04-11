@@ -262,7 +262,7 @@ bool RyPipeData::parseResponseHeader(const QByteArray& headers){
 }
 
 
-const QByteArray& RyPipeData::dataToSend(bool sendToProxy)const{
+const QByteArray RyPipeData::dataToSend(bool sendToProxy)const{
     if(sendToProxy){
         return _sigToSendForProxy + _dataToSend;
     }else{

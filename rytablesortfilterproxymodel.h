@@ -20,7 +20,7 @@ public:
     };
 
     explicit RyTableSortFilterProxyModel(QObject *parent = 0);
-    void setSourceModel(RyTableModel *sourceModel);
+    void setSourceModel(QAbstractItemModel *sourceModel);
     RyTableModel *sourceModel()const;
     RyPipeData_ptr getItem(int sourceRow);
     RyPipeData_ptr getItem(const QModelIndex& proxyIndex);
