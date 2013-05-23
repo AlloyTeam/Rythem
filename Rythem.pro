@@ -152,10 +152,10 @@ OTHER_FILES += \
     remove.png \
     rythem_zh_CN.ts \
     rythem_zh_CN.qm \
-    deploy.txt \
     qt_zh_CN.qm \
     setupproxy \
-    publish
+    publish \
+    deploy
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

@@ -23,7 +23,7 @@ class RyPipeData : public QObject
         bool parseRequestHeader(const QByteArray&);
         bool parseResponseHeader(const QByteArray&);
 
-        const QByteArray& dataToSend(bool sendToProxy = false)const;
+        const QByteArray dataToSend(bool sendToProxy = false)const;
         bool appendRequestBody(QByteArray* newData);
 
         int readChunk(int chunkSize,QByteArray* chunkData,QByteArray* unChunkDes);
@@ -41,6 +41,7 @@ class RyPipeData : public QObject
         int socketHandle;       // socket really handle
         quint64 socketConnectionId;//connection id in rythem
         QString host;
+        QString virtualHost; // for header
         QString replacedHost;
         quint16 port;
         QString method;

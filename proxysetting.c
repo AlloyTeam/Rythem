@@ -126,7 +126,7 @@ int runSelfByPriviledge(char *path_to_self){
   
   if (status != errAuthorizationSuccess)
   {
-    IFDEBUG(fprintf(stderr, "Failed to create the authref: %ld.\n", status));
+    IFDEBUG(fprintf(stderr, "Failed to create the authref: %ld.\n", (long)status));
     return kMyAuthorizedCommandInternalError;
   }
   

@@ -134,21 +134,21 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
     path = "/";
     port = 80;//TODO
 
-    QString withouProtocol = fullUrl;
+    QString withoutProtocol = fullUrl;
     int indexOfHost = fullUrl.indexOf("://");
     if(indexOfHost!=-1){
-        withouProtocol = fullUrl.mid(indexOfHost+3);
+        withoutProtocol = fullUrl.mid(indexOfHost+3);
     }
 
     if(indexOfHost==-1){
         // request after CONNECT tunnel
         path = fullUrl;
     }
-    QString hostAndPort = withouProtocol;
-    int indexOfPath = withouProtocol.indexOf("/");
+    QString hostAndPort = withoutProtocol;
+    int indexOfPath = withoutProtocol.indexOf("/");
     if(indexOfPath!=-1){
-        hostAndPort = withouProtocol.left(indexOfPath);
-        path = withouProtocol.mid(indexOfPath);
+        hostAndPort = withoutProtocol.left(indexOfPath);
+        path = withoutProtocol.mid(indexOfPath);
     }
     int indexOfPort = hostAndPort.indexOf(":");
     host = hostAndPort;
@@ -159,6 +159,8 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
     if(method == "CONNECT"){
         isConnectTunnel = true;
         fullUrl.prepend("http://");
+    }else if(host == hostAndPort){
+        host = "";
     }
 
     //qDebug()<<"host="<<host<<port;
@@ -178,10 +180,10 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
         if(headerName == "Host"){
             int d = value.indexOf(":");
             if(d!=-1){
-                host = value.left(d);
+                virtualHost = value.left(d);
                 port = value.mid(d+1).trimmed().toInt();
             }else{
-                host = value;
+                virtualHost = value;
             }
         }
 
@@ -190,7 +192,9 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
         _dataToSend.append(value);
         _dataToSend.append("\r\n");
     }
-
+    if(host.isEmpty()){
+        host = virtualHost;
+    }
     if(path == fullUrl){
         if(method!="CONNECT"){
             if(port == 80){
@@ -258,7 +262,7 @@ bool RyPipeData::parseResponseHeader(const QByteArray& headers){
 }
 
 
-const QByteArray& RyPipeData::dataToSend(bool sendToProxy)const{
+const QByteArray RyPipeData::dataToSend(bool sendToProxy)const{
     if(sendToProxy){
         return _sigToSendForProxy + _dataToSend;
     }else{

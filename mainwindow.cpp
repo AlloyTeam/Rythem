@@ -136,12 +136,42 @@ bool setProxy(const QSettings& proxySetting){
 #endif
 #ifdef Q_OS_MAC
 
+const char * myCFStringCStringPtr(CFStringRef aString,CFStringEncoding encoding,bool* needFree = 0){
+    if(needFree!=0){
+        *needFree = false;
+    }
+    if(!aString){
+        qDebug()<<"myCFStringCStringPtr source is NULL";
+        return NULL;
+    }
+    const char* ret = CFStringGetCStringPtr(aString,encoding);
+    if(ret == NULL){
+
+        CFIndex length = CFStringGetLength(aString);
+        CFIndex maxSize =
+          CFStringGetMaximumSizeForEncoding(length,
+                                            kCFStringEncodingUTF8);
+        char *buffer = (char *)malloc(maxSize);
+
+        if (CFStringGetCString(aString, buffer, maxSize,
+                             kCFStringEncodingUTF8)) {
+            if(needFree != 0){
+                *needFree = true;
+            }
+            return buffer;
+        }
+        free(buffer);
+        return NULL;
+    }
+    return ret;
+}
+
 QString getServiceName(){
     // get primary serverId
     char *serviceName = NULL;
     CFStringRef primaryServiceId=NULL;
     SCDynamicStoreRef dynamicStoreDomainState = SCDynamicStoreCreate(NULL,
-                                                                     CFSTR("myApplicationName"),
+                                                                     CFSTR("Rythem"),
                                                                      NULL,
                                                                      NULL);
     // get primary interface
@@ -154,25 +184,49 @@ QString getServiceName(){
         n += CFStringGetLength(kSCEntNetIPv4);
         n += 3;// for three '/'
         char *netIp4KeyStr = (char*)malloc(sizeof(char)*(n+1));
+
+        bool stateNeedFree = false;
+        const char *domainState = myCFStringCStringPtr(kSCDynamicStoreDomainState, kCFStringEncodingUTF8,&stateNeedFree);
+        bool networkNeedFree = false;
+        const char *network = myCFStringCStringPtr(kSCCompNetwork, kCFStringEncodingUTF8,&networkNeedFree);
+        bool globalNeedFree = false;
+        const char *global = myCFStringCStringPtr(kSCCompGlobal, kCFStringEncodingUTF8,&globalNeedFree);
+        bool ipv4NeedFree = false;
+        const char *ipv4 = myCFStringCStringPtr(kSCEntNetIPv4, kCFStringEncodingUTF8,&ipv4NeedFree);
+
         sprintf(netIp4KeyStr, "%s/%s/%s/%s",
-                CFStringGetCStringPtr(kSCDynamicStoreDomainState, kCFStringEncodingUTF8),
-                CFStringGetCStringPtr(kSCCompNetwork, kCFStringEncodingUTF8),
-                CFStringGetCStringPtr(kSCCompGlobal, kCFStringEncodingUTF8),
-                CFStringGetCStringPtr(kSCEntNetIPv4, kCFStringEncodingUTF8));
+                domainState,
+                network,
+                global,
+                ipv4);
+        if(stateNeedFree){
+            free((char*)domainState);
+        }
+        if(networkNeedFree){
+            free((char*)network);
+        }
+        if(globalNeedFree){
+            free((char*)global);
+        }
+        if(ipv4NeedFree){
+            free((char*)ipv4);
+        }
+
 
         CFStringRef netIpv4KeyCFStr = CFStringCreateWithCString(NULL, netIp4KeyStr, kCFStringEncodingUTF8);
         CFPropertyListRef netIpv4List =SCDynamicStoreCopyValue(dynamicStoreDomainState, netIpv4KeyCFStr);
         if (netIpv4List) {
             primaryServiceId = (CFStringRef)CFDictionaryGetValue((CFDictionaryRef)netIpv4List, kSCDynamicStorePropNetPrimaryService);
+            if(primaryServiceId){
+                CFRetain(primaryServiceId);
+            }
+            CFRelease(netIpv4List);
         }
-        if(primaryServiceId){
-            CFRetain(primaryServiceId);
-        }
-        CFRelease(netIpv4List);
         CFRelease(netIpv4KeyCFStr);
         free(netIp4KeyStr);
     }
     if(!primaryServiceId){
+        qDebug()<<"no service name found";
         return QString();
     }
     CFShow(primaryServiceId);
@@ -189,12 +243,20 @@ QString getServiceName(){
 
         CFStringRef serviceId = SCNetworkServiceGetServiceID(service);
         CFShow(serviceId);
+        CFShow(primaryServiceId);
         if( CFStringCompare(primaryServiceId,serviceId,0) == kCFCompareEqualTo ){
             CFStringRef name = SCNetworkServiceGetName(service);// Wi-Fi "Bluetooth DUN" etc.
             if(name){
                 unsigned long l = CFStringGetLength(name) + 1;
+                CFShow(name);
                 serviceName = (char*)malloc(l*sizeof(char));
-                sprintf(serviceName, "%s",CFStringGetCStringPtr(name, kCFStringEncodingUTF8));
+                bool needFree = false;
+                const char* theName = myCFStringCStringPtr(name, kCFStringEncodingUTF8,&needFree);
+                sprintf(serviceName, "%s",theName);
+                if(needFree){
+                    free((char *)theName);
+                }
+
             }
             //break;
         }else{
@@ -219,6 +281,10 @@ QString getServiceName(){
 
 bool execScript(const QString &script){
     QString service = getServiceName();
+    if(service == NULL || service.isEmpty()){
+        // TODO 提示
+        return false;
+    }
     QProcess process;
     qDebug()<<"script"<<script.arg(service);
     QStringList args = script.arg(service).split(" ");
@@ -251,6 +317,10 @@ bool disableAutoProxyAndSetProxyForService(const QString& host, const int port){
 bool execProxysetting(const QString &pacUrl=QString()){
     QProcess process;
     QString service = getServiceName();
+    if(service == NULL || service.isEmpty()){
+        // TODO 提示
+        return false;
+    }
     QString script = "proxysetting";
     if(pacUrl.isEmpty()){
         script = QString(appPath+"/proxysetting --disablepac %1").arg(service);
@@ -415,14 +485,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ActionCapture,SIGNAL(triggered()),SLOT(toggleCapture()));
     connect(ui->actionRemoveAll,SIGNAL(triggered()),this,SLOT(onActionRemoveAll()));
     connect(ui->actionWaterfall, SIGNAL(triggered()), this, SLOT(onWaterfallActionTriggered()));
-/*
-#ifdef Q_WS_MAC
-    // TODO: mac下需手动设置代理
-    ui->ActionCapture->setEnabled(false);
-    ui->ActionCapture->setText(tr("SetupProxyManually"));
-    ui->ActionCapture->setToolTip(tr("non-windows OS need to set proxy to:127.0.0.1:8889 manually"));
-#endif
-*/
+
     checker = new RyUpdateChecker(this);
     QTimer timer;
     timer.singleShot(1000,this,SLOT(checkNewVersion()));
@@ -662,7 +725,7 @@ void MainWindow::onWaterfallActionTriggered(){
 
 void MainWindow::toggleProxy(){
     QMutexLocker locker(&proxyMutex);
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     bool setProxySuccess = false;
     if(_isUsingCapture){
         if(_previousProxyInfo.isUsingPac == "1"){
@@ -678,17 +741,22 @@ void MainWindow::toggleProxy(){
             int isPacEnabled = 0;
             //CFStringRef CFPacUrl = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigURLString);
             //if(CFPacUrl){
-            //    _previousProxyInfo.pacUrl = QString::fromUtf8( CFStringGetCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
+            //    _previousProxyInfo.pacUrl = QString::fromUtf8( myCFStringCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
             //}
             if (proxies){
-                CFNumberRef pacEnabled;
+                CFNumberRef tmpRef;
                 //kSCPropNetProxiesHTTPSProxy
-                if ((pacEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigEnable))){
-                    if (CFNumberGetValue(pacEnabled, kCFNumberIntType, &pacEnabled) && pacEnabled){
+                if ((tmpRef = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigEnable))){
+                    CFNumberRef pacEnabled;
+                    CFNumberGetValue(pacEnabled, kCFNumberIntType, &pacEnabled);
+                    if(!pacEnabled){
+                        CFNumberGetValue(pacEnabled, kCFNumberSInt32Type, &pacEnabled);
+                    }
+                    if (pacEnabled){
                         isPacEnabled = 1;
                         _previousProxyInfo.isUsingPac = QString("1");
                         CFStringRef CFPacUrl = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigURLString);
-                        _previousProxyInfo.pacUrl = QString::fromUtf8( CFStringGetCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
+                        _previousProxyInfo.pacUrl = QString::fromUtf8( myCFStringCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
                     }
                 }
             }
@@ -703,7 +771,7 @@ void MainWindow::toggleProxy(){
                 if (httpEnabled && CFNumberGetValue(httpEnabled, kCFNumberIntType, &tmp) && tmp){
                     CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPProxy);
                     CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPPort);
-                    QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
+                    QString hostQ = QString::fromUtf8( myCFStringCStringPtr(host,kCFStringEncodingUTF8) );
                     UInt64 portQ=20;
                     CFNumberGetValue(port, kCFNumberSInt64Type, &portQ);
                     QString proxyStr = QString("Proxy %1:%2").arg(hostQ).arg(portQ);
@@ -713,7 +781,7 @@ void MainWindow::toggleProxy(){
                 if (httpsEnabled && CFNumberGetValue(httpsEnabled, kCFNumberIntType, &tmp) && tmp){
                     CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSProxy);
                     CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSPort);
-                    QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
+                    QString hostQ = QString::fromUtf8( myCFStringCStringPtr(host,kCFStringEncodingUTF8) );
                     UInt64 portQ=20;
                     CFNumberGetValue(port, kCFNumberSInt64Type, &portQ);
                     QString proxyStr = QString("Proxy %1:%2").arg(hostQ).arg(portQ);

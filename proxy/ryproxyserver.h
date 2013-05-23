@@ -30,7 +30,7 @@ class RyProxyServer : public QTcpServer
 
 
     protected:
-        void incomingConnection(int handle);
+        void incomingConnection(qintptr handle);
 
     private:
         QMutex connectionOpMutex;

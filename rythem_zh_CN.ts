@@ -155,7 +155,7 @@ Host: www.alloyteam.com
         <translation type="obsolete">非windows系统需手动设置代理为 127.0.0.1:8889</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="435"/>
+        <location filename="mainwindow.cpp" line="499"/>
         <source>-</source>
         <translation type="unfinished">-</translation>
     </message>
@@ -164,7 +164,7 @@ Host: www.alloyteam.com
         <translation type="obsolete">请了</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="436"/>
+        <location filename="mainwindow.cpp" line="500"/>
         <source>Please drag to Applications dir first 
 
  otherwise creat replace rule will cause crash on MacOS 10.8 (Mountain Lion)</source>
@@ -174,51 +174,51 @@ Host: www.alloyteam.com
 否则需要手动设置代理且在创建替换规则时 Rythem 会崩溃</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="460"/>
+        <location filename="mainwindow.cpp" line="524"/>
         <source>&amp;File</source>
         <translation type="unfinished">文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="461"/>
+        <location filename="mainwindow.cpp" line="525"/>
         <source>&amp;import session...</source>
-        <translation type="unfinished">导入回放(&amp;i)...</translation>
+        <translation type="unfinished">导入会放(&amp;i)...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="462"/>
+        <location filename="mainwindow.cpp" line="526"/>
         <source>hide image requests</source>
         <translation type="unfinished">隐藏图片请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="464"/>
+        <location filename="mainwindow.cpp" line="528"/>
         <source>hide 304s</source>
         <translation type="unfinished">隐藏304</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="466"/>
+        <location filename="mainwindow.cpp" line="530"/>
         <source>show matching sessions only</source>
         <translation type="unfinished">只显示匹配规则的请求</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="468"/>
+        <location filename="mainwindow.cpp" line="532"/>
         <source>hide connect tunnels</source>
         <translation type="unfinished">隐藏Connect遂道</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="476"/>
+        <location filename="mainwindow.cpp" line="540"/>
         <source>select file to open</source>
         <translation type="unfinished">选择文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="739"/>
-        <location filename="mainwindow.cpp" line="768"/>
-        <location filename="mainwindow.cpp" line="769"/>
+        <location filename="mainwindow.cpp" line="806"/>
+        <location filename="mainwindow.cpp" line="835"/>
+        <location filename="mainwindow.cpp" line="836"/>
         <source>start capture</source>
         <translation type="unfinished">开始抓包</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="748"/>
-        <location filename="mainwindow.cpp" line="764"/>
-        <location filename="mainwindow.cpp" line="765"/>
+        <location filename="mainwindow.cpp" line="815"/>
+        <location filename="mainwindow.cpp" line="831"/>
+        <location filename="mainwindow.cpp" line="832"/>
         <source>stop capture</source>
         <translation type="unfinished">停止抓包</translation>
     </message>
@@ -297,12 +297,12 @@ Host: www.alloyteam.com
 <context>
     <name>RyUpdateChecker</name>
     <message>
-        <location filename="ryupdatechecker.cpp" line="74"/>
+        <location filename="ryupdatechecker.cpp" line="73"/>
         <source>got new version</source>
         <translation>有可用新版本</translation>
     </message>
     <message>
-        <location filename="ryupdatechecker.cpp" line="75"/>
+        <location filename="ryupdatechecker.cpp" line="74"/>
         <source>old version:%1
 new version:%2
 update:%3

@@ -98,6 +98,7 @@ void RyConnection::onRequestReadyRead(){
         _receivingPerformance.requestBegin = QDateTime::currentMSecsSinceEpoch();
     }
     QByteArray newContent = _requestSocket->readAll();
+    qDebug()<<newContent;
     if(_isConnectTunnel){
         // https隧道,直接透传不解析
         // TODO: decrypt https tunnel
@@ -576,8 +577,10 @@ bool RyConnection::checkLocalWebServer(RyPipeData_ptr& pipe){
     QString host = pipe->host;
     quint16 port = pipe->port;
     // check if is request to self
-    //qDebug()<<host<<QString::number(port);
-    if(host == RyProxyServer::instance()->serverAddress().toString()
+    qDebug()<<"checking local:"<<host<<QString::number(port);
+
+    QHostAddress h(host);
+    if(h.isLoopback()
             && port == RyProxyServer::instance()->serverPort()){
         // TODO: move these mapping to global util
         qDebug()<<"simple http"<<pipe->path;

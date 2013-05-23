@@ -22,10 +22,6 @@
 #include "proxy/proxyautoconfig.h"
 #endif
 
-#ifdef Q_OS_LINUX
-#include "proxy/proxyautoconfig.h"
-#endif
-
 #include <QtNetwork>
 QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query);
 
@@ -72,12 +68,9 @@ int main(int argc, char *argv[])
     }
 
 
-#ifndef Q_OS_LINUX
 #ifdef Q_OS_MAC
     ProxyAutoConfig::instance();
 #endif
-#endif
-
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
 
@@ -115,7 +108,11 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(pipeBegin(RyPipeData_ptr)),&w,SLOT(onNewPipe(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
-    server->listen(QHostAddress("127.0.0.1"),8889);
+    bool isListenSuccess = server->listen(QHostAddress::Any,8889);
+    if(!isListenSuccess){
+        return 0;
+    }
+    qDebug()<<"listen success";
 
     //w.showMaximized();
     w.show();
