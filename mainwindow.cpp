@@ -136,12 +136,40 @@ bool setProxy(const QSettings& proxySetting){
 #endif
 #ifdef Q_OS_MAC
 
+const char * myCFStringCStringPtr(CFStringRef aString,CFStringEncoding encoding,bool* needFree){
+    if(needFree!=0){
+        *needFree = false;
+    }
+
+    const char* ret = CFStringGetCStringPtr(aString,encoding);
+    if(ret == NULL){
+        if (aString == NULL) {
+          return NULL;
+        }
+
+        CFIndex length = CFStringGetLength(aString);
+        CFIndex maxSize =
+          CFStringGetMaximumSizeForEncoding(length,
+                                            kCFStringEncodingUTF8);
+        char *buffer = (char *)malloc(maxSize);
+
+        if (CFStringGetCString(aString, buffer, maxSize,
+                             kCFStringEncodingUTF8)) {
+            *needFree = true;
+            return buffer;
+        }
+        free(buffer);
+        return NULL;
+    }
+    return ret;
+}
+
 QString getServiceName(){
     // get primary serverId
     char *serviceName = NULL;
     CFStringRef primaryServiceId=NULL;
     SCDynamicStoreRef dynamicStoreDomainState = SCDynamicStoreCreate(NULL,
-                                                                     CFSTR("myApplicationName"),
+                                                                     CFSTR("Rythem"),
                                                                      NULL,
                                                                      NULL);
     // get primary interface
@@ -154,25 +182,49 @@ QString getServiceName(){
         n += CFStringGetLength(kSCEntNetIPv4);
         n += 3;// for three '/'
         char *netIp4KeyStr = (char*)malloc(sizeof(char)*(n+1));
+
+        bool stateNeedFree = false;
+        const char *domainState = myCFStringCStringPtr(kSCDynamicStoreDomainState, kCFStringEncodingUTF8,&stateNeedFree);
+        bool networkNeedFree = false;
+        const char *network = myCFStringCStringPtr(kSCCompNetwork, kCFStringEncodingUTF8,&networkNeedFree);
+        bool globalNeedFree = false;
+        const char *global = myCFStringCStringPtr(kSCCompGlobal, kCFStringEncodingUTF8,&globalNeedFree);
+        bool ipv4NeedFree = false;
+        const char *ipv4 = myCFStringCStringPtr(kSCEntNetIPv4, kCFStringEncodingUTF8,&ipv4NeedFree);
+
         sprintf(netIp4KeyStr, "%s/%s/%s/%s",
-                CFStringGetCStringPtr(kSCDynamicStoreDomainState, kCFStringEncodingUTF8),
-                CFStringGetCStringPtr(kSCCompNetwork, kCFStringEncodingUTF8),
-                CFStringGetCStringPtr(kSCCompGlobal, kCFStringEncodingUTF8),
-                CFStringGetCStringPtr(kSCEntNetIPv4, kCFStringEncodingUTF8));
+                domainState,
+                network,
+                global,
+                ipv4);
+        if(stateNeedFree){
+            free((char*)domainState);
+        }
+        if(networkNeedFree){
+            free((char*)network);
+        }
+        if(globalNeedFree){
+            free((char*)global);
+        }
+        if(ipv4NeedFree){
+            free((char*)ipv4);
+        }
+
 
         CFStringRef netIpv4KeyCFStr = CFStringCreateWithCString(NULL, netIp4KeyStr, kCFStringEncodingUTF8);
         CFPropertyListRef netIpv4List =SCDynamicStoreCopyValue(dynamicStoreDomainState, netIpv4KeyCFStr);
         if (netIpv4List) {
             primaryServiceId = (CFStringRef)CFDictionaryGetValue((CFDictionaryRef)netIpv4List, kSCDynamicStorePropNetPrimaryService);
+            if(primaryServiceId){
+                CFRetain(primaryServiceId);
+            }
+            CFRelease(netIpv4List);
         }
-        if(primaryServiceId){
-            CFRetain(primaryServiceId);
-        }
-        CFRelease(netIpv4List);
         CFRelease(netIpv4KeyCFStr);
         free(netIp4KeyStr);
     }
     if(!primaryServiceId){
+        qDebug()<<"no service name found";
         return QString();
     }
     CFShow(primaryServiceId);
@@ -189,12 +241,20 @@ QString getServiceName(){
 
         CFStringRef serviceId = SCNetworkServiceGetServiceID(service);
         CFShow(serviceId);
+        CFShow(primaryServiceId);
         if( CFStringCompare(primaryServiceId,serviceId,0) == kCFCompareEqualTo ){
             CFStringRef name = SCNetworkServiceGetName(service);// Wi-Fi "Bluetooth DUN" etc.
             if(name){
                 unsigned long l = CFStringGetLength(name) + 1;
+                CFShow(name);
                 serviceName = (char*)malloc(l*sizeof(char));
-                sprintf(serviceName, "%s",CFStringGetCStringPtr(name, kCFStringEncodingUTF8));
+                bool needFree = false;
+                const char* theName = myCFStringCStringPtr(name, kCFStringEncodingUTF8,&needFree);
+                sprintf(serviceName, "%s",theName);
+                if(needFree){
+                    free((char *)theName);
+                }
+
             }
             //break;
         }else{
@@ -219,6 +279,10 @@ QString getServiceName(){
 
 bool execScript(const QString &script){
     QString service = getServiceName();
+    if(service == NULL || service.isEmpty()){
+        // TODO 提示
+        return false;
+    }
     QProcess process;
     qDebug()<<"script"<<script.arg(service);
     QStringList args = script.arg(service).split(" ");
@@ -251,6 +315,10 @@ bool disableAutoProxyAndSetProxyForService(const QString& host, const int port){
 bool execProxysetting(const QString &pacUrl=QString()){
     QProcess process;
     QString service = getServiceName();
+    if(service == NULL || service.isEmpty()){
+        // TODO 提示
+        return false;
+    }
     QString script = "proxysetting";
     if(pacUrl.isEmpty()){
         script = QString(appPath+"/proxysetting --disablepac %1").arg(service);
