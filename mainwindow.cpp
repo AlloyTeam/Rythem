@@ -136,16 +136,16 @@ bool setProxy(const QSettings& proxySetting){
 #endif
 #ifdef Q_OS_MAC
 
-const char * myCFStringCStringPtr(CFStringRef aString,CFStringEncoding encoding,bool* needFree){
+const char * myCFStringCStringPtr(CFStringRef aString,CFStringEncoding encoding,bool* needFree = 0){
     if(needFree!=0){
         *needFree = false;
     }
-
+    if(!aString){
+        qDebug()<<"myCFStringCStringPtr source is NULL";
+        return NULL;
+    }
     const char* ret = CFStringGetCStringPtr(aString,encoding);
     if(ret == NULL){
-        if (aString == NULL) {
-          return NULL;
-        }
 
         CFIndex length = CFStringGetLength(aString);
         CFIndex maxSize =
@@ -155,7 +155,9 @@ const char * myCFStringCStringPtr(CFStringRef aString,CFStringEncoding encoding,
 
         if (CFStringGetCString(aString, buffer, maxSize,
                              kCFStringEncodingUTF8)) {
-            *needFree = true;
+            if(needFree != 0){
+                *needFree = true;
+            }
             return buffer;
         }
         free(buffer);
@@ -739,17 +741,22 @@ void MainWindow::toggleProxy(){
             int isPacEnabled = 0;
             //CFStringRef CFPacUrl = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigURLString);
             //if(CFPacUrl){
-            //    _previousProxyInfo.pacUrl = QString::fromUtf8( CFStringGetCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
+            //    _previousProxyInfo.pacUrl = QString::fromUtf8( myCFStringCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
             //}
             if (proxies){
-                CFNumberRef pacEnabled;
+                CFNumberRef tmpRef;
                 //kSCPropNetProxiesHTTPSProxy
-                if ((pacEnabled = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigEnable))){
-                    if (CFNumberGetValue(pacEnabled, kCFNumberIntType, &pacEnabled) && pacEnabled){
+                if ((tmpRef = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigEnable))){
+                    CFNumberRef pacEnabled;
+                    CFNumberGetValue(pacEnabled, kCFNumberIntType, &pacEnabled);
+                    if(!pacEnabled){
+                        CFNumberGetValue(pacEnabled, kCFNumberSInt32Type, &pacEnabled);
+                    }
+                    if (pacEnabled){
                         isPacEnabled = 1;
                         _previousProxyInfo.isUsingPac = QString("1");
                         CFStringRef CFPacUrl = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigURLString);
-                        _previousProxyInfo.pacUrl = QString::fromUtf8( CFStringGetCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
+                        _previousProxyInfo.pacUrl = QString::fromUtf8( myCFStringCStringPtr(CFPacUrl,kCFStringEncodingUTF8) );
                     }
                 }
             }
@@ -764,7 +771,7 @@ void MainWindow::toggleProxy(){
                 if (httpEnabled && CFNumberGetValue(httpEnabled, kCFNumberIntType, &tmp) && tmp){
                     CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPProxy);
                     CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPPort);
-                    QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
+                    QString hostQ = QString::fromUtf8( myCFStringCStringPtr(host,kCFStringEncodingUTF8) );
                     UInt64 portQ=20;
                     CFNumberGetValue(port, kCFNumberSInt64Type, &portQ);
                     QString proxyStr = QString("Proxy %1:%2").arg(hostQ).arg(portQ);
@@ -774,7 +781,7 @@ void MainWindow::toggleProxy(){
                 if (httpsEnabled && CFNumberGetValue(httpsEnabled, kCFNumberIntType, &tmp) && tmp){
                     CFStringRef host = (CFStringRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSProxy);
                     CFNumberRef port = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesHTTPSPort);
-                    QString hostQ = QString::fromUtf8( CFStringGetCStringPtr(host,kCFStringEncodingUTF8) );
+                    QString hostQ = QString::fromUtf8( myCFStringCStringPtr(host,kCFStringEncodingUTF8) );
                     UInt64 portQ=20;
                     CFNumberGetValue(port, kCFNumberSInt64Type, &portQ);
                     QString proxyStr = QString("Proxy %1:%2").arg(hostQ).arg(portQ);
