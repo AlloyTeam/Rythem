@@ -94,8 +94,8 @@ mac:SOURCES += proxy/proxyautoconfig.cpp
 win32:HEADERS  += proxy/rywinhttp.h
 win32:SOURCES  += proxy/rywinhttp.cpp
 
-unix:HEADERS += proxy/proxyautoconfig.h
-unix:SOURCES += proxy/proxyautoconfig.cpp
+linux:HEADERS += proxy/proxyautoconfig.h
+linux:SOURCES += proxy/proxyautoconfig.cpp
 
 FORMS    += mainwindow.ui \
     composer.ui \
