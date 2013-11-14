@@ -176,7 +176,12 @@ Host: www.alloyteam.com
     <message>
         <location filename="mainwindow.cpp" line="510"/>
         <source>Port:8889 Address: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">监听端口 8889 本机IP </translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="518"/>
+        <source>           --By AlloyTeam::iptton</source>
+        <translation type="unfinished">                      --AlloyTeam::iptton</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="541"/>

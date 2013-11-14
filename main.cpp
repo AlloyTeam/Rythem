@@ -27,7 +27,7 @@ QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query);
 
 using namespace rule;
 
-QString version = "0.1.0";
+QString version = "0.5.0";
 QString appPath = "";
 void myMessageHandler(QtMsgType type, const char *msg)
 {
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     bool isListenSuccess = server->listen(QHostAddress::Any,8889);
     if(!isListenSuccess){
-        return 0;
+        exit(1);
     }
     qDebug()<<"listen success";
 

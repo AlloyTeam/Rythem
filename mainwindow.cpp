@@ -515,7 +515,7 @@ MainWindow::MainWindow(QWidget *parent) :
         qDebug()<<address.protocol()<<address.toString();
         if(address.protocol() != QAbstractSocket::IPv4Protocol )continue;
         qDebug()<<address.toString();
-        statusBarStr = statusBarStr.append(address.toString()+"           --By AlloyTeam::iptton");
+        statusBarStr = statusBarStr.append(address.toString()+tr("           --By AlloyTeam::iptton"));
     }
     ui->statusBar->showMessage(statusBarStr);
 }
