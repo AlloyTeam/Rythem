@@ -580,7 +580,7 @@ bool RyConnection::checkLocalWebServer(RyPipeData_ptr& pipe){
     qDebug()<<"checking local:"<<host<<QString::number(port);
 
     QHostAddress h(host);
-    if(h.isLoopback()
+    if(h == QHostAddress::LocalHost
             && port == RyProxyServer::instance()->serverPort()){
         // TODO: move these mapping to global util
         qDebug()<<"simple http"<<pipe->path;

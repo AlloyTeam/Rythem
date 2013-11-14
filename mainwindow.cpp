@@ -463,7 +463,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _jsBridge = new RyJsBridge();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     addJsObject();
-    connect(ui->webView->page()->mainFrame(),&QWebFrame::javaScriptWindowObjectCleared,this,&MainWindow::addJsObject);
+    connect(ui->webView->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(addJsObject()));
     //修复proxy服务器过完启动导致配置页面空白的问题 延迟一秒加载
     QTimer::singleShot(1000, this, SLOT(loadConfigPage()));
 
@@ -501,6 +501,23 @@ MainWindow::MainWindow(QWidget *parent) :
                                  QMessageBox::Ok);
     }
 #endif
+
+
+
+    // show local ip address in statusbar
+    // TODO refresh after network changed
+    QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
+    QString statusBarStr = tr("Port:8889 Address: ");//TODO
+    foreach(const QHostAddress &address , addresses){
+        qDebug()<<address.toString();
+        if(address == QHostAddress::LocalHost || address.isNull()
+                )continue;
+        qDebug()<<address.protocol()<<address.toString();
+        if(address.protocol() != QAbstractSocket::IPv4Protocol )continue;
+        qDebug()<<address.toString();
+        statusBarStr = statusBarStr.append(address.toString()+"           --By AlloyTeam::iptton");
+    }
+    ui->statusBar->showMessage(statusBarStr);
 }
 
 MainWindow::~MainWindow()
@@ -748,10 +765,10 @@ void MainWindow::toggleProxy(){
                 //kSCPropNetProxiesHTTPSProxy
                 if ((tmpRef = (CFNumberRef)CFDictionaryGetValue(proxies, kSCPropNetProxiesProxyAutoConfigEnable))){
                     CFNumberRef pacEnabled;
-                    CFNumberGetValue(pacEnabled, kCFNumberIntType, &pacEnabled);
-                    if(!pacEnabled){
-                        CFNumberGetValue(pacEnabled, kCFNumberSInt32Type, &pacEnabled);
-                    }
+                    CFNumberGetValue(tmpRef, CFNumberGetType(tmpRef), &pacEnabled);
+                    //if(!pacEnabled){
+                    //    CFNumberGetValue(tmpRef, kCFNumberSInt32Type, &pacEnabled);
+                    //}
                     if (pacEnabled){
                         isPacEnabled = 1;
                         _previousProxyInfo.isUsingPac = QString("1");

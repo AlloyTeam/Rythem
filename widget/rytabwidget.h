@@ -2,7 +2,7 @@
 #define RYTABWIDGET_H
 
 #include <QtEvents>
-#include <QtWidgets>
+#include <QtGui>
 
 class RyTabWidget : public QTabWidget
 {

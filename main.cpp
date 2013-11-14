@@ -1,5 +1,5 @@
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QStatusBar>
+#include <QApplication>
+#include <QStatusBar>
 #include "mainwindow.h"
 #include <QDebug>
 

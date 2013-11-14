@@ -1,9 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
+#include <QtGui>
 #include <QtCore>
-#include <QtWidgets>
 #include <QtNetwork>
 #include <QtWebKit>
 #include "rytablemodel.h"

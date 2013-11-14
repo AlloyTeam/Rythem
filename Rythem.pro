@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network script webkit widgets webkitwidgets
+QT       += core gui network script webkit
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
 
 TARGET = Rythem
