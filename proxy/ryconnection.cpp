@@ -98,7 +98,7 @@ void RyConnection::onRequestReadyRead(){
         _receivingPerformance.requestBegin = QDateTime::currentMSecsSinceEpoch();
     }
     QByteArray newContent = _requestSocket->readAll();
-    qDebug()<<newContent;
+    //qDebug()<<newContent;
     if(_isConnectTunnel){
         // https隧道,直接透传不解析
         // TODO: decrypt https tunnel
@@ -182,7 +182,7 @@ void RyConnection::onRequestError(QAbstractSocket::SocketError){
 }
 
 void RyConnection::onResponseConnected(){
-    //qDebug()<<"responseConnected";
+    qDebug()<<"responseConnected";
     if(_sendingPerformance.responseConnected==-1){
         _sendingPerformance.responseConnected = QDateTime::currentMSecsSinceEpoch();
     }
@@ -244,7 +244,8 @@ void RyConnection::onResponseClose(){
     }
     onResponseError();
 }
-void RyConnection::onResponseError(QAbstractSocket::SocketError){
+void RyConnection::onResponseError(QAbstractSocket::SocketError error){
+    qDebug()<<"onError"<<error;
     // TODO: markAsError
     if(_sendingPipeData){
         if(_sendingPipeData->responseHeaderRawData().isEmpty()){
@@ -483,13 +484,14 @@ void RyConnection::doRequestToNetwork(){
         return;
     }
     if(checkLocalWebServer(_sendingPipeData)){
+        qDebug()<<"isLocal";
         return;
     }
 
 
 
     //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
-    //qDebug()<<"to connect:"<<host<<port;
+    qDebug()<<"to connect:"<<_connectingHost<<oldPort;
     _fullUrl = _sendingPipeData->fullUrl;
     if(!_responseSocket ||
         _connectingHost.toLower() != oldHost ||
@@ -497,7 +499,7 @@ void RyConnection::doRequestToNetwork(){
         _isUsingProxy = false;
         getNewResponseSocket(_sendingPipeData);
     }else{
-        //qDebug()<<"reuse old socket";
+        qDebug()<<"reuse old socket";
     }
 
     bool needReconnect = true;
@@ -513,7 +515,8 @@ void RyConnection::doRequestToNetwork(){
         QList<QNetworkProxy> proxylist = RyWinHttp::queryProxy(QNetworkProxyQuery(QUrl(_sendingPipeData->fullUrl)));
         for(int i=0,l=proxylist.length();i<l;++i){
             QNetworkProxy p = proxylist.at(i);
-            if(p.hostName() == RyProxyServer::instance()->serverAddress().toString()
+            if(p.hostName().isEmpty())continue;
+            if(QHostAddress(p.hostName()) == QHostAddress::LocalHost
                     && p.port() == RyProxyServer::instance()->serverPort()){
                 qWarning()<<"warining: proxy is your self!";
                 continue;
@@ -556,7 +559,7 @@ void RyConnection::doRequestToNetwork(){
             needReconnect = false;
             onResponseConnected();
         }else{
-            //qDebug()<<"responseSocket not open yet"<<responseState;
+            qDebug()<<"responseSocket not open yet"<<responseState;
             _responseSocket->blockSignals(true);
             _responseSocket->disconnectFromHost();
             _responseSocket->abort();
@@ -566,8 +569,10 @@ void RyConnection::doRequestToNetwork(){
     if(needReconnect){
         connect(_responseSocket,SIGNAL(connected()),SLOT(onResponseConnected()));
         if(!_isConnectTunnel && _isUsingProxy){
+            qDebug()<<currentProxy.hostName();
             _responseSocket->connectToHost(currentProxy.hostName(),currentProxy.port());
         }else{
+            qDebug()<<_connectingHost;
             _responseSocket->connectToHost(_connectingHost,_connectingPort);
         }
     }
