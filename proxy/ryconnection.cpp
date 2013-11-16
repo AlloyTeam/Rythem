@@ -478,8 +478,7 @@ void RyConnection::doRequestToNetwork(){
     QString oldHost = _connectingHost;
     quint64 oldPort = _connectingPort;
 
-    _connectingHost = _sendingPipeData->host;
-    _connectingPort = _sendingPipeData->port;
+
     if(checkRule(_sendingPipeData)){
         return;
     }
@@ -488,10 +487,11 @@ void RyConnection::doRequestToNetwork(){
         return;
     }
 
-
+    _connectingHost = _sendingPipeData->host;
+    _connectingPort = _sendingPipeData->port;
 
     //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
-    qDebug()<<"to connect:"<<_connectingHost<<oldPort;
+    //qDebug()<<"to connect:"<<_connectingHost<<oldPort;
     _fullUrl = _sendingPipeData->fullUrl;
     if(!_responseSocket ||
         _connectingHost.toLower() != oldHost ||
