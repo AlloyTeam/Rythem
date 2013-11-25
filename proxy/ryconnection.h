@@ -18,6 +18,16 @@ class RyConnection:public QObject{
             ConnectionStateHeadFound=3,
             ConnectionStatePackageFound=4
         };
+
+        enum RuleMatchType{
+            RuleMatchTypeHost,
+            RuleMatchTypeReplaceSingle,
+            RuleMatchTypeRemote,
+            RuleMatchTypeReplaceDirectory,
+            RuleMatchTypeReplaceDirectoryNotFound,
+            RuleMatchTypeNone
+        };
+
         //public functions
         explicit RyConnection(int handle,quint64 connectionId,QObject *parent = 0);
         ~RyConnection();
@@ -94,7 +104,7 @@ class RyConnection:public QObject{
         void doRequestToNetwork();
 
         bool checkLocalWebServer(RyPipeData_ptr&);
-        bool checkRule(RyPipeData_ptr&);
+        enum RuleMatchType checkRule(RyPipeData_ptr&);
         void getNewResponseSocket(RyPipeData_ptr&);
 
         RyPipeData_ptr nextPipe();

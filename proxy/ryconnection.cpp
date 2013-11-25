@@ -479,7 +479,9 @@ void RyConnection::doRequestToNetwork(){
 
     _connectingHost = _sendingPipeData->host;
     _connectingPort = _sendingPipeData->port;
-    if(checkRule(_sendingPipeData)){
+    RyConnection::RuleMatchType ruleType = checkRule(_sendingPipeData);
+    if(ruleType == RyConnection::RuleMatchTypeReplaceDirectory ||
+            ruleType == RyConnection::RuleMatchTypeReplaceSingle){
         return;
     }
     if(checkLocalWebServer(_sendingPipeData)){
@@ -533,7 +535,7 @@ void RyConnection::doRequestToNetwork(){
         QMetaObject::invokeMethod(pac, "findProxyForUrl", Qt::DirectConnection,
                                    Q_RETURN_ARG(QString, retVal),
                                    Q_ARG(QString, _sendingPipeData->fullUrl),
-                                   Q_ARG(QString, _sendingPipeData->host));
+                                   Q_ARG(QString, _sendingPipeData->replacedHost));
         QStringList l = retVal.split(" ");
         if(l.length() > 1){
             QString hostAndPort = l.at(1);
@@ -652,7 +654,7 @@ bool RyConnection::checkLocalWebServer(RyPipeData_ptr& pipe){
     return false;
 }
 
-bool RyConnection::checkRule(RyPipeData_ptr& pipe){
+RyConnection::RuleMatchType RyConnection::checkRule(RyPipeData_ptr& pipe){
 
     RyRuleManager *manager = RyRuleManager::instance();//qApp->applicationDirPath()+"/config.txt");
     QList<QSharedPointer<RyRule> > matchResult;
@@ -669,12 +671,13 @@ bool RyConnection::checkRule(RyPipeData_ptr& pipe){
                 rule->type() == RyRule::SIMPLE_ADDRESS_REPLACE){
             _connectingHost = rule->replace();
             _sendingPipeData->replacedHost = _connectingHost;
+            return RuleMatchTypeHost;
         }else{
             bool isResouceFound = true;
             QPair<QByteArray,QByteArray> headerAndBody = manager->getReplaceContent(rule,_sendingPipeData->fullUrl,&isResouceFound);
             // TODO check settings if go through when local replace match but got 404
             if(rule->type() == RyRule::LOCAL_DIR_REPLACE && !isResouceFound){
-                return false;
+                return RuleMatchTypeReplaceDirectoryNotFound;
             }
 
             //qDebug()<<headerAndBody.second;
@@ -691,13 +694,13 @@ bool RyConnection::checkRule(RyPipeData_ptr& pipe){
                 _requestSocket->write(headerAndBody.second);
                 _requestSocket->flush();
                 onResponsePackageFound();
-                return true;
+                return RuleMatchTypeReplaceDirectory;
             }else{
                 break;
             }
         }
     }
-    return false;
+    return RuleMatchTypeNone;
 }
 
 void RyConnection::getNewResponseSocket(RyPipeData_ptr&){

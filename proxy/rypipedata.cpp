@@ -152,6 +152,7 @@ bool RyPipeData::parseRequestHeader(const QByteArray& headers){
     }
     int indexOfPort = hostAndPort.indexOf(":");
     host = hostAndPort;
+    replacedHost = host;// replaceHost 用于host替换规则。这里名字似乎应该用 realConnectHost
     if(indexOfPort!=-1){
         host = hostAndPort.left(indexOfPort);
         port = hostAndPort.mid(indexOfPort+1).toInt();
