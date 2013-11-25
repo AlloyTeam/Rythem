@@ -481,7 +481,9 @@ void RyConnection::doRequestToNetwork(){
     _connectingHost = _sendingPipeData->host;
     _connectingPort = _sendingPipeData->port;
 
-    if(checkRule(_sendingPipeData)){
+    RuleMatchType ruleType = checkRule(_sendingPipeData);
+    if(ruleType == RuleMatchTypeReplaceSingle ||
+            ruleType == RuleMatchTypeReplaceDirectory){
         return;
     }
     if(checkLocalWebServer(_sendingPipeData)){
