@@ -4,6 +4,9 @@
  
 By [AlloyTeam](http://www.AlloyTeam.com/)
 
+### License
+[MIT](http://opensource.org/licenses/MIT)
+
 使用介绍：[rythem介绍-alloyteam](http://www.alloyteam.com/2012/05/web-front-end-tool-rythem-1/)
 
 代码阅读建议：https://github.com/AlloyTeam/Rythem/wiki
