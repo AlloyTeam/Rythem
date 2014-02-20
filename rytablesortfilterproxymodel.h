@@ -25,6 +25,7 @@ public:
     RyPipeData_ptr getItem(int sourceRow);
     RyPipeData_ptr getItem(const QModelIndex& proxyIndex);
 
+    void setFilterText(QString filterText);
     void setFilter(int filter);
     int filter()const;
     void setCustomeFilter(FilterCallBack);
@@ -43,6 +44,7 @@ public slots:
     
 private:
     RyTableModel *_sourceModel;
+    QString _filterText;
     int _filterFlags;
     FilterCallBack _filterCallback;
 

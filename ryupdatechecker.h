@@ -5,13 +5,13 @@
 #include <QtNetwork>
 
 #ifdef Q_OS_MAC
-#define CURRENT_VERSION "0.13.11.15"
+#define CURRENT_VERSION "1.0.140220"
 #endif
 #ifdef Q_OS_LINUX
 #define CURRENT_VERSION "0.5.09.21"
 #endif
 #ifdef Q_OS_WIN
-#define CURRENT_VERSION "0.13.11.15"
+#define CURRENT_VERSION "1.0.140220"
 #endif
 
 #define RYTHEM_UPDATE_PREFIX "http://rythem.alloyteam.com/update.php?"

@@ -103,6 +103,7 @@ private slots:
     void on_actionDebug_triggered();
     void on_actionCheckNew_triggered();
     void loadConfigPage();
+    void onFilterTextChanged(QString);
 };
 
 #endif // MAINWINDOW_H

@@ -518,7 +518,13 @@ MainWindow::MainWindow(QWidget *parent) :
         statusBarStr = statusBarStr.append(address.toString()+"  ");
     }
     statusBarStr = statusBarStr.append(tr("           --By AlloyTeam::iptton"));
+    statusBarStr = statusBarStr.append(tr(" version:")).append(CURRENT_VERSION);
     ui->statusBar->showMessage(statusBarStr);
+    connect(ui->edit_filter,SIGNAL(textChanged(QString)),this,SLOT(onFilterTextChanged(QString)));
+}
+
+void MainWindow::onFilterTextChanged(QString filterText){
+    sortFilterProxyModel->setFilterText(filterText);
 }
 
 MainWindow::~MainWindow()

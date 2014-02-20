@@ -20,6 +20,20 @@ bool RyTableSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIn
         qDebug()<<"filterAcceptsRow got null";
         return true;
     }
+
+    //先处理文本过滤
+    if(!_filterText.isEmpty()){
+        QStringList hostFilterList = _filterText.split("|");
+        bool matchHost = false;
+        foreach(QString hostFilter,hostFilterList){
+            if(p->host.indexOf(hostFilter) != -1){
+                matchHost = true;
+            }
+        }
+        if(!matchHost){
+            return matchHost;
+        }
+    }
     //qDebug()<<"filterAcceptsRow comparing"<<p->responseStatus;
     if(_filterFlags & NoImageFilter){
         if(p->getResponseHeader("Content-Type").toLower().indexOf("image")!=-1){
@@ -61,6 +75,11 @@ RyPipeData_ptr RyTableSortFilterProxyModel::getItem(int sourceRow){
 }
 RyPipeData_ptr RyTableSortFilterProxyModel::getItem(const QModelIndex& proxyIndex){
     return getItem(mapToSource(proxyIndex).row());
+}
+
+void RyTableSortFilterProxyModel::setFilterText(QString filterText){
+    _filterText = filterText;
+    invalidateFilter();
 }
 
 void RyTableSortFilterProxyModel::setFilter(int flag){

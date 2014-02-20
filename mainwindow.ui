@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>818</width>
-    <height>625</height>
+    <width>810</width>
+    <height>559</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Rythem</string>
@@ -19,13 +25,45 @@ background:#dddfe2;
 }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="RyConnectionTableView" name="tableView"/>
+      <widget class="QWidget" name="verticalLayoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="RyConnectionTableView" name="tableView">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="edit_filter">
+          <property name="placeholderText">
+           <string>[host filter]: qq.com|alloyteam</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="RyTabWidget" name="toolTabs">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
@@ -101,8 +139,8 @@ background:#dddfe2;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>523</width>
-                   <height>164</height>
+                   <width>516</width>
+                   <height>131</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -165,7 +203,7 @@ background:#dddfe2;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>818</width>
+     <width>810</width>
      <height>22</height>
     </rect>
    </property>

@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
     server->connect(server,SIGNAL(pipeComplete(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     server->connect(server,SIGNAL(pipeError(RyPipeData_ptr)),&w,SLOT(onPipeUpdate(RyPipeData_ptr)));
     bool isListenSuccess = server->listen(QHostAddress::Any,8889);
+
     if(!isListenSuccess){
         exit(1);
     }
