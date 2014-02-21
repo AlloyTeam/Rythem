@@ -27,10 +27,10 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getReplaceContent(bool setLon
     switch(_rule->type()){
     case RyRule::LOCAL_FILE_REPLACE:
         return getLocalReplaceContent(setLongCache,isResouceFound);
-        break;
     case RyRule::LOCAL_FILES_REPLACE:
         return getLocalMergeReplaceContent(setLongCache,isResouceFound);
-        break;
+    case RyRule::LOCAL_FILES_REPLACE2:
+        return getLocalMergeReplaceContent2(setLongCache,isResouceFound);
     case RyRule::LOCAL_DIR_REPLACE:
         return getLocalDirReplaceContent(setLongCache,isResouceFound);
         break;
@@ -142,30 +142,68 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalReplaceContent(bool s
     return ret;
 }
 
-QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(bool setLongCache,bool *isResouceFound){
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getMergedContents(QStringList fileNames,QString mimeType,bool setLongCache){
     QPair<QByteArray,QByteArray> ret;
     //open local file for read
     QString status;
     QByteArray body;
     QByteArray header;
+
+    int contentLength;
+    QString encode = "utf-8";
+    QString cacheControl = "";
+    if(setLongCache){
+        cacheControl = "Cache-Control:max-age=315360000 \r\n";
+    }
+
+    QFile file;
+    status = "200 OK";
+    bool fileCanOpen;
+    foreach(QString itemFileName,fileNames){
+        file.setFileName(itemFileName);
+        fileCanOpen = file.open(QFile::ReadOnly);
+        if(fileCanOpen){
+            body.append(file.readAll());
+        }else{
+            // TODO 似乎不应该打这个，但要有log提示
+            body.append(QString("/*file:【%1】 not found*/").arg(itemFileName));
+        }
+        file.close();
+    }
+    contentLength = body.size();
+    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n%4\r\n")
+                       .arg(status)
+                       .arg(mimeType) // TODO
+                       .arg(contentLength)
+                       .arg(cacheControl));
+
+    ret.first = header;
+    ret.second = body;
+    return ret;
+}
+
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent2(bool setLongCache,bool *isResouceFound){
+    QString replace = _rule->replace();
+    QStringList fileNames = replace.split("\n");
+    return getMergedContents(fileNames);
+}
+
+
+QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(bool setLongCache,bool *isResouceFound){
+    //open local file for read
     QString replace = _rule->replace();
     QFileInfo fileInfo(replace);
     QFile file;
     QString mimeTypeKey;
     QString mimeType = "text/plain";
-    int contentLength;
     QString encode = "utf-8";
     QScriptEngine engine;
     QString mergeFileContent;
     QMap<QString,QVariant> mergeValueMap;
     bool mergeContentHasError=false;
     QString mergeFilePath;
-    QString cacheControl = "";
-    if(setLongCache){
-        cacheControl = "Cache-Control:max-age=315360000 \r\n";
-    }
 
-    bool fileCanOpen;
+    QStringList fileNames;
     file.setFileName(replace);
     if(file.open(QFile::ReadOnly)){
         mergeFilePath = fileInfo.absolutePath();
@@ -200,11 +238,22 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(b
     file.close();
     if(mergeContentHasError){
         if(isResouceFound!=0)*isResouceFound = false;
-        mimeType = "text/plain";
-        status = "404 NOT FOUND";
+        QString mimeType = "text/plain";
+        QString status = "404 mergefile_NOT FOUND";
+        QByteArray body;
+        QByteArray header;
         body.append(QString("merge file with wrong format:").append(replace).append(mergeFileContent));
+
+        int contentLength = body.size();
+        header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n")
+                           .arg(status)
+                           .arg(mimeType) // TODO
+                           .arg(contentLength));
+        QPair<QByteArray,QByteArray> errorRet(header,body);
+        errorRet.first = header;
+        errorRet.second = body;
+        return errorRet;
     }else{
-        status = "200 OK";
         foreach(QVariant item,mergeValueMap["include"].toList()){
             //qDebug()<<item.toString();
             QString itemFileName = item.toString();
@@ -212,26 +261,10 @@ QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalMergeReplaceContent(b
                 itemFileName.prepend("/");
                 itemFileName.prepend(mergeFilePath);
             }
-            file.setFileName(itemFileName);
-            fileCanOpen = file.open(QFile::ReadOnly);
-            if(fileCanOpen){
-                body.append(file.readAll());
-            }else{
-                body.append(QString("/*file:【%1】 not found*/").arg(itemFileName));
-            }
-            file.close();
+            fileNames.append(itemFileName);
         }
+        return getMergedContents(fileNames,mimeType,setLongCache);
     }
-    contentLength = body.size();
-    header.append(QString("HTTP/1.1 %1 \r\nServer: Rythem \r\nContent-Type: %2 \r\nContent-Length: %3 \r\n%4\r\n")
-                       .arg(status)
-                       .arg(mimeType) // TODO
-                       .arg(contentLength)
-                       .arg(cacheControl));
-
-    ret.first = header;
-    ret.second = body;
-    return ret;
 }
 
 QPair<QByteArray,QByteArray> RyRuleReplaceContent::getLocalDirReplaceContent(bool setLongCache,bool *isResouceFound){

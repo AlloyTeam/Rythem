@@ -22,7 +22,7 @@ public:
     QMap<int,RyPipeData_ptr > pipesMap;
     QVector<RyPipeData_ptr > pipesVector;
 
-    int rowCount( const QModelIndex & parent ) const;
+    int rowCount( const QModelIndex & parent = QModelIndex() ) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
@@ -30,6 +30,8 @@ public:
 
     bool itemLessThan(RyPipeData_ptr left,int leftColumn,RyPipeData_ptr right,int rightColumn);
     bool itemLessThan(const QModelIndex& left,const QModelIndex& right);
+
+    void setMaxRequestSize(int maxSize);
 public slots:
     void addItem(RyPipeData_ptr p);
     void removeItems();
@@ -51,6 +53,7 @@ public slots:
 private:
     int _pipeNumber;
     int _sortingColumn;
+    int _maxRequestSize;
 };
 
 #endif // RYTABLEMODEL_H

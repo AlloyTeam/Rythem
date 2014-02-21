@@ -34,6 +34,8 @@ public:
     void updateItem(RyPipeData_ptr);
     void addItem(RyPipeData_ptr);
 
+    void setMaxRequestSize(int maxSize);
+
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;

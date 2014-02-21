@@ -28,8 +28,9 @@ function updateConfigs(){
                 <option value="2">Simple Host</option>\
                 <option value="3" disabled>Remote Content</option>\
                 <option value="4">Local File</option>\
-                <option value="5">Local File Merge</option>\
+                <option value="5">Local File Merge(config file)</option>\
                 <option value="6">Local Directory</option>\
+                <option value="7">Local File Merge(MultiChoice)</option>\
             </select>\
             <div class="pattern editable" contentEditable>' + escapeToHtml(ruleConfig.rule.pattern) + '</div>\
             <div class="replace editable" contentEditable>' + escapeToHtml(ruleConfig.rule.replace) + '</div>\
@@ -66,7 +67,7 @@ function updateConfigs(){
         el.delegate('.editable', 	'focus', function(e, el){ me.onFieldsFocus(e, el); },true);
         el.delegate('.editable', 	'keydown', 	function(e, el){ me.onFieldsEditing(e, el); });
         el.delegate('.editable', 	'blur', 	function(e, el){ me.onFieldsBlur(e, el); },true);
-        el.delegate('.selectFile', 	'click', 	function(e, el){ me.onSelectFile(e, el);});
+        el.delegate('.selectFile', 	'click', 	function(e, el){ me.onSelectFile(e, el,ruleConfig.type);});
         el.delegate('.selectDir', 	'click', 	function(e, el){ me.onSelectDir(e, el);});
 		ruleConfig.enable = (ruleConfig.enable!=0)
         this.setEnable(ruleConfig.enable);
@@ -227,15 +228,22 @@ function updateConfigs(){
                 window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
             }
         },
-		onSelectFile: function(e,fieldEl){
-			var s = window.App.getFile();
+        onSelectFile: function(e,fieldEl,type){
+            var s;
+            switch(type){
+            case 5:
+                s = window.App.getFile();
+                break;
+            case 7:
+                s = window.App.getFileList();
+            }
             if(s===""){
                return;
             }
             this.__replaceField.innerText = s;
 			this.__config.rule.replace = s;
-			if(window.App){
-				window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
+            if(window.App){
+                window.App.doAction(4,JSON.stringify(this.__config),this.__config.groupId);
 			}
 		},
 		onSelectDir: function(e,fieldEl){
@@ -250,7 +258,7 @@ function updateConfigs(){
 			}
         },
         updateButtonState:function(type){
-            if(type === 4 || type === 5){
+            if(type === 4 || type === 5 || type == 7){
                 this.__selectFileField.classList.remove("hidden");
                 this.__selectDirField.classList.add("hidden");
             }else if(type === 6){
@@ -802,7 +810,7 @@ function updateConfigs(){
         });
         addRulePanel.typeField.addEventListener("change",function(e){
             var type = Number(e.target.value);
-            if(type === 4 || type === 5){
+            if(type === 4 || type === 5 || type == 7){
                 addRulePanel.selectDirBtn.classList.add("hidden");
                 addRulePanel.selectFileBtn.classList.remove("hidden");
             }else if(type === 6){

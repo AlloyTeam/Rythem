@@ -156,7 +156,8 @@ OTHER_FILES += \
     qt_zh_CN.qm \
     setupproxy \
     publish \
-    deploy
+    deploy \
+    readme.md
 CONFIG(release){
     #DEFINES += DEBUGTOFILE
     #message("debug")

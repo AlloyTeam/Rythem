@@ -414,6 +414,11 @@ QString RyJsBridge::doAction(int action, const QString msg, quint64 groupId){
 QString RyJsBridge::getFile(){
     return QFileDialog::getOpenFileName();
 }
+
+QString RyJsBridge::getFileList(){
+    return QFileDialog::getOpenFileNames().join("\n");
+}
+
 QString RyJsBridge::getDir(){
     return QFileDialog::getExistingDirectory();
 }
@@ -556,7 +561,35 @@ void MainWindow::createMenus(){
     _hideConnectTunnelAct = _fileMenu->addAction(tr("hide connect tunnels"));
     _hideConnectTunnelAct->setCheckable(true);
 
+    _requestLimitMenu = menuBar()->addMenu(tr("limit max save request"));
+    _limitGroup = new QActionGroup(this);
+    _setMaxRequest15Act = _limitGroup->addAction("15");
+    _setMaxRequest15Act->setData(QVariant(15));
+    _setMaxRequest15Act->setCheckable(true);
+    _setMaxRequest30Act = _limitGroup->addAction("30");
+    _setMaxRequest30Act->setData(QVariant(30));
+    _setMaxRequest30Act->setCheckable(true);
+    _setMaxRequest30Act->setChecked(true);
+    _setMaxRequest100Act = _limitGroup->addAction("100");
+    _setMaxRequest100Act->setData(QVariant(100));
+    _setMaxRequest100Act->setCheckable(true);
+    _setMaxRequest500Act = _limitGroup->addAction("500");
+    _setMaxRequest500Act->setData(QVariant(500));
+    _setMaxRequest500Act->setCheckable(true);
+    _requestLimitMenu->addAction(_setMaxRequest15Act);
+    _requestLimitMenu->addAction(_setMaxRequest30Act);
+    _requestLimitMenu->addAction(_setMaxRequest100Act);
+    _requestLimitMenu->addAction(_setMaxRequest500Act);
+
+    QAction* devAction = _limitGroup->addAction("2");
+    devAction->setData(QVariant(2));
+    devAction->setCheckable(true);
+    _requestLimitMenu->addAction(devAction);
+
+
     connect(_fileMenu,SIGNAL(triggered(QAction*)),SLOT(onAction(QAction*)));
+    connect(_requestLimitMenu,SIGNAL(triggered(QAction*)),SLOT(onAction(QAction*)));
+    connect(_limitGroup,SIGNAL(triggered(QAction*)),SLOT(onAction(QAction*)));
 }
 
 void MainWindow::importSessions(){
@@ -911,6 +944,14 @@ void MainWindow::onAction(QAction *action){
             sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() | RyTableSortFilterProxyModel::HideTunnelFilter);
         }else{
             sortFilterProxyModel->setFilter(sortFilterProxyModel->filter() & (~RyTableSortFilterProxyModel::HideTunnelFilter));
+        }
+    }else if(action->actionGroup() == _limitGroup){
+        QVariant data = action->data();
+        bool ok;
+        int limit = data.toInt(&ok);
+        qDebug()<<"action = group "<<(ok?"ok":"not ok");
+        if(ok){
+            this->sortFilterProxyModel->setMaxRequestSize(limit);
         }
     }
 }

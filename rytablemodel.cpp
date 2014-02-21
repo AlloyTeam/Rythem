@@ -5,7 +5,7 @@
 #include <QDebug>
 
 RyTableModel::RyTableModel(QObject *parent) :
-    QAbstractTableModel(parent),_pipeNumber(0){
+    QAbstractTableModel(parent),_pipeNumber(0),_maxRequestSize(30){
 }
 RyTableModel::~RyTableModel(){
     blockSignals(true);
@@ -181,13 +181,24 @@ void RyTableModel::updateItem(RyPipeData_ptr p){
 }
 
 void RyTableModel::addItem(RyPipeData_ptr p){
+    if(pipesVector.size() > _maxRequestSize){
+        beginRemoveRows(QModelIndex(),0,0);
+        RyPipeData_ptr itemToRemove = pipesVector.at(0);
+        pipesVector.remove(0);
+        pipesMap.remove(itemToRemove->id);
+        endRemoveRows();
+        qDebug()<<"removing..";
+    }
+
     //qDebug()<<"addItem...."<<p->getRequestHeader(QByteArray("Host"))<<pipesVector.count();
     RyPipeData_ptr p1 = p;
     ++_pipeNumber;
     int l = pipesVector.size();
+    /*
     if(l==0){
         _pipeNumber = 1;
     }
+    */
     p1->number=_pipeNumber;
     this->beginInsertRows(index(l, 0),l,l);
 
@@ -195,11 +206,8 @@ void RyTableModel::addItem(RyPipeData_ptr p){
 	pipesMap[p1->id] = p1;
 	pipesVector.append(p1);
 
-    //QModelIndex index1 = index(pipeNumber-1, 0);
-    //QModelIndex index2 = index(pipeNumber-1, 7);
 
     this->endInsertRows();
-    //emit(dataChanged(index1,index2));
 	emit connectionAdded(p);
 }
 
@@ -212,4 +220,22 @@ void RyTableModel::removeAllItem(){
 }
 void RyTableModel::removeItems(){
     this->removeAllItem();
+}
+
+void RyTableModel::setMaxRequestSize(int maxSize){
+    qDebug()<<"max size "<<maxSize;
+    _maxRequestSize = maxSize;
+    int currentSize = pipesVector.size();
+    if(currentSize > maxSize){
+        beginRemoveRows(QModelIndex(),0,_maxRequestSize);
+        int d = currentSize - maxSize;
+        qDebug()<<"remove n="<<d;
+        while( d-- > 0 ){
+            RyPipeData_ptr itemToRemove = pipesVector.at(0);
+            pipesMap.remove(itemToRemove->id);
+            pipesVector.remove(0);
+        }
+        endRemoveRows();
+    }
+    this->submit();
 }

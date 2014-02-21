@@ -26,7 +26,7 @@ bool RyTableSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIn
         QStringList hostFilterList = _filterText.split("|");
         bool matchHost = false;
         foreach(QString hostFilter,hostFilterList){
-            if(p->host.indexOf(hostFilter) != -1){
+            if(p->fullUrl.indexOf(hostFilter) != -1){
                 matchHost = true;
             }
         }
@@ -96,6 +96,10 @@ int RyTableSortFilterProxyModel::filter()const{
 }
 void RyTableSortFilterProxyModel::setCustomeFilter(FilterCallBack filtercb){
     _filterCallback = filtercb;
+}
+void RyTableSortFilterProxyModel::setMaxRequestSize(int maxSize){
+    sourceModel()->setMaxRequestSize(maxSize);
+    invalidateFilter();
 }
 
 void RyTableSortFilterProxyModel::removeAllItem(){

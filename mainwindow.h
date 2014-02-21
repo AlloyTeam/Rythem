@@ -30,6 +30,7 @@ class RyJsBridge:public QObject{
         QString getFile();
         QString getDir();
         QString getConfigs();
+        QString getFileList();
 
    signals:
         void ruleChanged(int action,QString json);
@@ -82,6 +83,14 @@ private:
     QAction *_filterShowMatchOnlyAct;
     QAction *_captureAct;
     QAction *_hideConnectTunnelAct;
+
+    QActionGroup *_limitGroup;
+    QMenu *_requestLimitMenu;
+    QAction *_setMaxRequest15Act;
+    QAction *_setMaxRequest30Act;
+    QAction *_setMaxRequest100Act;
+    QAction *_setMaxRequest500Act;
+
     QItemSelectionModel *_itemSelectModel;
 
     RyUpdateChecker *checker;

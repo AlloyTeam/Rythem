@@ -18,7 +18,8 @@ public:
         REMOTE_CONTENT_REPLACE = 3,
         LOCAL_FILE_REPLACE = 4,
         LOCAL_FILES_REPLACE = 5,
-        LOCAL_DIR_REPLACE = 6
+        LOCAL_DIR_REPLACE = 6,
+        LOCAL_FILES_REPLACE2 = 7
     };
     RyRule(quint64 groupId,const QScriptValue& rule);
     RyRule(quint64 groupId,int type,const QString& pattern,const QString& replace,bool enable = true);

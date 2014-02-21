@@ -21,7 +21,10 @@ private:
     QPair<QByteArray,QByteArray> getRemoteReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
     QPair<QByteArray,QByteArray> getLocalReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
     QPair<QByteArray,QByteArray> getLocalMergeReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
+    QPair<QByteArray,QByteArray> getLocalMergeReplaceContent2(bool setLongCache=false,bool *isResouceFound=0);
     QPair<QByteArray,QByteArray> getLocalDirReplaceContent(bool setLongCache=false,bool *isResouceFound=0);
+
+    QPair<QByteArray,QByteArray> getMergedContents(QStringList fileNames,QString mimeType = "text/plain",bool setLongCache=false);
 
     QNetworkAccessManager manager;
     QString _url;
