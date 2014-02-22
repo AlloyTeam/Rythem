@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
 #endif
     a.setQuitOnLastWindowClosed(false);
     appPath =  qApp->applicationDirPath();
+    QSettings settings("alloyteam","rythem_rule_config");
 
     // load app translate file
     QTranslator translator;
@@ -91,7 +92,8 @@ int main(int argc, char *argv[])
 #endif
 
     RyRuleManager *manager = RyRuleManager::instance();
-    manager->loadLocalConfig(appPath+"/rythem_config.txt");
+    settings.setIniCodec("UTF-8");
+    manager->loadLocalConfig(settings.fileName());//appPath+"/rythem_config.txt");
 
     // register metatypes
     qRegisterMetaType<RyPipeData_ptr>("RyPipeData_ptr");

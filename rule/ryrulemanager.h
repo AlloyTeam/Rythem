@@ -74,8 +74,18 @@ public:
     const QList<QSharedPointer<RyRuleProject> > getProjects()const{
         return _projects;
     }
-private:
 
+    QMutex writeConfigLock;
+    bool needWriteConfigFile;
+    void startWriteConfigTimer(){
+        needWriteConfigFile = true;
+        timer.start(10000);
+    }
+
+private slots:
+    void saveConfig();
+private:
+    QTimer timer;
     QString _configFileName;
     RyRuleManager();
     // save file system (config and every project local file);

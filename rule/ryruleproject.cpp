@@ -24,7 +24,7 @@ RyRuleProject::~RyRuleProject(){
     delete _loop;
     _loop = NULL;
     qDebug()<<"~RyRuleProject";
-    saveToFile();
+//    saveToFile();
     _groups.clear();
 }
 void RyRuleProject::saveToFile(){

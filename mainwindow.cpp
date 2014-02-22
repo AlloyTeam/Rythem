@@ -365,6 +365,8 @@ QString RyJsBridge::doAction(int action, const QString msg, quint64 groupId){
     QSharedPointer<RyRuleProject> pro;
     QSharedPointer<RyRuleGroup> group;
     QSharedPointer<RyRule> rule;
+
+    manager->startWriteConfigTimer();
     switch(action){
     case 0://add local group
         group = manager->addGroupToLocalProject(msg);//暂时只允许添加到本地project

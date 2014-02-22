@@ -17,13 +17,41 @@ RyRuleManager* RyRuleManager::instance(){
 }
 
 RyRuleManager::RyRuleManager():QObject(qApp),_longCache(false){
+    connect(&timer,SIGNAL(timeout()),this,SLOT(saveConfig()));
 }
 RyRuleManager::~RyRuleManager(){
     qDebug()<<"~rulemanager";
-    //save config
+    if(timer.isActive()){
+        timer.stop();
+        saveConfig();
+    }
+    _projects.clear();
+    _projectFileNameToProjectMap.clear();
+    _groupToProjectMap.clear();
+    qDebug()<<"~rulemanager done";
+}
 
+void RyRuleManager::saveConfig(){
+    if(!needWriteConfigFile){
+        needWriteConfigFile = false;
+        return;
+    }
+
+    timer.stop();
+    needWriteConfigFile = false;
+
+    //save projects
+    foreach(QSharedPointer<RyRuleProject> project, _projects){
+        project->saveToFile();
+    }
+
+    //save config
+    qDebug()<<"write config ";
     if(_configFileName.isEmpty()){
-        _configFileName = appPath+"/rythem_config.txt";
+        QSettings settings("r","r");
+        QString path = settings.fileName();
+        path.chop(2);
+        _configFileName = path+"/rythem_config.txt";
     }
     QFile f(_configFileName);
     bool canFileOpen = f.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -45,10 +73,6 @@ RyRuleManager::~RyRuleManager(){
         f.write(ba);
         f.close();
     }
-    _projects.clear();
-    _projectFileNameToProjectMap.clear();
-    _groupToProjectMap.clear();
-    qDebug()<<"~rulemanager done";
 }
 
 void RyRuleManager::loadLocalConfig(const QString& configFileName){
@@ -130,7 +154,11 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProject(const QStrin
     urlEscaped.replace("\\","\\\\");
     urlEscaped.replace("\'","\\'");
     int i=1;
-    QString localAddress = appPath+"/remoteRuleCache_";
+
+    QSettings settings("r","r");
+    QString path = settings.fileName();
+    path.chop(2);
+    QString localAddress = path + "/remoteRuleCache_";
     while(true){
         if(i==0){//不可能出现的情况(当远程rule个数越过int最大值时才会出现
             break;
@@ -149,7 +177,9 @@ const QSharedPointer<RyRuleProject> RyRuleManager::addRemoteProject(const QStrin
 const QSharedPointer<RyRuleGroup> RyRuleManager::addGroupToLocalProject(const QString& content){
     // add to project default_local_project
     QString projectName = "default_local_project.txt";
-    QString defaultProjectFullFileName = appPath+"/"+projectName;
+    QSettings settings("alloyteam","rythem_default_local_project");
+    settings.setIniCodec("UTF-8");
+    QString defaultProjectFullFileName = settings.fileName();//appPath+"/"+projectName;
     if(_projectFileNameToProjectMap.contains(defaultProjectFullFileName)){
         QScriptEngine engine;
         QScriptValue value = engine.evaluate("("+content+")");
