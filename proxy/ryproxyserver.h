@@ -20,6 +20,23 @@ class RyProxyServer : public QTcpServer
 
         quint64 nextPipeId();
 
+        // TODO
+        static bool isCurrentProxy(QStringList& hostAndPor){
+            if(hostAndPor.size() == 2){
+                QString host = hostAndPor.at(0);
+                QString port = hostAndPor.at(1);
+                qDebug()<<host<<port;
+                if((host == "127.0.0.1" ||
+                        host.toLower() == "localhost") &&
+                        port == "8889"
+
+                        ){
+                    return true;
+                }
+            }
+            return false;
+        }
+
     signals:
         void pipeBegin(RyPipeData_ptr);
         void pipeComplete(RyPipeData_ptr);

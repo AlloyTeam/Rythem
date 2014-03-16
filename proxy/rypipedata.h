@@ -117,6 +117,7 @@ class RyPipeData : public QObject
         QString getResponseHeader(const QString& name)const;
 
         bool isMatchingRule;
+        bool isContentReplaced;
         bool isImported;
         bool isConnectTunnel;
         int ruleType;

@@ -90,10 +90,14 @@ QVariant RyTableModel::data(const QModelIndex &index, int role) const{
 
             RyPipeData_ptr d = pipesVector.at(index.row());
             if(d->isMatchingRule){
-                return Qt::cyan;
+                if(d->isContentReplaced){
+                    return Qt::cyan;
+                }else{
+                    return Qt::darkGreen;
+                }
                 //return QVariant((int)Qt::cyan);
             }else if(d->responseStatus.startsWith('4') || d->responseStatus.startsWith('5')){
-                return Qt::darkGray;
+                return Qt::lightGray;
                 //return QVariant((int)Qt::darkCyan);
             }
         }else{

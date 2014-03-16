@@ -484,6 +484,7 @@ void RyConnection::doRequestToNetwork(){
     RuleMatchType ruleType = checkRule(_sendingPipeData);
     if(ruleType == RuleMatchTypeReplaceSingle ||
             ruleType == RuleMatchTypeReplaceDirectory){
+        qDebug()<<"content replaced";
         return;
     }
     if(checkLocalWebServer(_sendingPipeData)){
@@ -492,9 +493,10 @@ void RyConnection::doRequestToNetwork(){
     }
 
 
-    //qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
+    qDebug()<<"connecting:"<<_connectingHost<<_connectingPort;
     //qDebug()<<"to connect:"<<_connectingHost<<oldPort;
     _fullUrl = _sendingPipeData->fullUrl;
+    _isUsingProxy = false;
     if(!_responseSocket ||
         _connectingHost.toLower() != oldHost ||
         _connectingPort != oldPort){
@@ -544,14 +546,17 @@ void RyConnection::doRequestToNetwork(){
             QString hostAndPort = l.at(1);
             QStringList hAndP = hostAndPort.split(":");
             qDebug()<<hostAndPort;
-
-            if(_isConnectTunnel){
-                _responseSocket->setProxy( QNetworkProxy(QNetworkProxy::HttpProxy,hAndP.at(0),hAndP.at(1).toInt()) );
-            }else{
-                currentProxy.setHostName(hAndP.at(0));
-                currentProxy.setPort(hAndP.at(1).toInt());
-                _isUsingProxy = true;
+            if(!RyProxyServer::isCurrentProxy(hAndP)){
+                if(_isConnectTunnel){
+                    _responseSocket->setProxy( QNetworkProxy(QNetworkProxy::HttpProxy,hAndP.at(0),hAndP.at(1).toInt()) );
+                }else{
+                    currentProxy.setHostName(hAndP.at(0));
+                    currentProxy.setPort(hAndP.at(1).toInt());
+                    _isUsingProxy = true;
+                }
             }
+        }else{
+            _isUsingProxy =false;
         }
         qDebug()<<"proxyis"<<retVal;
 #endif
@@ -669,6 +674,7 @@ RyConnection::RuleMatchType RyConnection::checkRule(RyPipeData_ptr& pipe){
     }else{
         _sendingPipeData->isMatchingRule = false;
     }
+    _sendingPipeData->isContentReplaced =false;
     for(int i=0,l=matchResult.size();i<l;++i){
         QSharedPointer<RyRule> rule = matchResult.at(i);
         qDebug()<<"rule found"<<rule->toJSON();
@@ -691,6 +697,7 @@ RyConnection::RuleMatchType RyConnection::checkRule(RyPipeData_ptr& pipe){
             QByteArray ba = headerAndBody.first;
             _sendingPipeData->parseResponse(&ba,&isOk);
             if(isOk){
+                _sendingPipeData->isContentReplaced =true;
                 _requestSocket->write(headerAndBody.first);
                 _requestSocket->flush();
                 onResponseHeaderFound();

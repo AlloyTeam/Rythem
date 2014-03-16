@@ -11,6 +11,7 @@ RyPipeData::RyPipeData(int _socketHandle,quint64 connectionId,QObject *parent):
     _isContentLenthUnLimit =false;
     _isResponseChunked = false;
     isMatchingRule = false;
+    isContentReplaced = false;
     isImported = false;
     isConnectTunnel = false;
 }
